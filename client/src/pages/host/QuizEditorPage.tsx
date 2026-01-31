@@ -117,6 +117,7 @@ export default function QuizEditorPage() {
           <QuestionList
             questions={quiz.questions}
             activeIndex={activeQuestionIndex}
+            validationErrors={editor.validationErrors}
             onSelect={setActiveQuestionIndex}
             onAdd={() => {
               editor.addQuestion();
@@ -149,6 +150,7 @@ export default function QuizEditorPage() {
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                 <QuestionEditor
                   question={activeQuestion}
+                  errors={editor.validationErrors[activeQuestionIndex]}
                   onChange={(data) => editor.updateQuestion(activeQuestionIndex, data)}
                   onChangeType={(type) => editor.changeQuestionType(activeQuestionIndex, type)}
                   onAnswerChange={(answerIndex, data) =>

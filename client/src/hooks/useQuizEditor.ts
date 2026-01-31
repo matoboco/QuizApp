@@ -59,11 +59,57 @@ function createEmptyQuestion(quizId: string, orderIndex: number, questionType: Q
   };
 }
 
+export type ValidationErrors = Record<number, string[]>;
+
+function validateQuiz(quiz: Quiz): ValidationErrors {
+  const errors: ValidationErrors = {};
+
+  quiz.questions.forEach((q, i) => {
+    const qErrors: string[] = [];
+
+    if (!q.text.trim()) {
+      qErrors.push('Question text is required');
+    }
+
+    const emptyAnswers = q.answers.filter((a) => !a.text.trim());
+    if (emptyAnswers.length > 0) {
+      qErrors.push('All answers must have text');
+    }
+
+    const correctCount = q.answers.filter((a) => a.isCorrect).length;
+
+    switch (q.questionType) {
+      case 'true-false':
+      case 'multiple-choice':
+        if (correctCount === 0) {
+          qErrors.push('Select a correct answer');
+        } else if (correctCount > 1) {
+          qErrors.push('Only 1 correct answer is allowed');
+        }
+        break;
+      case 'multi-select':
+        if (correctCount === 0) {
+          qErrors.push('Select at least 1 correct answer');
+        }
+        break;
+      case 'ordering':
+        break;
+    }
+
+    if (qErrors.length > 0) {
+      errors[i] = qErrors;
+    }
+  });
+
+  return errors;
+}
+
 export interface UseQuizEditorReturn {
   quiz: Quiz | null;
   isLoading: boolean;
   error: string | null;
   isDirty: boolean;
+  validationErrors: ValidationErrors;
   updateTitle: (title: string) => void;
   updateDescription: (description: string) => void;
   updatePublished: (isPublished: boolean) => void;
@@ -83,6 +129,7 @@ export function useQuizEditor(quizId: string): UseQuizEditorReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const initialLoadDone = useRef(false);
 
   useEffect(() => {
@@ -239,6 +286,14 @@ export function useQuizEditor(quizId: string): UseQuizEditorReturn {
 
   const save = useCallback(async () => {
     if (!quiz) return;
+
+    const vErrors = validateQuiz(quiz);
+    setValidationErrors(vErrors);
+    if (Object.keys(vErrors).length > 0) {
+      const count = Object.keys(vErrors).length;
+      throw new Error(`${count} ${count === 1 ? 'question has' : 'questions have'} validation errors`);
+    }
+
     try {
       setError(null);
       const questionsPayload: CreateQuestionInput[] = quiz.questions.map((q) => ({
@@ -282,6 +337,7 @@ export function useQuizEditor(quizId: string): UseQuizEditorReturn {
     isLoading,
     error,
     isDirty,
+    validationErrors,
     updateTitle,
     updateDescription,
     updatePublished,

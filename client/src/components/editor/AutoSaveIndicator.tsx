@@ -39,7 +39,9 @@ export default function AutoSaveIndicator(props: AutoSaveIndicatorProps) {
   const label =
     status === 'saved' && props.lastSaved
       ? `Saved at ${formatTime(props.lastSaved)}`
-      : config.label;
+      : status === 'error' && props.error
+        ? props.error
+        : config.label;
 
   return (
     <div className="flex items-center gap-2 text-sm text-gray-500">

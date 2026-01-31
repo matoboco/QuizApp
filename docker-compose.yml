@@ -1,0 +1,29 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    environment:
+      NODE_ENV: production
+      PORT: "3001"
+      JWT_SECRET: change-me-in-production
+      JWT_HOST_EXPIRY: 24h
+      JWT_PLAYER_EXPIRY: 4h
+      CORS_ORIGIN: http://localhost
+      DB_PATH: /app/data/quiz.db
+    volumes:
+      - quiz-data:/app/data
+    restart: unless-stopped
+
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+    restart: unless-stopped
+
+volumes:
+  quiz-data:
