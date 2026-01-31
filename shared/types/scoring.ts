@@ -18,6 +18,7 @@ export interface ScoreBreakdown {
   streakMultiplier: number;
   totalPoints: number;
   isCorrect: boolean;
+  correctRatio: number; // 0.0 - 1.0 for partial credit (multi-select, ordering)
   timeTaken: number; // ms
   streak: number;
 }
@@ -27,15 +28,17 @@ export function calculateScore(
   timeTaken: number,
   timeLimit: number,
   streak: number,
+  correctRatio: number = isCorrect ? 1.0 : 0.0,
   config: ScoringConfig = DEFAULT_SCORING
 ): ScoreBreakdown {
-  if (!isCorrect) {
+  if (correctRatio <= 0) {
     return {
       basePoints: 0,
       timeBonus: 0,
       streakMultiplier: 1,
       totalPoints: 0,
       isCorrect: false,
+      correctRatio: 0,
       timeTaken,
       streak: 0,
     };
@@ -43,19 +46,21 @@ export function calculateScore(
 
   const timeLimitMs = timeLimit * 1000;
   const timeRatio = Math.max(0, 1 - timeTaken / timeLimitMs);
-  const timeBonus = Math.round(config.timeBonusMax * timeRatio);
+  const timeBonus = Math.round(config.timeBonusMax * timeRatio * correctRatio);
   const streakMultiplier = Math.min(
     config.maxStreakMultiplier,
     1 + streak * config.streakMultiplierStep
   );
-  const totalPoints = Math.round((config.basePoints + timeBonus) * streakMultiplier);
+  const basePoints = Math.round(config.basePoints * correctRatio);
+  const totalPoints = Math.round((basePoints + timeBonus) * streakMultiplier);
 
   return {
-    basePoints: config.basePoints,
+    basePoints,
     timeBonus,
     streakMultiplier,
     totalPoints,
-    isCorrect: true,
+    isCorrect: correctRatio >= 1.0,
+    correctRatio,
     timeTaken,
     streak,
   };

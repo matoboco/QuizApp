@@ -4,7 +4,9 @@ import {
   MAX_TIME_LIMIT,
   MIN_ANSWERS,
   MAX_ANSWERS,
+  QUESTION_TYPES,
 } from '@shared/types';
+import type { QuestionType } from '@shared/types';
 
 export const answerInputSchema = z.object({
   id: z.string().optional(),
@@ -22,6 +24,8 @@ export const questionInputSchema = z.object({
     .string()
     .min(1, 'Question text is required'),
   imageUrl: z.string().url('Invalid image URL').optional().or(z.literal('')),
+  questionType: z.enum(QUESTION_TYPES as [QuestionType, ...QuestionType[]]).default('multiple-choice'),
+  requireAll: z.boolean().default(false),
   timeLimit: z
     .number()
     .int()
@@ -36,11 +40,40 @@ export const questionInputSchema = z.object({
   answers: z
     .array(answerInputSchema)
     .min(MIN_ANSWERS, `At least ${MIN_ANSWERS} answers are required`)
-    .max(MAX_ANSWERS, `At most ${MAX_ANSWERS} answers are allowed`)
-    .refine(
-      (answers) => answers.some((a) => a.isCorrect),
-      { message: 'At least one answer must be marked as correct' }
-    ),
+    .max(MAX_ANSWERS, `At most ${MAX_ANSWERS} answers are allowed`),
+}).superRefine((data, ctx) => {
+  const { questionType, answers } = data;
+
+  switch (questionType) {
+    case 'true-false':
+      if (answers.length !== 2) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'True/False questions must have exactly 2 answers' });
+      }
+      if (answers.filter((a) => a.isCorrect).length !== 1) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'True/False questions must have exactly 1 correct answer' });
+      }
+      break;
+
+    case 'multiple-choice':
+      if (answers.length < 2 || answers.length > 4) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Multiple choice questions must have 2-4 answers' });
+      }
+      if (answers.filter((a) => a.isCorrect).length !== 1) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Multiple choice questions must have exactly 1 correct answer' });
+      }
+      break;
+
+    case 'multi-select':
+      if (answers.filter((a) => a.isCorrect).length < 1) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Multi-select questions must have at least 1 correct answer' });
+      }
+      break;
+
+    case 'ordering':
+      // For ordering, all answers define the correct order via orderIndex
+      // No isCorrect validation needed
+      break;
+  }
 });
 
 export const createQuizSchema = z.object({

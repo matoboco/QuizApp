@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { getDb } from '../connection';
-import { Quiz, QuizSummary, Question, Answer, CreateQuestionInput } from '@shared/types';
+import { Quiz, QuizSummary, Question, Answer, CreateQuestionInput, QuestionType } from '@shared/types';
 
 interface QuizRow {
   id: string;
@@ -17,6 +17,8 @@ interface QuestionRow {
   quiz_id: string;
   text: string;
   image_url: string | null;
+  question_type: string;
+  require_all: number;
   time_limit: number;
   points: number;
   order_index: number;
@@ -63,6 +65,8 @@ function rowToQuestion(row: QuestionRow, answers: Answer[]): Question {
     quizId: row.quiz_id,
     text: row.text,
     imageUrl: row.image_url ?? undefined,
+    questionType: (row.question_type || 'multiple-choice') as QuestionType,
+    requireAll: row.require_all === 1,
     timeLimit: row.time_limit,
     points: row.points,
     orderIndex: row.order_index,
@@ -194,8 +198,21 @@ export class QuizRepository {
 
   delete(id: string): boolean {
     const db = getDb();
-    const result = db.prepare('DELETE FROM quizzes WHERE id = ?').run(id);
-    return result.changes > 0;
+
+    const deleteTransaction = db.transaction(() => {
+      // Delete dependent rows that lack ON DELETE CASCADE
+      const sessionIds = db.prepare('SELECT id FROM game_sessions WHERE quiz_id = ?').all(id) as { id: string }[];
+      for (const s of sessionIds) {
+        db.prepare('DELETE FROM player_answers WHERE session_id = ?').run(s.id);
+        db.prepare('DELETE FROM players WHERE session_id = ?').run(s.id);
+      }
+      db.prepare('DELETE FROM game_sessions WHERE quiz_id = ?').run(id);
+
+      const result = db.prepare('DELETE FROM quizzes WHERE id = ?').run(id);
+      return result.changes > 0;
+    });
+
+    return deleteTransaction();
   }
 
   replaceQuestions(quizId: string, questions: CreateQuestionInput[]): Question[] {
@@ -209,8 +226,8 @@ export class QuizRepository {
       db.prepare('DELETE FROM questions WHERE quiz_id = ?').run(quizId);
 
       const insertQuestion = db.prepare(
-        `INSERT INTO questions (id, quiz_id, text, image_url, time_limit, points, order_index, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO questions (id, quiz_id, text, image_url, question_type, require_all, time_limit, points, order_index, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       );
 
       const insertAnswer = db.prepare(
@@ -229,6 +246,8 @@ export class QuizRepository {
           quizId,
           q.text,
           q.imageUrl || null,
+          q.questionType || 'multiple-choice',
+          q.requireAll ? 1 : 0,
           q.timeLimit,
           q.points,
           q.orderIndex,
@@ -261,6 +280,8 @@ export class QuizRepository {
           quizId,
           text: q.text,
           imageUrl: q.imageUrl,
+          questionType: q.questionType || 'multiple-choice',
+          requireAll: q.requireAll || false,
           timeLimit: q.timeLimit,
           points: q.points,
           orderIndex: q.orderIndex,

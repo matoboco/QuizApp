@@ -1,3 +1,5 @@
+export type QuestionType = 'multiple-choice' | 'true-false' | 'multi-select' | 'ordering';
+
 export interface Quiz {
   id: string;
   title: string;
@@ -24,6 +26,8 @@ export interface Question {
   quizId: string;
   text: string;
   imageUrl?: string;
+  questionType: QuestionType;
+  requireAll: boolean; // multi-select: require all correct answers
   timeLimit: number; // seconds
   points: number;
   orderIndex: number;
@@ -54,6 +58,8 @@ export interface CreateQuestionInput {
   id?: string;
   text: string;
   imageUrl?: string;
+  questionType?: QuestionType;
+  requireAll?: boolean;
   timeLimit: number;
   points: number;
   orderIndex: number;
@@ -76,4 +82,5 @@ export const MIN_TIME_LIMIT = 5;
 export const MAX_TIME_LIMIT = 120;
 export const DEFAULT_POINTS = 1000;
 export const MIN_ANSWERS = 2;
-export const MAX_ANSWERS = 4;
+export const MAX_ANSWERS = 8;
+export const QUESTION_TYPES: QuestionType[] = ['multiple-choice', 'true-false', 'multi-select', 'ordering'];

@@ -10,13 +10,14 @@ import {
 } from '@shared/types';
 import { Quiz } from '@shared/types';
 import { calculateScore, ScoreBreakdown } from '@shared/types';
+import { checkAnswer } from './answer-checker';
 
 // Internal state that extends GameState with tracking data not sent to clients
 interface InternalGameState extends GameState {
   // Full list of questions from the quiz (with correct answers)
   questions: Question[];
-  // Map of playerId -> answerId for the current question
-  currentAnswers: Map<string, { answerId: string; timeTaken: number; scoreBreakdown: ScoreBreakdown }>;
+  // Map of playerId -> answer data for the current question
+  currentAnswers: Map<string, { answerId: string | string[]; timeTaken: number; scoreBreakdown: ScoreBreakdown }>;
 }
 
 class GameStateManager {
@@ -136,14 +137,14 @@ class GameStateManager {
 
   /**
    * Record a player's answer for the current question.
-   * Calculates score using the shared scoring function.
+   * Calculates score using the shared scoring function with correctRatio support.
    * Updates the player's score and streak in state.
    * Returns the ScoreBreakdown, or undefined if invalid.
    */
   recordAnswer(
     sessionId: string,
     playerId: string,
-    answerId: string,
+    answerId: string | string[],
     timeTaken: number
   ): ScoreBreakdown | undefined {
     const state = this.states.get(sessionId);
@@ -160,24 +161,24 @@ class GameStateManager {
     const player = state.players.find((p) => p.id === playerId);
     if (!player) return undefined;
 
-    // Determine correctness
-    const correctAnswer = question.answers.find((a) => a.isCorrect);
-    const isCorrect = correctAnswer?.id === answerId;
+    // Use answer checker for all question types
+    const { isCorrect, correctRatio } = checkAnswer(question, answerId);
 
-    // Calculate the new streak value (before scoring, so current streak is used)
-    const currentStreak = isCorrect ? player.streak : 0;
+    // Streak: only increment for fully correct answers (correctRatio === 1.0)
+    const currentStreak = correctRatio >= 1.0 ? player.streak : 0;
 
-    // Calculate score
+    // Calculate score with correctRatio
     const scoreBreakdown = calculateScore(
       isCorrect,
       timeTaken,
       question.timeLimit,
-      currentStreak
+      currentStreak,
+      correctRatio
     );
 
     // Update player state
     player.score += scoreBreakdown.totalPoints;
-    player.streak = isCorrect ? player.streak + 1 : 0;
+    player.streak = correctRatio >= 1.0 ? player.streak + 1 : 0;
 
     // Record the answer
     state.currentAnswers.set(playerId, {
@@ -217,6 +218,7 @@ class GameStateManager {
 
   /**
    * Get the answer distribution for the current question.
+   * For multi-select and ordering, a single player's answer can count toward multiple answers.
    */
   getAnswerDistribution(sessionId: string): AnswerDistribution[] {
     const state = this.states.get(sessionId);
@@ -227,16 +229,28 @@ class GameStateManager {
     return question.answers.map((answer) => {
       let count = 0;
       state.currentAnswers.forEach((data) => {
-        if (data.answerId === answer.id) {
-          count++;
+        if (Array.isArray(data.answerId)) {
+          // multi-select or ordering: check if this answer is in the array
+          if (data.answerId.includes(answer.id)) {
+            count++;
+          }
+        } else {
+          if (data.answerId === answer.id) {
+            count++;
+          }
         }
       });
+
+      // For ordering questions, mark as "correct" based on orderIndex position
+      const isCorrect = question.questionType === 'ordering'
+        ? true // all answers in ordering are part of the sequence
+        : answer.isCorrect;
 
       return {
         answerId: answer.id,
         answerText: answer.text,
         count,
-        isCorrect: answer.isCorrect,
+        isCorrect,
         orderIndex: answer.orderIndex,
       };
     });
@@ -260,6 +274,8 @@ class GameStateManager {
         id: state.currentQuestion.id,
         text: state.currentQuestion.text,
         imageUrl: state.currentQuestion.imageUrl,
+        questionType: state.currentQuestion.questionType,
+        requireAll: state.currentQuestion.requireAll,
         timeLimit: state.currentQuestion.timeLimit,
         answers: state.currentQuestion.answers.map((a) => ({
           id: a.id,

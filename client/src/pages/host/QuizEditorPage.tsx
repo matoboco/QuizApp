@@ -150,6 +150,7 @@ export default function QuizEditorPage() {
                 <QuestionEditor
                   question={activeQuestion}
                   onChange={(data) => editor.updateQuestion(activeQuestionIndex, data)}
+                  onChangeType={(type) => editor.changeQuestionType(activeQuestionIndex, type)}
                   onAnswerChange={(answerIndex, data) =>
                     editor.updateAnswer(activeQuestionIndex, answerIndex, data)
                   }

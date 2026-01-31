@@ -337,7 +337,7 @@ function registerPlayerEvents(socket: TypedSocket, io: TypedServer): void {
     }
   });
 
-  socket.on('player:submit-answer', async (data: { sessionId: string; questionId: string; answerId: string }) => {
+  socket.on('player:submit-answer', async (data: { sessionId: string; questionId: string; answerId: string | string[] }) => {
     try {
       const playerId = socket.data.playerId;
       if (!playerId) {

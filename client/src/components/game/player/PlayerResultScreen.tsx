@@ -55,20 +55,25 @@ export default function PlayerResultScreen({
   rank,
 }: PlayerResultScreenProps) {
   const isCorrect = result.isCorrect;
+  const isPartial = !isCorrect && result.correctRatio > 0 && result.correctRatio < 1;
+  const hasPoints = result.totalPoints > 0;
+
+  const bgColor = isCorrect ? 'bg-green-600' : isPartial ? 'bg-yellow-600' : 'bg-red-600';
+  const iconBg = isCorrect ? 'bg-green-400' : isPartial ? 'bg-yellow-400' : 'bg-red-400';
 
   return (
     <div
       className={cn(
         'min-h-screen flex flex-col items-center justify-center px-6 py-8 text-center',
-        isCorrect ? 'bg-green-600' : 'bg-red-600'
+        bgColor
       )}
     >
-      {/* Correct / Incorrect icon */}
+      {/* Correct / Partial / Incorrect icon */}
       <div
         className={cn(
           'w-24 h-24 md:w-32 md:h-32 rounded-full flex items-center justify-center mb-6',
           'animate-bounce-in',
-          isCorrect ? 'bg-green-400' : 'bg-red-400'
+          iconBg
         )}
       >
         {isCorrect ? (
@@ -84,6 +89,21 @@ export default function PlayerResultScreen({
               strokeLinecap="round"
               strokeLinejoin="round"
               d="M5 13l4 4L19 7"
+            />
+          </svg>
+        ) : isPartial ? (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-14 w-14 md:h-20 md:w-20 text-white"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={3}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M20 12H4"
             />
           </svg>
         ) : (
@@ -105,11 +125,17 @@ export default function PlayerResultScreen({
       </div>
 
       <h1 className="text-3xl md:text-4xl font-display font-bold text-white text-shadow mb-2">
-        {isCorrect ? 'Correct!' : 'Incorrect'}
+        {isCorrect ? 'Correct!' : isPartial ? 'Partially Correct!' : 'Incorrect'}
       </h1>
 
+      {isPartial && (
+        <p className="text-white/80 text-lg mb-2">
+          {Math.round(result.correctRatio * 100)}% correct
+        </p>
+      )}
+
       {/* Score breakdown */}
-      {isCorrect && (
+      {hasPoints && (
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 mt-4 mb-4 w-full max-w-xs animate-fade-in">
           <div className="space-y-2 text-white/90 text-sm">
             <div className="flex justify-between">
@@ -136,7 +162,7 @@ export default function PlayerResultScreen({
         </div>
       )}
 
-      {!isCorrect && (
+      {!hasPoints && (
         <p className="text-white/80 text-lg mt-2 mb-4">
           Better luck on the next one!
         </p>

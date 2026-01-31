@@ -1,4 +1,4 @@
-import { Question } from './quiz';
+import { Question, QuestionType } from './quiz';
 import { ScoreBreakdown } from './scoring';
 
 export type GameStatus = 'lobby' | 'starting' | 'question' | 'answers' | 'result' | 'leaderboard' | 'finished';
@@ -75,6 +75,8 @@ export interface PlayerGameState {
     id: string;
     text: string;
     imageUrl?: string;
+    questionType: QuestionType;
+    requireAll: boolean;
     timeLimit: number;
     answers: { id: string; text: string; orderIndex: number }[];
   };

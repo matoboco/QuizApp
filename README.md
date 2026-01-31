@@ -6,7 +6,11 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 
 ### Quiz Management (Host)
 - Create, edit and delete quizzes with multiple questions
-- 2-4 answer options per question with one correct answer
+- **4 question types**:
+  - **Multiple Choice** - 2-4 answers, one correct
+  - **True / False** - two fixed options
+  - **Multi Select** - 2-8 answers, multiple correct (with optional partial credit)
+  - **Ordering** - 2-8 items, players arrange in the correct order (partial credit)
 - Configurable time limit per question (5-120 seconds)
 - Optional image URL for questions
 - Draft / published quiz states
@@ -20,10 +24,12 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 - Host can kick players from the lobby
 
 ### Scoring System
-- **Base points**: 1000 per correct answer
+- **Base points**: 1000 per correct answer (scaled by correctness ratio for partial credit)
 - **Time bonus**: up to 500 points for fast answers
-- **Streak multiplier**: increases by 0.1x for each consecutive correct answer (max 2x)
-- Incorrect answers reset streak to 0
+- **Streak multiplier**: increases by 0.1x for each consecutive fully correct answer (max 2x)
+- Incorrect answers reset streak to 0; partially correct answers also reset streak but still earn points
+- **Multi Select partial credit**: `(correct selected - incorrect selected) / total correct` (min 0)
+- **Ordering partial credit**: `items in correct position / total items`
 - Individual score breakdown after each question
 
 ### Reconnection
@@ -121,7 +127,7 @@ All transitions are automatic with status guards - host can also advance manuall
 
 - [ ] Image upload for questions (currently URL only)
 - [ ] Sound effects and music
-- [ ] Additional question types (true/false, open-ended, ordering)
+- [ ] Open-ended question type
 - [ ] Team mode
 - [ ] Quiz import/export (JSON, CSV)
 - [ ] Quiz duplication

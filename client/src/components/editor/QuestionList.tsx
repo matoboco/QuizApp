@@ -55,9 +55,18 @@ export default function QuestionList({
                   <p className="text-sm font-medium text-gray-900 truncate">
                     {question.text || 'Untitled question'}
                   </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {question.answers.length} answers
-                  </p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 font-medium">
+                      {question.questionType === 'multiple-choice' ? 'MC'
+                        : question.questionType === 'true-false' ? 'T/F'
+                        : question.questionType === 'multi-select' ? 'Multi'
+                        : question.questionType === 'ordering' ? 'Order'
+                        : 'MC'}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {question.answers.length} answers
+                    </span>
+                  </div>
                 </div>
               </div>
 

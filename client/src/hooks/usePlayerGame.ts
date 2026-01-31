@@ -22,7 +22,7 @@ export function usePlayerGame() {
   } = usePlayerGameSocket();
 
   const [hasJoined, setHasJoined] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
+  const [selectedAnswer, setSelectedAnswer] = useState<string | string[] | null>(null);
   const [joinError, setJoinError] = useState<string | null>(null);
   const [isJoining, setIsJoining] = useState(false);
 
@@ -59,7 +59,7 @@ export function usePlayerGame() {
   );
 
   const submitAnswer = useCallback(
-    (answerId: string) => {
+    (answerId: string | string[]) => {
       if (!playerState) return;
       const questionId = playerState.currentQuestion?.id;
       if (!questionId) return;

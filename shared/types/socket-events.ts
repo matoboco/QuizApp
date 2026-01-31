@@ -1,5 +1,6 @@
 import { GameState, PlayerGameState, LeaderboardEntry, AnswerDistribution, GameStatus } from './game';
 import { ScoreBreakdown } from './scoring';
+import { QuestionType } from './quiz';
 
 // Client -> Server events
 export interface ClientToServerEvents {
@@ -14,7 +15,7 @@ export interface ClientToServerEvents {
 
   // Player events
   'player:join': (data: { pin: string; nickname: string }, callback: (response: { success: boolean; error?: string; playerId?: string; sessionId?: string; token?: string }) => void) => void;
-  'player:submit-answer': (data: { sessionId: string; questionId: string; answerId: string }) => void;
+  'player:submit-answer': (data: { sessionId: string; questionId: string; answerId: string | string[] }) => void;
 
   // Common events
   'reconnect-game': (data: { sessionId: string; playerId?: string }) => void;
@@ -34,7 +35,7 @@ export interface ServerToClientEvents {
 
   // Player events
   'player:state-update': (state: PlayerGameState) => void;
-  'player:question': (data: { id: string; text: string; imageUrl?: string; timeLimit: number; answers: { id: string; text: string; orderIndex: number }[]; questionIndex: number; totalQuestions: number }) => void;
+  'player:question': (data: { id: string; text: string; imageUrl?: string; questionType: QuestionType; requireAll: boolean; timeLimit: number; answers: { id: string; text: string; orderIndex: number }[]; questionIndex: number; totalQuestions: number }) => void;
   'player:answer-result': (result: ScoreBreakdown) => void;
   'player:game-status': (status: GameStatus) => void;
   'player:kicked': () => void;

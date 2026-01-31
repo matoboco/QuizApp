@@ -7,6 +7,7 @@ import type {
   UpdateQuizRequest,
   CreateQuestionInput,
   CreateAnswerInput,
+  QuestionType,
 } from '@shared/types/quiz';
 import { DEFAULT_TIME_LIMIT, DEFAULT_POINTS } from '@shared/types/quiz';
 
@@ -24,20 +25,37 @@ function createEmptyAnswer(questionId: string, orderIndex: number): Answer {
   };
 }
 
-function createEmptyQuestion(quizId: string, orderIndex: number): Question {
+function createDefaultAnswers(questionId: string, questionType: QuestionType): Answer[] {
+  switch (questionType) {
+    case 'true-false':
+      return [
+        { id: generateId('a'), questionId, text: 'True', isCorrect: true, orderIndex: 0 },
+        { id: generateId('a'), questionId, text: 'False', isCorrect: false, orderIndex: 1 },
+      ];
+    case 'multi-select':
+    case 'ordering':
+    case 'multiple-choice':
+    default:
+      return [
+        createEmptyAnswer(questionId, 0),
+        createEmptyAnswer(questionId, 1),
+      ];
+  }
+}
+
+function createEmptyQuestion(quizId: string, orderIndex: number, questionType: QuestionType = 'multiple-choice'): Question {
   const questionId = generateId('q');
   return {
     id: questionId,
     quizId,
     text: '',
     imageUrl: undefined,
+    questionType,
+    requireAll: false,
     timeLimit: DEFAULT_TIME_LIMIT,
     points: DEFAULT_POINTS,
     orderIndex,
-    answers: [
-      createEmptyAnswer(questionId, 0),
-      createEmptyAnswer(questionId, 1),
-    ],
+    answers: createDefaultAnswers(questionId, questionType),
   };
 }
 
@@ -49,7 +67,8 @@ export interface UseQuizEditorReturn {
   updateTitle: (title: string) => void;
   updateDescription: (description: string) => void;
   updatePublished: (isPublished: boolean) => void;
-  addQuestion: () => void;
+  addQuestion: (questionType?: QuestionType) => void;
+  changeQuestionType: (index: number, questionType: QuestionType) => void;
   removeQuestion: (index: number) => void;
   updateQuestion: (index: number, data: Partial<Question>) => void;
   moveQuestion: (fromIndex: number, toIndex: number) => void;
@@ -108,11 +127,28 @@ export function useQuizEditor(quizId: string): UseQuizEditorReturn {
     setIsDirty(true);
   }, []);
 
-  const addQuestion = useCallback(() => {
+  const addQuestion = useCallback((questionType: QuestionType = 'multiple-choice') => {
     setQuiz((prev) => {
       if (!prev) return prev;
-      const newQuestion = createEmptyQuestion(prev.id, prev.questions.length);
+      const newQuestion = createEmptyQuestion(prev.id, prev.questions.length, questionType);
       return { ...prev, questions: [...prev.questions, newQuestion] };
+    });
+    setIsDirty(true);
+  }, []);
+
+  const changeQuestionType = useCallback((index: number, questionType: QuestionType) => {
+    setQuiz((prev) => {
+      if (!prev) return prev;
+      const questions = [...prev.questions];
+      const question = questions[index];
+      const newAnswers = createDefaultAnswers(question.id, questionType);
+      questions[index] = {
+        ...question,
+        questionType,
+        requireAll: false,
+        answers: newAnswers,
+      };
+      return { ...prev, questions };
     });
     setIsDirty(true);
   }, []);
@@ -156,7 +192,10 @@ export function useQuizEditor(quizId: string): UseQuizEditorReturn {
       if (!prev) return prev;
       const questions = [...prev.questions];
       const question = questions[questionIndex];
-      if (question.answers.length >= 4) return prev;
+      const maxAnswers = question.questionType === 'true-false' ? 2
+        : (question.questionType === 'multi-select' || question.questionType === 'ordering') ? 8
+        : 4;
+      if (question.answers.length >= maxAnswers) return prev;
       const newAnswer = createEmptyAnswer(question.id, question.answers.length);
       questions[questionIndex] = {
         ...question,
@@ -206,6 +245,8 @@ export function useQuizEditor(quizId: string): UseQuizEditorReturn {
         id: q.id,
         text: q.text,
         imageUrl: q.imageUrl,
+        questionType: q.questionType,
+        requireAll: q.requireAll,
         timeLimit: q.timeLimit,
         points: q.points,
         orderIndex: q.orderIndex,
@@ -245,6 +286,7 @@ export function useQuizEditor(quizId: string): UseQuizEditorReturn {
     updateDescription,
     updatePublished,
     addQuestion,
+    changeQuestionType,
     removeQuestion,
     updateQuestion,
     moveQuestion,

@@ -91,7 +91,7 @@ function CountdownDisplay({ seconds }: { seconds: number }) {
   );
 }
 
-function WaitingForResultsScreen({ selectedId }: { selectedId?: string | null }) {
+function WaitingForResultsScreen({ selectedId }: { selectedId?: string | string[] | null }) {
   // Find the color of the selected answer for visual feedback
   // We don't know the orderIndex here, so just show a generic screen
   return (
@@ -347,6 +347,8 @@ export default function PlayerGamePage() {
               {currentQuestion && (
                 <AnswerGrid
                   answers={currentQuestion.answers}
+                  questionType={currentQuestion.questionType}
+                  requireAll={currentQuestion.requireAll}
                   onSelect={submitAnswer}
                   selectedId={selectedAnswer ?? undefined}
                   disabled={hasAnswered}

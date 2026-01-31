@@ -159,6 +159,8 @@ class GameEngine {
       id: question.id,
       text: question.text,
       imageUrl: question.imageUrl,
+      questionType: question.questionType,
+      requireAll: question.requireAll,
       timeLimit: question.timeLimit,
       answers: question.answers.map((a) => ({
         id: a.id,
@@ -185,7 +187,7 @@ class GameEngine {
     sessionId: string,
     playerId: string,
     questionId: string,
-    answerId: string
+    answerId: string | string[]
   ): Promise<void> {
     const question = gameStateManager.getCurrentQuestion(sessionId);
     if (!question || question.id !== questionId) {
@@ -218,17 +220,14 @@ class GameEngine {
       return;
     }
 
-    // Determine correctness for DB
-    const correctAnswer = question.answers.find((a) => a.isCorrect);
-    const isCorrect = correctAnswer?.id === answerId;
-
-    // Persist to DB
+    // Persist to DB (store first answerId for single answers, or first from array)
+    const dbAnswerId = Array.isArray(answerId) ? answerId[0] || null : answerId;
     playerAnswerRepository.create({
       playerId,
       sessionId,
       questionId,
-      answerId,
-      isCorrect,
+      answerId: dbAnswerId,
+      isCorrect: scoreBreakdown.isCorrect,
       timeTaken,
       score: scoreBreakdown.totalPoints,
     });

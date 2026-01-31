@@ -268,7 +268,7 @@ interface UsePlayerGameSocketReturn {
     nickname: string,
     callback: (response: JoinGameCallback) => void
   ) => void;
-  submitAnswer: (sessionId: string, questionId: string, answerId: string) => void;
+  submitAnswer: (sessionId: string, questionId: string, answerId: string | string[]) => void;
 }
 
 /**
@@ -340,6 +340,8 @@ export function usePlayerGameSocket(): UsePlayerGameSocketReturn {
       id: string;
       text: string;
       imageUrl?: string;
+      questionType: import('@shared/types/quiz').QuestionType;
+      requireAll: boolean;
       timeLimit: number;
       answers: { id: string; text: string; orderIndex: number }[];
       questionIndex: number;
@@ -353,6 +355,8 @@ export function usePlayerGameSocket(): UsePlayerGameSocketReturn {
             id: data.id,
             text: data.text,
             imageUrl: data.imageUrl,
+            questionType: data.questionType,
+            requireAll: data.requireAll,
             timeLimit: data.timeLimit,
             answers: data.answers,
           },
@@ -492,7 +496,7 @@ export function usePlayerGameSocket(): UsePlayerGameSocketReturn {
 
   // ---- submitAnswer ----
   const submitAnswer = useCallback(
-    (sessionId: string, questionId: string, answerId: string) => {
+    (sessionId: string, questionId: string, answerId: string | string[]) => {
       if (!socket) return;
       socket.emit('player:submit-answer', { sessionId, questionId, answerId });
       setPlayerState((prev) => {

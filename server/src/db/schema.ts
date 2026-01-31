@@ -32,6 +32,8 @@ export function initializeDatabase(): void {
       quiz_id TEXT NOT NULL,
       text TEXT NOT NULL,
       image_url TEXT,
+      question_type TEXT NOT NULL DEFAULT 'multiple-choice',
+      require_all INTEGER NOT NULL DEFAULT 0,
       time_limit INTEGER NOT NULL DEFAULT 20,
       points INTEGER NOT NULL DEFAULT 1000,
       order_index INTEGER NOT NULL,
@@ -58,7 +60,7 @@ export function initializeDatabase(): void {
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       started_at TEXT,
       finished_at TEXT,
-      FOREIGN KEY (quiz_id) REFERENCES quizzes(id),
+      FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE,
       FOREIGN KEY (host_id) REFERENCES users(id)
     );
 
@@ -101,4 +103,15 @@ export function initializeDatabase(): void {
     CREATE INDEX IF NOT EXISTS idx_player_answers_session_question ON player_answers(session_id, question_id);
     CREATE INDEX IF NOT EXISTS idx_player_answers_player_question ON player_answers(player_id, question_id);
   `);
+
+  // Migrations for existing databases
+  const columns = db.prepare("PRAGMA table_info(questions)").all() as { name: string }[];
+  const columnNames = columns.map((c) => c.name);
+
+  if (!columnNames.includes('question_type')) {
+    db.exec(`ALTER TABLE questions ADD COLUMN question_type TEXT NOT NULL DEFAULT 'multiple-choice'`);
+  }
+  if (!columnNames.includes('require_all')) {
+    db.exec(`ALTER TABLE questions ADD COLUMN require_all INTEGER NOT NULL DEFAULT 0`);
+  }
 }
