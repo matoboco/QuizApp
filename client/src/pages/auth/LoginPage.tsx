@@ -104,12 +104,13 @@ export default function LoginPage() {
           <div className="mt-4 pt-4 border-t border-gray-200 text-center">
             <Link
               to="/play"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-purple-600 hover:text-purple-500 transition-colors"
+              className="inline-flex items-center justify-center gap-3 w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-display font-bold text-lg rounded-xl transition-colors shadow-md hover:shadow-lg"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
               </svg>
-              Join a game as player
+              Join a Game
             </Link>
           </div>
         </div>
