@@ -7,7 +7,7 @@ import {
 } from '@shared/types';
 
 export const answerInputSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().optional(),
   text: z
     .string()
     .min(1, 'Answer text is required')
@@ -17,11 +17,11 @@ export const answerInputSchema = z.object({
 });
 
 export const questionInputSchema = z.object({
-  id: z.string().uuid().optional(),
+  id: z.string().optional(),
   text: z
     .string()
     .min(1, 'Question text is required'),
-  imageUrl: z.string().url('Invalid image URL').optional(),
+  imageUrl: z.string().url('Invalid image URL').optional().or(z.literal('')),
   timeLimit: z
     .number()
     .int()

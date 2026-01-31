@@ -85,7 +85,7 @@ export function initializeDatabase(): void {
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE CASCADE,
       FOREIGN KEY (session_id) REFERENCES game_sessions(id) ON DELETE CASCADE,
-      FOREIGN KEY (question_id) REFERENCES questions(id)
+      FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
     );
 
     -- Indices for frequently queried columns

@@ -202,7 +202,10 @@ export class QuizRepository {
     const db = getDb();
 
     const replaceTransaction = db.transaction(() => {
-      // Delete all existing questions (answers cascade-delete automatically)
+      // Delete player_answers referencing these questions, then questions themselves
+      db.prepare(
+        `DELETE FROM player_answers WHERE question_id IN (SELECT id FROM questions WHERE quiz_id = ?)`
+      ).run(quizId);
       db.prepare('DELETE FROM questions WHERE quiz_id = ?').run(quizId);
 
       const insertQuestion = db.prepare(
