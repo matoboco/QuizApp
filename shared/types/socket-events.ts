@@ -13,7 +13,7 @@ export interface ClientToServerEvents {
   'host:kick-player': (data: { sessionId: string; playerId: string }) => void;
 
   // Player events
-  'player:join': (data: { pin: string; nickname: string }, callback: (response: { success: boolean; error?: string; playerId?: string; sessionId?: string }) => void) => void;
+  'player:join': (data: { pin: string; nickname: string }, callback: (response: { success: boolean; error?: string; playerId?: string; sessionId?: string; token?: string }) => void) => void;
   'player:submit-answer': (data: { sessionId: string; questionId: string; answerId: string }) => void;
 
   // Common events

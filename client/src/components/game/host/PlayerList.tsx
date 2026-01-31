@@ -22,7 +22,7 @@ export default function PlayerList({ players, onKick, showKick }: PlayerListProp
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+    <div className="flex flex-wrap gap-3">
       {players.map((player) => (
         <div
           key={player.id}

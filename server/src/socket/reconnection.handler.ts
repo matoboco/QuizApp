@@ -6,6 +6,7 @@ import type {
   SocketData,
 } from '@shared/types';
 import { gameStateManager } from '../game/game-state.manager';
+import { gameEngine } from '../game/game.engine';
 import { gameRepository, playerRepository } from '../db/repositories';
 
 type TypedSocket = Socket<
@@ -54,12 +55,11 @@ export function handleReconnection(
   }
 
   // ------------------------------------------------------------------
-  // 2. Check if in-memory game state is still available
+  // 2. Ensure in-memory game state is available (creates it for lobby sessions)
   // ------------------------------------------------------------------
-  const gameState = gameStateManager.getGameState(sessionId);
+  const gameState = gameEngine.ensureLobbyState(sessionId);
   if (!gameState) {
-    // The game state has been cleaned up (e.g. game finished and TTL expired).
-    // The DB record may still exist, but live game data is gone.
+    // The game state could not be created (quiz missing or session cleaned up).
     socket.emit(
       'error',
       'Game session state has expired. Please start or join a new game.'

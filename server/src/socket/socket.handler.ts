@@ -64,8 +64,8 @@ export function setupSocketHandlers(io: TypedServer): void {
           socket.join(hostRoom(activeSession.id));
           console.log(`[socket.io] Host ${socket.data.userId} joined room ${hostRoom(activeSession.id)}`);
 
-          // Send current game state if one exists in memory
-          const state = gameStateManager.getGameState(activeSession.id);
+          // Ensure in-memory state exists (creates it for lobby sessions)
+          const state = gameEngine.ensureLobbyState(activeSession.id);
           if (state) {
             socket.emit('game:state-update', state);
           }
@@ -316,11 +316,12 @@ function registerPlayerEvents(socket: TypedSocket, io: TypedServer): void {
 
       console.log(`[socket.io] Player ${player.nickname} (${player.id}) joined session ${session.id}`);
 
-      // Respond to the player with success
+      // Respond to the player with success (include JWT token for reconnection)
       callback({
         success: true,
         playerId: player.id,
         sessionId: session.id,
+        token,
       });
 
       // Also send the player token via the handshake-style auth update

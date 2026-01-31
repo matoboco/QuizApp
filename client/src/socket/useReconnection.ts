@@ -194,6 +194,13 @@ export function useReconnection(
     socket.io.on('reconnect_attempt', onReconnectAttempt);
     socket.io.on('reconnect_failed', onReconnectFailed);
 
+    // If the socket is already connected by the time this effect runs,
+    // we missed the 'connect' event. Trigger the handler manually so
+    // reconnect-game is emitted and the server sends the current state.
+    if (socket.connected) {
+      onConnect();
+    }
+
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);

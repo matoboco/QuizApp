@@ -310,6 +310,15 @@ export function usePlayerGameSocket(): UsePlayerGameSocketReturn {
     }
   );
 
+  // Clear stale player token if the socket connection fails with an auth error.
+  // This lets the socket reconnect anonymously so the player can join a new game.
+  useEffect(() => {
+    if (socketError && playerToken) {
+      localStorage.removeItem(PLAYER_TOKEN_KEY);
+      setPlayerToken(undefined);
+    }
+  }, [socketError, playerToken]);
+
   // Reconnection support
   const {
     isReconnecting,
@@ -460,14 +469,13 @@ export function usePlayerGameSocket(): UsePlayerGameSocketReturn {
 
       socket.emit('player:join', { pin, nickname }, (response) => {
         if (response.success && response.playerId) {
-          // The server may issue a player-specific token as part of the
-          // join response. For this implementation we use the playerId as
-          // a lightweight token so the socket can reconnect with identity.
-          // If the server returns a dedicated token field it should be
-          // used instead.
-          const token = response.playerId;
-          localStorage.setItem(PLAYER_TOKEN_KEY, token);
-          setPlayerToken(token);
+          // Store the JWT token for reconnection on page refresh.
+          // We do NOT call setPlayerToken here because that would tear
+          // down the current socket (which is already in the right rooms).
+          // The token is only needed if the page is refreshed.
+          if (response.token) {
+            localStorage.setItem(PLAYER_TOKEN_KEY, response.token);
+          }
 
           // Store reconnection data for page refresh recovery
           if (response.sessionId) {

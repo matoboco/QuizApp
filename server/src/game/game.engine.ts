@@ -47,6 +47,32 @@ class GameEngine {
   }
 
   /**
+   * Ensure in-memory game state exists for a lobby session.
+   * Called when host connects so the lobby UI can render immediately.
+   * Returns the GameState or undefined if session/quiz not found.
+   */
+  ensureLobbyState(sessionId: string): ReturnType<typeof gameStateManager.getGameState> {
+    // Already in memory? Just return it.
+    const existing = gameStateManager.getGameState(sessionId);
+    if (existing) return existing;
+
+    const session = gameRepository.findById(sessionId);
+    if (!session) return undefined;
+
+    const quiz = quizRepository.findById(session.quizId);
+    if (!quiz) return undefined;
+
+    // Create in-memory state and load existing players from DB
+    gameStateManager.createGameState(session, quiz);
+    const players = playerRepository.findBySessionId(sessionId);
+    for (const player of players) {
+      gameStateManager.addPlayer(sessionId, player);
+    }
+
+    return gameStateManager.getGameState(sessionId);
+  }
+
+  /**
    * Start a game: load quiz data, initialize in-memory state,
    * update DB status, and emit state to host.
    */
@@ -68,10 +94,12 @@ class GameEngine {
       return;
     }
 
-    // Initialize in-memory game state
-    gameStateManager.createGameState(session, quiz);
+    // Ensure in-memory game state exists (may already from lobby)
+    if (!gameStateManager.getGameState(sessionId)) {
+      gameStateManager.createGameState(session, quiz);
+    }
 
-    // Load existing players from DB into state
+    // Load existing players from DB into state (in case any are missing)
     const players = playerRepository.findBySessionId(sessionId);
     for (const player of players) {
       gameStateManager.addPlayer(sessionId, player);
@@ -91,6 +119,11 @@ class GameEngine {
 
     // Notify all players that the game is starting
     this.io.to(playerRoom(sessionId)).emit('player:game-status', 'starting');
+
+    // Auto-advance to the first question after a brief "Get Ready" delay
+    setTimeout(() => {
+      this.nextQuestion(sessionId);
+    }, 3000);
   }
 
   /**
@@ -238,11 +271,17 @@ class GameEngine {
       // Emit time-up to signal that the question phase is over
       this.io.to(hostRoom(sessionId)).emit('game:time-up');
       this.io.to(playerRoom(sessionId)).emit('game:time-up');
+
+      // Auto-advance to answers phase after a brief pause
+      setTimeout(() => {
+        this.showAnswers(sessionId);
+      }, 1500);
     }
   }
 
   /**
    * Show answers phase: set status and emit to host.
+   * Auto-advances to result phase after 3 seconds.
    */
   async showAnswers(sessionId: string): Promise<void> {
     gameStateManager.setStatus(sessionId, 'answers');
@@ -255,10 +294,19 @@ class GameEngine {
 
     // Notify players
     this.io.to(playerRoom(sessionId)).emit('player:game-status', 'answers');
+
+    // Auto-advance to result phase
+    setTimeout(() => {
+      const s = gameStateManager.getGameState(sessionId);
+      if (s?.session.status === 'answers') {
+        this.showResult(sessionId);
+      }
+    }, 3000);
   }
 
   /**
    * Show result phase: set status, emit answer distribution to host.
+   * Auto-advances to leaderboard phase after 5 seconds.
    */
   async showResult(sessionId: string): Promise<void> {
     gameStateManager.setStatus(sessionId, 'result');
@@ -275,10 +323,19 @@ class GameEngine {
 
     // Notify players
     this.io.to(playerRoom(sessionId)).emit('player:game-status', 'result');
+
+    // Auto-advance to leaderboard phase
+    setTimeout(() => {
+      const s = gameStateManager.getGameState(sessionId);
+      if (s?.session.status === 'result') {
+        this.showLeaderboard(sessionId);
+      }
+    }, 5000);
   }
 
   /**
    * Show leaderboard phase: set status, emit leaderboard to all participants.
+   * Auto-advances to next question (or ends game) after 5 seconds.
    */
   async showLeaderboard(sessionId: string): Promise<void> {
     gameStateManager.setStatus(sessionId, 'leaderboard');
@@ -296,6 +353,21 @@ class GameEngine {
 
     // Send individual player state updates so each player sees their own rank
     this.emitPlayerStates(sessionId);
+
+    // Auto-advance to next question or end game
+    setTimeout(() => {
+      const s = gameStateManager.getGameState(sessionId);
+      if (s?.session.status === 'leaderboard') {
+        // Check if there are more questions
+        const isLastQuestion =
+          s.session.currentQuestionIndex >= s.totalQuestions - 1;
+        if (isLastQuestion) {
+          this.endGame(sessionId);
+        } else {
+          this.nextQuestion(sessionId);
+        }
+      }
+    }, 5000);
   }
 
   /**
@@ -417,6 +489,11 @@ class GameEngine {
         this.clearTimer(sessionId);
         this.io.to(hostRoom(sessionId)).emit('game:time-up');
         this.io.to(playerRoom(sessionId)).emit('game:time-up');
+
+        // Auto-advance to answers phase after a brief pause
+        setTimeout(() => {
+          this.showAnswers(sessionId);
+        }, 1500);
         return;
       }
 

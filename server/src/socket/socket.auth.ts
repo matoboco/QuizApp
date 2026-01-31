@@ -58,10 +58,14 @@ export function socketAuthMiddleware(
     }
 
     return next();
-  } catch (err) {
-    // Token is invalid or expired
-    // Reject the connection with an error
-    const error = new Error('Authentication failed: invalid or expired token');
-    return next(error);
+  } catch {
+    // Token is invalid or expired – fall back to anonymous player connection
+    // rather than rejecting outright. The player can still join a game via
+    // the player:join event and will receive a fresh token.
+    console.warn(`[socket.auth] Invalid/expired token, allowing anonymous connection for ${socket.id}`);
+    socket.data = {
+      type: 'player',
+    };
+    return next();
   }
 }
