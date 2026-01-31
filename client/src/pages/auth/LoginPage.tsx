@@ -100,6 +100,18 @@ export default function LoginPage() {
               Create one
             </Link>
           </p>
+
+          <div className="mt-4 pt-4 border-t border-gray-200 text-center">
+            <Link
+              to="/play"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-purple-600 hover:text-purple-500 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+              </svg>
+              Join a game as player
+            </Link>
+          </div>
         </div>
       </div>
     </div>
