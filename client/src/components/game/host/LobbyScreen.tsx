@@ -1,0 +1,103 @@
+import { QRCodeSVG } from 'qrcode.react';
+import type { Player } from '@shared/types/game';
+import Button from '@/components/common/Button';
+import PlayerList from './PlayerList';
+
+interface LobbyScreenProps {
+  pin: string;
+  players: Player[];
+  onStart: () => void;
+  onKickPlayer: (playerId: string) => void;
+}
+
+export default function LobbyScreen({
+  pin,
+  players,
+  onStart,
+  onKickPlayer,
+}: LobbyScreenProps) {
+  const joinUrl = `${window.location.origin}/play?pin=${pin}`;
+  const connectedCount = players.filter((p) => p.isConnected).length;
+
+  return (
+    <div className="game-bg flex flex-col">
+      {/* Top section: PIN & QR */}
+      <div className="flex-shrink-0 pt-8 pb-6 px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+            {/* PIN display */}
+            <div className="text-center">
+              <p className="text-white/70 text-lg font-semibold uppercase tracking-widest mb-2">
+                Game PIN
+              </p>
+              <div className="bg-white rounded-2xl px-10 py-6 shadow-2xl">
+                <span className="font-display font-black text-6xl sm:text-7xl md:text-8xl tracking-[0.3em] text-game-bg select-all">
+                  {pin}
+                </span>
+              </div>
+              <p className="text-white/50 text-sm mt-3">
+                Go to <span className="text-white font-semibold">{window.location.host}/play</span> and enter this PIN
+              </p>
+            </div>
+
+            {/* QR Code */}
+            <div className="flex flex-col items-center">
+              <div className="bg-white rounded-2xl p-4 shadow-2xl">
+                <QRCodeSVG
+                  value={joinUrl}
+                  size={160}
+                  bgColor="#ffffff"
+                  fgColor="#46178f"
+                  level="M"
+                  includeMargin={false}
+                />
+              </div>
+              <p className="text-white/50 text-xs mt-2">Scan to join</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="flex-shrink-0 px-4">
+        <div className="max-w-4xl mx-auto border-t border-white/10" />
+      </div>
+
+      {/* Player list section */}
+      <div className="flex-1 overflow-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto">
+          {/* Player count header */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <h2 className="text-white font-display font-bold text-xl">Players</h2>
+              <span className="bg-white/20 text-white font-bold px-3 py-1 rounded-full text-sm">
+                {connectedCount}
+              </span>
+            </div>
+          </div>
+
+          <PlayerList
+            players={players}
+            onKick={onKickPlayer}
+            showKick={true}
+          />
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="flex-shrink-0 px-4 pb-6">
+        <div className="max-w-4xl mx-auto flex justify-center">
+          <Button
+            variant="primary"
+            size="lg"
+            disabled={connectedCount < 1}
+            onClick={onStart}
+            className="px-12 py-4 text-xl font-display font-bold bg-green-500 hover:bg-green-600 focus:ring-green-400 shadow-lg shadow-green-500/30 disabled:bg-gray-500 disabled:shadow-none transition-all duration-200"
+          >
+            {connectedCount < 1 ? 'Waiting for players...' : `Start Game (${connectedCount} player${connectedCount !== 1 ? 's' : ''})`}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

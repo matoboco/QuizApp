@@ -1,0 +1,67 @@
+import type { Socket } from 'socket.io';
+import type {
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents,
+  SocketData,
+} from '@shared/types';
+import { authService } from '../auth/auth.service';
+
+type TypedSocket = Socket<
+  ClientToServerEvents,
+  ServerToClientEvents,
+  InterServerEvents,
+  SocketData
+>;
+
+/**
+ * Socket.IO authentication middleware.
+ *
+ * Validates the JWT token from `socket.handshake.auth.token`.
+ * - For host connections: sets userId and type='host' on socket.data
+ * - For player connections: sets playerId, sessionId, and type='player' on socket.data
+ * - For anonymous connections (no token): allows connection with type='player' and no IDs
+ *   (players who haven't joined yet connect first, then use player:join to get credentials)
+ */
+export function socketAuthMiddleware(
+  socket: TypedSocket,
+  next: (err?: Error) => void
+): void {
+  const token = socket.handshake.auth?.token as string | undefined;
+
+  if (!token) {
+    // Allow anonymous connections for players who haven't joined yet
+    socket.data = {
+      type: 'player',
+    };
+    return next();
+  }
+
+  try {
+    const payload = authService.verifyToken(token);
+
+    if (payload.type === 'host') {
+      socket.data = {
+        userId: payload.userId,
+        type: 'host',
+      };
+    } else if (payload.type === 'player') {
+      socket.data = {
+        playerId: payload.playerId,
+        sessionId: payload.sessionId,
+        type: 'player',
+      };
+    } else {
+      socket.data = {
+        type: 'player',
+      };
+    }
+
+    return next();
+  } catch (err) {
+    // Token is invalid or expired
+    // Reject the connection with an error
+    const error = new Error('Authentication failed: invalid or expired token');
+    return next(error);
+  }
+}
