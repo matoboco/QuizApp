@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { UserPublic } from '@shared/types/auth';
-import { loginApi, registerApi, getMeApi } from '@/api/auth.api';
+import { loginApi, registerApi, verifyEmailApi, getMeApi } from '@/api/auth.api';
 import { AUTH_TOKEN_KEY } from '@/lib/constants';
 
 interface AuthState {
@@ -14,6 +14,7 @@ interface AuthState {
 interface AuthContextValue extends AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<void>;
+  verifyEmail: (email: string, code: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -57,7 +58,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(
     async (email: string, password: string) => {
-      const { user, token } = await loginApi({ email, password });
+      const result = await loginApi({ email, password });
+
+      if ('requiresVerification' in result) {
+        navigate('/verify', { state: { email } });
+        return;
+      }
+
+      const { user, token } = result;
       localStorage.setItem(AUTH_TOKEN_KEY, token);
       setState({
         user,
@@ -72,7 +80,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = useCallback(
     async (email: string, username: string, password: string) => {
-      const { user, token } = await registerApi({ email, username, password });
+      await registerApi({ email, username, password });
+      navigate('/verify', { state: { email } });
+    },
+    [navigate]
+  );
+
+  const verifyEmailFn = useCallback(
+    async (email: string, code: string) => {
+      const { user, token } = await verifyEmailApi({ email, code });
       localStorage.setItem(AUTH_TOKEN_KEY, token);
       setState({
         user,
@@ -102,6 +118,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         ...state,
         login,
         register,
+        verifyEmail: verifyEmailFn,
         logout,
       }}
     >

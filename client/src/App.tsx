@@ -5,6 +5,7 @@ import ProtectedRoute from '@/components/guards/ProtectedRoute';
 import MainLayout from '@/components/layout/MainLayout';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
+import VerifyEmailPage from '@/pages/auth/VerifyEmailPage';
 import DashboardPage from '@/pages/host/DashboardPage';
 import QuizEditorPage from '@/pages/host/QuizEditorPage';
 import PlayerJoinPage from '@/pages/player/PlayerJoinPage';
@@ -20,6 +21,7 @@ function App() {
             {/* Public auth routes */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/verify" element={<VerifyEmailPage />} />
 
             {/* Public player routes (no auth required) */}
             <Route path="/play" element={<PlayerJoinPage />} />

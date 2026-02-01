@@ -12,8 +12,20 @@ export function initializeDatabase(): void {
       email TEXT NOT NULL UNIQUE,
       username TEXT NOT NULL UNIQUE,
       password_hash TEXT NOT NULL,
+      email_verified INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS email_verification_codes (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      email TEXT NOT NULL,
+      code TEXT NOT NULL,
+      expires_at TEXT NOT NULL,
+      used_at TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS quizzes (
@@ -102,6 +114,8 @@ export function initializeDatabase(): void {
     CREATE INDEX IF NOT EXISTS idx_player_answers_player_id ON player_answers(player_id);
     CREATE INDEX IF NOT EXISTS idx_player_answers_session_question ON player_answers(session_id, question_id);
     CREATE INDEX IF NOT EXISTS idx_player_answers_player_question ON player_answers(player_id, question_id);
+    CREATE INDEX IF NOT EXISTS idx_verification_codes_user_id ON email_verification_codes(user_id);
+    CREATE INDEX IF NOT EXISTS idx_verification_codes_email ON email_verification_codes(email);
   `);
 
   // Migrations for existing databases
@@ -113,5 +127,15 @@ export function initializeDatabase(): void {
   }
   if (!columnNames.includes('require_all')) {
     db.exec(`ALTER TABLE questions ADD COLUMN require_all INTEGER NOT NULL DEFAULT 0`);
+  }
+
+  // Migration: add email_verified column to existing users table
+  const userColumns = db.prepare("PRAGMA table_info(users)").all() as { name: string }[];
+  const userColumnNames = userColumns.map((c) => c.name);
+
+  if (!userColumnNames.includes('email_verified')) {
+    db.exec(`ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0`);
+    // Mark all existing users as verified so they don't need to re-verify
+    db.exec(`UPDATE users SET email_verified = 1`);
   }
 }

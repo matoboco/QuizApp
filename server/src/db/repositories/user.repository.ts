@@ -7,6 +7,7 @@ interface UserRow {
   email: string;
   username: string;
   password_hash: string;
+  email_verified: number;
   created_at: string;
   updated_at: string;
 }
@@ -23,6 +24,7 @@ function rowToUser(row: UserRow): User {
     email: row.email,
     username: row.username,
     passwordHash: row.password_hash,
+    emailVerified: row.email_verified === 1,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -53,8 +55,8 @@ export class UserRepository {
     const now = new Date().toISOString();
 
     db.prepare(
-      `INSERT INTO users (id, email, username, password_hash, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?)`
+      `INSERT INTO users (id, email, username, password_hash, email_verified, created_at, updated_at)
+       VALUES (?, ?, ?, ?, 0, ?, ?)`
     ).run(id, data.email, data.username, data.passwordHash, now, now);
 
     return {
@@ -62,9 +64,16 @@ export class UserRepository {
       email: data.email,
       username: data.username,
       passwordHash: data.passwordHash,
+      emailVerified: false,
       createdAt: now,
       updatedAt: now,
     };
+  }
+
+  markEmailVerified(userId: string): void {
+    const db = getDb();
+    db.prepare('UPDATE users SET email_verified = 1, updated_at = ? WHERE id = ?')
+      .run(new Date().toISOString(), userId);
   }
 
   existsByEmail(email: string): boolean {

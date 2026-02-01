@@ -3,6 +3,7 @@ export interface User {
   email: string;
   username: string;
   passwordHash: string;
+  emailVerified: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -11,6 +12,7 @@ export interface UserPublic {
   id: string;
   email: string;
   username: string;
+  emailVerified: boolean;
   createdAt: string;
 }
 
@@ -29,6 +31,23 @@ export interface AuthResponse {
   user: UserPublic;
   token: string;
 }
+
+export interface VerifyEmailRequest {
+  email: string;
+  code: string;
+}
+
+export interface ResendCodeRequest {
+  email: string;
+}
+
+export interface AuthPendingVerification {
+  requiresVerification: true;
+  email: string;
+  message: string;
+}
+
+export type AuthResult = AuthResponse | AuthPendingVerification;
 
 export interface HostTokenPayload {
   userId: string;
