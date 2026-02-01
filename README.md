@@ -44,9 +44,24 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 | Frontend | React 18, TypeScript, Vite, Tailwind CSS |
 | Backend | Express.js, TypeScript, Socket.IO |
 | Database | SQLite (better-sqlite3) |
-| Auth | JWT (host 24h, player 4h), bcrypt |
+| Auth | JWT (host 24h, player 4h), bcrypt, email verification |
+| Email | Nodemailer (MailPit for dev) |
 | Validation | Zod |
 | Real-time | Socket.IO (WebSocket) |
+| Deployment | Docker Compose, Nginx |
+
+### Email Verification
+- New users must verify their email with a 6-digit code before accessing the app
+- Unverified users who log in receive a fresh verification code automatically
+- Configurable allowed email domains (`ALLOWED_EMAIL_DOMAINS` - comma-separated, empty = all allowed)
+- Code expires after 10 minutes (configurable via `VERIFICATION_CODE_EXPIRY_MINUTES`)
+- Resend button with 60-second cooldown
+
+### Docker Deployment
+- Single command deployment with `docker compose up -d --build`
+- Nginx reverse proxy for the client
+- MailPit for email testing (web UI at `http://localhost:8025`)
+- Persistent SQLite volume
 
 ## Quick Start
 
@@ -66,6 +81,14 @@ cd client && npm run dev
 ```
 
 Open `http://localhost:5173` in browser.
+
+### Docker
+
+```bash
+docker compose up -d --build
+```
+
+Open `http://localhost` (app) and `http://localhost:8025` (MailPit email UI).
 
 ### Test Credentials
 
@@ -112,6 +135,14 @@ Server `.env` (defaults work for development):
 | `JWT_SECRET` | `dev-secret` | JWT signing key |
 | `CORS_ORIGIN` | `http://localhost:5173` | Allowed client origin |
 | `DB_PATH` | `./data/quiz.db` | SQLite file path |
+| `SMTP_HOST` | `localhost` | SMTP server host |
+| `SMTP_PORT` | `1025` | SMTP server port |
+| `SMTP_SECURE` | `false` | Use TLS for SMTP |
+| `SMTP_USER` | | SMTP auth username |
+| `SMTP_PASS` | | SMTP auth password |
+| `SMTP_FROM` | `QuizApp <noreply@quizapp.local>` | Sender address |
+| `VERIFICATION_CODE_EXPIRY_MINUTES` | `10` | Code expiry time |
+| `ALLOWED_EMAIL_DOMAINS` | | Comma-separated allowed domains (empty = all) |
 
 ## Game Flow
 
@@ -135,7 +166,8 @@ All transitions are automatic with status guards - host can also advance manuall
 - [ ] Password reset / forgot password
 - [ ] Rate limiting on API endpoints
 - [ ] Unit and integration tests
-- [ ] Docker setup for deployment
+- [x] Docker setup for deployment
+- [x] Email verification at registration
 - [ ] Production build and deployment guide
 - [ ] Configurable auto-advance timing per quiz
 - [ ] Player avatars / custom colors
