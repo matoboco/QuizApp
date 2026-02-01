@@ -2,15 +2,18 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuizzes } from '@/hooks/useQuizzes';
 import { createGameApi } from '@/api/game.api';
+import { getQuizApi, createQuizApi, updateQuizApi } from '@/api/quiz.api';
 import QuizCardGrid from '@/components/quiz/QuizCardGrid';
 import CreateQuizFab from '@/components/quiz/CreateQuizFab';
 import DeleteQuizDialog from '@/components/quiz/DeleteQuizDialog';
+import ImportQuizButton from '@/components/quiz/ImportQuizButton';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { serializeQuizTxt, downloadQuizTxt, sanitizeFilename, type ParsedQuiz } from '@/lib/quizTxt';
 import type { QuizSummary } from '@shared/types/quiz';
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { quizzes, isLoading, error, deleteQuiz, createQuiz } = useQuizzes();
+  const { quizzes, isLoading, error, refetch, deleteQuiz, createQuiz } = useQuizzes();
 
   const [deleteTarget, setDeleteTarget] = useState<QuizSummary | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -78,6 +81,33 @@ export default function DashboardPage() {
     }
   }, [createQuiz, navigate]);
 
+  const handleExport = useCallback(async (id: string) => {
+    try {
+      setActionError(null);
+      const quiz = await getQuizApi(id);
+      const content = serializeQuizTxt(quiz);
+      const filename = `${sanitizeFilename(quiz.title)}.quiz.txt`;
+      downloadQuizTxt(filename, content);
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.error || err?.message || 'Failed to export quiz';
+      setActionError(message);
+    }
+  }, []);
+
+  const handleImport = useCallback(async (parsed: ParsedQuiz) => {
+    try {
+      setActionError(null);
+      const quiz = await createQuizApi({ title: parsed.title, description: parsed.description });
+      await updateQuizApi(quiz.id, { questions: parsed.questions });
+      await refetch();
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.error || err?.message || 'Failed to import quiz';
+      setActionError(message);
+    }
+  }, [refetch]);
+
   // Loading state
   if (isLoading) {
     return (
@@ -118,13 +148,16 @@ export default function DashboardPage() {
   return (
     <div className="pb-20">
       {/* Page header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-display font-bold text-gray-900">
-          My Quizzes
-        </h1>
-        <p className="mt-1 text-gray-500">
-          Create, manage, and host your quizzes.
-        </p>
+      <div className="mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-display font-bold text-gray-900">
+            My Quizzes
+          </h1>
+          <p className="mt-1 text-gray-500">
+            Create, manage, and host your quizzes.
+          </p>
+        </div>
+        <ImportQuizButton onImport={handleImport} />
       </div>
 
       {/* Action error banner */}
@@ -174,6 +207,7 @@ export default function DashboardPage() {
         quizzes={quizzes}
         onDelete={handleDeleteClick}
         onPlay={handlePlay}
+        onExport={handleExport}
       />
 
       {/* Create quiz FAB */}

@@ -6,9 +6,10 @@ interface QuizCardGridProps {
   quizzes: QuizSummary[];
   onDelete: (id: string) => void;
   onPlay: (id: string) => void;
+  onExport: (id: string) => void;
 }
 
-export default function QuizCardGrid({ quizzes, onDelete, onPlay }: QuizCardGridProps) {
+export default function QuizCardGrid({ quizzes, onDelete, onPlay, onExport }: QuizCardGridProps) {
   if (quizzes.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -44,6 +45,7 @@ export default function QuizCardGrid({ quizzes, onDelete, onPlay }: QuizCardGrid
           quiz={quiz}
           onDelete={onDelete}
           onPlay={onPlay}
+          onExport={onExport}
         />
       ))}
     </div>

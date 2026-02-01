@@ -14,6 +14,7 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 - Configurable time limit per question (5-120 seconds)
 - Optional image URL for questions
 - Draft / published quiz states
+- **Export / Import** quizzes as plain-text `.quiz.txt` files — human-readable, editable in any text editor, round-trip safe
 
 ### Real-time Gameplay
 - Host generates a unique 6-digit PIN for each game session
@@ -57,6 +58,52 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 - Configurable allowed email domains (`ALLOWED_EMAIL_DOMAINS` - comma-separated, empty = all allowed)
 - Code expires after 10 minutes (configurable via `VERIFICATION_CODE_EXPIRY_MINUTES`)
 - Resend button with 60-second cooldown
+
+### Quiz Export / Import
+
+Export any quiz from the dashboard as a `.quiz.txt` file and import it back (or share it with others). The format is plain text, editable in any text editor:
+
+```
+# World Geography
+> Test your knowledge of world capitals and landmarks
+
+## What is the capital of France?
+type: multiple-choice
+* Paris
+- London
+- Berlin
+- Madrid
+
+## The Great Wall is in China
+type: true-false
+* True
+- False
+
+## Rank planets by distance from the Sun
+type: ordering
+time: 30
+points: 2000
+1. Mercury
+2. Venus
+3. Earth
+4. Mars
+
+## Select all prime numbers
+type: multi-select
+requireAll: true
+* 2
+* 3
+- 4
+* 5
+- 6
+```
+
+Format rules:
+- `# Title` and optional `> Description` at the top
+- `## Question text` starts each question
+- `type:` is required (`multiple-choice`, `true-false`, `multi-select`, `ordering`)
+- `time:` and `points:` are optional (defaults: 20s, 1000pts)
+- `* answer` = correct, `- answer` = wrong, `1. answer` = ordering position
 
 ### Database
 - **Dual database support** — switch between SQLite and PostgreSQL via a single env variable (`DB_TYPE=sqlite|postgres`)
@@ -186,7 +233,7 @@ All transitions are automatic with status guards - host can also advance manuall
 - [ ] Sound effects and music
 - [ ] Open-ended question type
 - [ ] Team mode
-- [ ] Quiz import/export (JSON, CSV)
+- [x] Quiz import/export (`.quiz.txt` plain-text format)
 - [ ] Quiz duplication
 - [ ] Post-game statistics and analytics for host
 - [ ] Password reset / forgot password
