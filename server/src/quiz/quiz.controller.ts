@@ -11,7 +11,7 @@ export async function createQuiz(
   try {
     const hostId = req.user!.userId;
     const data: CreateQuizInput = req.body;
-    const quiz = quizService.createQuiz(hostId, data);
+    const quiz = await quizService.createQuiz(hostId, data);
 
     const response: ApiResponse<Quiz> = {
       success: true,
@@ -32,7 +32,7 @@ export async function getQuizzes(
 ): Promise<void> {
   try {
     const hostId = req.user!.userId;
-    const quizzes = quizService.getQuizzesByHost(hostId);
+    const quizzes = await quizService.getQuizzesByHost(hostId);
 
     const response: ApiResponse<QuizSummary[]> = {
       success: true,
@@ -53,7 +53,7 @@ export async function getQuiz(
   try {
     const hostId = req.user!.userId;
     const quizId = req.params.id;
-    const quiz = quizService.getQuiz(quizId, hostId);
+    const quiz = await quizService.getQuiz(quizId, hostId);
 
     const response: ApiResponse<Quiz> = {
       success: true,
@@ -75,7 +75,7 @@ export async function updateQuiz(
     const hostId = req.user!.userId;
     const quizId = req.params.id;
     const data: UpdateQuizInput = req.body;
-    const quiz = quizService.updateQuiz(quizId, hostId, data);
+    const quiz = await quizService.updateQuiz(quizId, hostId, data);
 
     const response: ApiResponse<Quiz> = {
       success: true,
@@ -97,7 +97,7 @@ export async function deleteQuiz(
   try {
     const hostId = req.user!.userId;
     const quizId = req.params.id;
-    quizService.deleteQuiz(quizId, hostId);
+    await quizService.deleteQuiz(quizId, hostId);
 
     const response: ApiResponse = {
       success: true,

@@ -56,7 +56,7 @@ export async function getGame(
   try {
     const sessionId = req.params.id;
 
-    const result = gameService.getGameSession(sessionId);
+    const result = await gameService.getGameSession(sessionId);
 
     const response: ApiResponse<{ session: GameSession; players: Player[] }> = {
       success: true,

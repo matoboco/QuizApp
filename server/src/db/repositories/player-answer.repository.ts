@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getDb } from '../connection';
+import { sql } from 'kysely';
+import { getKysely } from '../connection';
 import { PlayerAnswer, AnswerDistribution } from '@shared/types';
 
 interface PlayerAnswerRow {
@@ -27,7 +28,7 @@ interface CreatePlayerAnswerData {
 interface AnswerDistributionRow {
   answer_id: string;
   answer_text: string;
-  count: number;
+  count: string | number;
   is_correct: number;
   order_index: number;
 }
@@ -47,25 +48,25 @@ function rowToPlayerAnswer(row: PlayerAnswerRow): PlayerAnswer {
 }
 
 export class PlayerAnswerRepository {
-  create(data: CreatePlayerAnswerData): PlayerAnswer {
-    const db = getDb();
+  async create(data: CreatePlayerAnswerData): Promise<PlayerAnswer> {
+    const db = getKysely();
     const id = uuidv4();
     const now = new Date().toISOString();
 
-    db.prepare(
-      `INSERT INTO player_answers (id, player_id, session_id, question_id, answer_id, is_correct, time_taken, score, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
-    ).run(
-      id,
-      data.playerId,
-      data.sessionId,
-      data.questionId,
-      data.answerId,
-      data.isCorrect ? 1 : 0,
-      data.timeTaken,
-      data.score,
-      now
-    );
+    await db
+      .insertInto('player_answers')
+      .values({
+        id,
+        player_id: data.playerId,
+        session_id: data.sessionId,
+        question_id: data.questionId,
+        answer_id: data.answerId,
+        is_correct: data.isCorrect ? 1 : 0,
+        time_taken: data.timeTaken,
+        score: data.score,
+        created_at: now,
+      })
+      .execute();
 
     return {
       id,
@@ -80,46 +81,55 @@ export class PlayerAnswerRepository {
     };
   }
 
-  findByPlayerAndQuestion(playerId: string, questionId: string): PlayerAnswer | undefined {
-    const db = getDb();
-    const row = db.prepare(
-      'SELECT * FROM player_answers WHERE player_id = ? AND question_id = ?'
-    ).get(playerId, questionId) as PlayerAnswerRow | undefined;
-    return row ? rowToPlayerAnswer(row) : undefined;
+  async findByPlayerAndQuestion(playerId: string, questionId: string): Promise<PlayerAnswer | undefined> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('player_answers')
+      .selectAll()
+      .where('player_id', '=', playerId)
+      .where('question_id', '=', questionId)
+      .executeTakeFirst();
+    return row ? rowToPlayerAnswer(row as PlayerAnswerRow) : undefined;
   }
 
-  findBySessionAndQuestion(sessionId: string, questionId: string): PlayerAnswer[] {
-    const db = getDb();
-    const rows = db.prepare(
-      'SELECT * FROM player_answers WHERE session_id = ? AND question_id = ?'
-    ).all(sessionId, questionId) as PlayerAnswerRow[];
-    return rows.map(rowToPlayerAnswer);
+  async findBySessionAndQuestion(sessionId: string, questionId: string): Promise<PlayerAnswer[]> {
+    const db = getKysely();
+    const rows = await db
+      .selectFrom('player_answers')
+      .selectAll()
+      .where('session_id', '=', sessionId)
+      .where('question_id', '=', questionId)
+      .execute();
+    return rows.map((row) => rowToPlayerAnswer(row as PlayerAnswerRow));
   }
 
-  getAnswerDistribution(sessionId: string, questionId: string): AnswerDistribution[] {
-    const db = getDb();
+  async getAnswerDistribution(sessionId: string, questionId: string): Promise<AnswerDistribution[]> {
+    const db = getKysely();
 
-    const rows = db.prepare(
-      `SELECT
-        a.id AS answer_id,
-        a.text AS answer_text,
-        COUNT(pa.id) AS count,
-        a.is_correct,
-        a.order_index
-       FROM answers a
-       LEFT JOIN player_answers pa
-         ON pa.answer_id = a.id
-         AND pa.session_id = ?
-         AND pa.question_id = ?
-       WHERE a.question_id = ?
-       GROUP BY a.id
-       ORDER BY a.order_index ASC`
-    ).all(sessionId, questionId, questionId) as AnswerDistributionRow[];
+    const rows = await db
+      .selectFrom('answers as a')
+      .leftJoin('player_answers as pa', (join) =>
+        join
+          .onRef('pa.answer_id', '=', 'a.id')
+          .on('pa.session_id', '=', sessionId)
+          .on('pa.question_id', '=', questionId)
+      )
+      .where('a.question_id', '=', questionId)
+      .groupBy('a.id')
+      .select([
+        'a.id as answer_id',
+        'a.text as answer_text',
+        sql<number>`COUNT(pa.id)`.as('count'),
+        'a.is_correct',
+        'a.order_index',
+      ])
+      .orderBy('a.order_index', 'asc')
+      .execute();
 
     return rows.map((row) => ({
       answerId: row.answer_id,
       answerText: row.answer_text,
-      count: row.count,
+      count: Number(row.count),
       isCorrect: row.is_correct === 1,
       orderIndex: row.order_index,
     }));

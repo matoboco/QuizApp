@@ -40,15 +40,15 @@ function playerIndividualRoom(playerId: string): string {
  * - If the session no longer exists in memory (expired/cleaned up), an
  *   error is emitted to the socket.
  */
-export function handleReconnection(
+export async function handleReconnection(
   socket: TypedSocket,
   sessionId: string,
   playerId?: string
-): void {
+): Promise<void> {
   // ------------------------------------------------------------------
   // 1. Verify the session exists in the database
   // ------------------------------------------------------------------
-  const session = gameRepository.findById(sessionId);
+  const session = await gameRepository.findById(sessionId);
   if (!session) {
     socket.emit('error', 'Game session not found. It may have expired.');
     return;
@@ -57,7 +57,7 @@ export function handleReconnection(
   // ------------------------------------------------------------------
   // 2. Ensure in-memory game state is available (creates it for lobby sessions)
   // ------------------------------------------------------------------
-  const gameState = gameEngine.ensureLobbyState(sessionId);
+  const gameState = await gameEngine.ensureLobbyState(sessionId);
   if (!gameState) {
     // The game state could not be created (quiz missing or session cleaned up).
     socket.emit(
@@ -74,7 +74,7 @@ export function handleReconnection(
     // ---------- Player reconnection ----------
 
     // Verify player exists in the database and belongs to this session
-    const player = playerRepository.findById(playerId);
+    const player = await playerRepository.findById(playerId);
     if (!player || player.sessionId !== sessionId) {
       socket.emit('error', 'Player not found in this session');
       return;
@@ -87,7 +87,7 @@ export function handleReconnection(
 
     // Mark player as connected in both in-memory state and DB
     gameStateManager.setPlayerConnected(sessionId, playerId, true);
-    playerRepository.setConnected(playerId, true);
+    await playerRepository.setConnected(playerId, true);
 
     // Re-join player rooms
     socket.join(playerRoom(sessionId));

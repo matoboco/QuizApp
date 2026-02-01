@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getDb } from '../connection';
+import { getKysely } from '../connection';
 import { GameSession, GameStatus } from '@shared/types';
 
 interface GameSessionRow {
@@ -41,27 +41,43 @@ function rowToGameSession(row: GameSessionRow): GameSession {
 }
 
 export class GameRepository {
-  findById(id: string): GameSession | undefined {
-    const db = getDb();
-    const row = db.prepare('SELECT * FROM game_sessions WHERE id = ?').get(id) as GameSessionRow | undefined;
-    return row ? rowToGameSession(row) : undefined;
+  async findById(id: string): Promise<GameSession | undefined> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('game_sessions')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+    return row ? rowToGameSession(row as GameSessionRow) : undefined;
   }
 
-  findByPin(pin: string): GameSession | undefined {
-    const db = getDb();
-    const row = db.prepare('SELECT * FROM game_sessions WHERE pin = ?').get(pin) as GameSessionRow | undefined;
-    return row ? rowToGameSession(row) : undefined;
+  async findByPin(pin: string): Promise<GameSession | undefined> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('game_sessions')
+      .selectAll()
+      .where('pin', '=', pin)
+      .executeTakeFirst();
+    return row ? rowToGameSession(row as GameSessionRow) : undefined;
   }
 
-  create(data: CreateGameData): GameSession {
-    const db = getDb();
+  async create(data: CreateGameData): Promise<GameSession> {
+    const db = getKysely();
     const id = uuidv4();
     const now = new Date().toISOString();
 
-    db.prepare(
-      `INSERT INTO game_sessions (id, quiz_id, host_id, pin, status, current_question_index, created_at)
-       VALUES (?, ?, ?, ?, 'lobby', 0, ?)`
-    ).run(id, data.quizId, data.hostId, data.pin, now);
+    await db
+      .insertInto('game_sessions')
+      .values({
+        id,
+        quiz_id: data.quizId,
+        host_id: data.hostId,
+        pin: data.pin,
+        status: 'lobby',
+        current_question_index: 0,
+        created_at: now,
+      })
+      .execute();
 
     return {
       id,
@@ -76,42 +92,40 @@ export class GameRepository {
     };
   }
 
-  updateStatus(id: string, status: GameStatus, extra?: UpdateStatusExtra): GameSession | undefined {
-    const db = getDb();
+  async updateStatus(id: string, status: GameStatus, extra?: UpdateStatusExtra): Promise<GameSession | undefined> {
+    const db = getKysely();
 
-    const fields: string[] = ['status = ?'];
-    const values: (string | number)[] = [status];
+    const updates: Record<string, string | number> = { status };
 
     if (extra?.currentQuestionIndex !== undefined) {
-      fields.push('current_question_index = ?');
-      values.push(extra.currentQuestionIndex);
+      updates.current_question_index = extra.currentQuestionIndex;
     }
     if (extra?.startedAt !== undefined) {
-      fields.push('started_at = ?');
-      values.push(extra.startedAt);
+      updates.started_at = extra.startedAt;
     }
     if (extra?.finishedAt !== undefined) {
-      fields.push('finished_at = ?');
-      values.push(extra.finishedAt);
+      updates.finished_at = extra.finishedAt;
     }
 
-    values.push(id);
-
-    db.prepare(
-      `UPDATE game_sessions SET ${fields.join(', ')} WHERE id = ?`
-    ).run(...values);
+    await db
+      .updateTable('game_sessions')
+      .set(updates)
+      .where('id', '=', id)
+      .execute();
 
     return this.findById(id);
   }
 
-  findActiveByHostId(hostId: string): GameSession | undefined {
-    const db = getDb();
-    const row = db.prepare(
-      `SELECT * FROM game_sessions
-       WHERE host_id = ? AND status != 'finished'
-       ORDER BY created_at DESC
-       LIMIT 1`
-    ).get(hostId) as GameSessionRow | undefined;
-    return row ? rowToGameSession(row) : undefined;
+  async findActiveByHostId(hostId: string): Promise<GameSession | undefined> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('game_sessions')
+      .selectAll()
+      .where('host_id', '=', hostId)
+      .where('status', '!=', 'finished')
+      .orderBy('created_at', 'desc')
+      .limit(1)
+      .executeTakeFirst();
+    return row ? rowToGameSession(row as GameSessionRow) : undefined;
   }
 }

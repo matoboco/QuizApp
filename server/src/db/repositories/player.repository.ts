@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getDb } from '../connection';
+import { sql } from 'kysely';
+import { getKysely } from '../connection';
 import { Player } from '@shared/types';
 
 interface PlayerRow {
@@ -30,29 +31,45 @@ function rowToPlayer(row: PlayerRow): Player {
 }
 
 export class PlayerRepository {
-  findById(id: string): Player | undefined {
-    const db = getDb();
-    const row = db.prepare('SELECT * FROM players WHERE id = ?').get(id) as PlayerRow | undefined;
-    return row ? rowToPlayer(row) : undefined;
+  async findById(id: string): Promise<Player | undefined> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('players')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+    return row ? rowToPlayer(row as PlayerRow) : undefined;
   }
 
-  findBySessionId(sessionId: string): Player[] {
-    const db = getDb();
-    const rows = db.prepare(
-      'SELECT * FROM players WHERE session_id = ? ORDER BY score DESC, joined_at ASC'
-    ).all(sessionId) as PlayerRow[];
-    return rows.map(rowToPlayer);
+  async findBySessionId(sessionId: string): Promise<Player[]> {
+    const db = getKysely();
+    const rows = await db
+      .selectFrom('players')
+      .selectAll()
+      .where('session_id', '=', sessionId)
+      .orderBy('score', 'desc')
+      .orderBy('joined_at', 'asc')
+      .execute();
+    return rows.map((row) => rowToPlayer(row as PlayerRow));
   }
 
-  create(data: CreatePlayerData): Player {
-    const db = getDb();
+  async create(data: CreatePlayerData): Promise<Player> {
+    const db = getKysely();
     const id = uuidv4();
     const now = new Date().toISOString();
 
-    db.prepare(
-      `INSERT INTO players (id, session_id, nickname, score, streak, is_connected, joined_at)
-       VALUES (?, ?, ?, 0, 0, 1, ?)`
-    ).run(id, data.sessionId, data.nickname, now);
+    await db
+      .insertInto('players')
+      .values({
+        id,
+        session_id: data.sessionId,
+        nickname: data.nickname,
+        score: 0,
+        streak: 0,
+        is_connected: 1,
+        joined_at: now,
+      })
+      .execute();
 
     return {
       id,
@@ -65,31 +82,41 @@ export class PlayerRepository {
     };
   }
 
-  updateScore(id: string, score: number, streak: number): void {
-    const db = getDb();
-    db.prepare(
-      'UPDATE players SET score = ?, streak = ? WHERE id = ?'
-    ).run(score, streak, id);
+  async updateScore(id: string, score: number, streak: number): Promise<void> {
+    const db = getKysely();
+    await db
+      .updateTable('players')
+      .set({ score, streak })
+      .where('id', '=', id)
+      .execute();
   }
 
-  setConnected(id: string, connected: boolean): void {
-    const db = getDb();
-    db.prepare(
-      'UPDATE players SET is_connected = ? WHERE id = ?'
-    ).run(connected ? 1 : 0, id);
+  async setConnected(id: string, connected: boolean): Promise<void> {
+    const db = getKysely();
+    await db
+      .updateTable('players')
+      .set({ is_connected: connected ? 1 : 0 })
+      .where('id', '=', id)
+      .execute();
   }
 
-  deleteBySessionId(sessionId: string): number {
-    const db = getDb();
-    const result = db.prepare('DELETE FROM players WHERE session_id = ?').run(sessionId);
-    return result.changes;
+  async deleteBySessionId(sessionId: string): Promise<number> {
+    const db = getKysely();
+    const result = await db
+      .deleteFrom('players')
+      .where('session_id', '=', sessionId)
+      .executeTakeFirst();
+    return Number(result.numDeletedRows);
   }
 
-  existsNicknameInSession(sessionId: string, nickname: string): boolean {
-    const db = getDb();
-    const row = db.prepare(
-      'SELECT 1 FROM players WHERE session_id = ? AND LOWER(nickname) = LOWER(?)'
-    ).get(sessionId, nickname);
+  async existsNicknameInSession(sessionId: string, nickname: string): Promise<boolean> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('players')
+      .select('id')
+      .where('session_id', '=', sessionId)
+      .where(sql`LOWER(nickname)`, '=', nickname.toLowerCase())
+      .executeTakeFirst();
     return !!row;
   }
 }

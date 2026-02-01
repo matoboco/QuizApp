@@ -2,7 +2,7 @@ import { config } from './config';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import app from './app';
-import { initializeDatabase } from './db/schema';
+import { runMigrations } from './db/migrator';
 import { closeDb } from './db/connection';
 import { setupSocketHandlers } from './socket/socket.handler';
 import { gameEngine } from './game/game.engine';
@@ -33,36 +33,34 @@ const io = new Server<
 });
 
 // ---------------------------------------------------------------------------
-// Database initialisation
+// Async bootstrap
 // ---------------------------------------------------------------------------
-try {
-  initializeDatabase();
-  console.log('[db] Database initialised successfully');
-} catch (err) {
-  console.error('[db] Failed to initialise database:', err);
-  process.exit(1);
+async function bootstrap(): Promise<void> {
+  try {
+    await runMigrations();
+    console.log('[db] Database initialised successfully');
+  } catch (err) {
+    console.error('[db] Failed to initialise database:', err);
+    process.exit(1);
+  }
+
+  // Socket.IO - initialize game engine and set up event handlers
+  gameEngine.initialize(io);
+  setupSocketHandlers(io);
+  console.log('[socket.io] Socket handlers registered');
+
+  // Game cleanup - start periodic stale-session cleanup
+  gameCleanup.startCleanupInterval();
+
+  // Start listening
+  httpServer.listen(config.port, () => {
+    console.log(
+      `[server] Quiz App server running on http://localhost:${config.port} (${config.nodeEnv})`,
+    );
+  });
 }
 
-// ---------------------------------------------------------------------------
-// Socket.IO - initialize game engine and set up event handlers
-// ---------------------------------------------------------------------------
-gameEngine.initialize(io);
-setupSocketHandlers(io);
-console.log('[socket.io] Socket handlers registered');
-
-// ---------------------------------------------------------------------------
-// Game cleanup - start periodic stale-session cleanup
-// ---------------------------------------------------------------------------
-gameCleanup.startCleanupInterval();
-
-// ---------------------------------------------------------------------------
-// Start listening
-// ---------------------------------------------------------------------------
-httpServer.listen(config.port, () => {
-  console.log(
-    `[server] Quiz App server running on http://localhost:${config.port} (${config.nodeEnv})`,
-  );
-});
+bootstrap();
 
 // ---------------------------------------------------------------------------
 // Handle uncaught errors so the process doesn't crash silently
@@ -101,13 +99,14 @@ function gracefulShutdown(signal: string) {
     console.log('[server] Socket.IO server closed');
   });
 
-  // Close the SQLite database
-  try {
-    closeDb();
-    console.log('[server] Database connection closed');
-  } catch (err) {
-    console.error('[server] Error closing database:', err);
-  }
+  // Close the database connection (async for PG pool drain)
+  closeDb()
+    .then(() => {
+      console.log('[server] Database connection closed');
+    })
+    .catch((err) => {
+      console.error('[server] Error closing database:', err);
+    });
 
   // Give existing connections a moment to finish, then exit
   setTimeout(() => {

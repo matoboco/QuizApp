@@ -50,7 +50,7 @@ export function setupSocketHandlers(io: TypedServer): void {
   // Apply authentication middleware
   io.use(socketAuthMiddleware);
 
-  io.on('connection', (socket: TypedSocket) => {
+  io.on('connection', async (socket: TypedSocket) => {
     console.log(
       `[socket.io] Client connected: ${socket.id} (type: ${socket.data.type}, userId: ${socket.data.userId || 'none'}, playerId: ${socket.data.playerId || 'none'})`
     );
@@ -59,13 +59,13 @@ export function setupSocketHandlers(io: TypedServer): void {
     try {
       if (socket.data.type === 'host' && socket.data.userId) {
         // Host: find their active session and join host room
-        const activeSession = gameRepository.findActiveByHostId(socket.data.userId);
+        const activeSession = await gameRepository.findActiveByHostId(socket.data.userId);
         if (activeSession) {
           socket.join(hostRoom(activeSession.id));
           console.log(`[socket.io] Host ${socket.data.userId} joined room ${hostRoom(activeSession.id)}`);
 
           // Ensure in-memory state exists (creates it for lobby sessions)
-          const state = gameEngine.ensureLobbyState(activeSession.id);
+          const state = await gameEngine.ensureLobbyState(activeSession.id);
           if (state) {
             socket.emit('game:state-update', state);
           }
@@ -78,7 +78,7 @@ export function setupSocketHandlers(io: TypedServer): void {
 
         // Mark player as connected
         gameStateManager.setPlayerConnected(sessionId, playerId, true);
-        playerRepository.setConnected(playerId, true);
+        await playerRepository.setConnected(playerId, true);
 
         console.log(`[socket.io] Player ${playerId} joined rooms for session ${sessionId}`);
 
@@ -103,7 +103,7 @@ export function setupSocketHandlers(io: TypedServer): void {
     registerCommonEvents(socket, io);
 
     // --- Handle disconnect ---
-    socket.on('disconnect', (reason) => {
+    socket.on('disconnect', async (reason) => {
       console.log(`[socket.io] Client disconnected: ${socket.id} (reason: ${reason})`);
 
       try {
@@ -112,7 +112,7 @@ export function setupSocketHandlers(io: TypedServer): void {
 
           // Mark player as disconnected
           gameStateManager.setPlayerConnected(sessionId, playerId, false);
-          playerRepository.setConnected(playerId, false);
+          await playerRepository.setConnected(playerId, false);
 
           // Notify host that a player disconnected
           const state = gameStateManager.getGameState(sessionId);
@@ -143,7 +143,7 @@ function registerHostEvents(socket: TypedSocket): void {
       }
 
       // Verify the host owns this session
-      const session = gameRepository.findById(sessionId);
+      const session = await gameRepository.findById(sessionId);
       if (!session || session.hostId !== socket.data.userId) {
         socket.emit('error', 'Unauthorized: you do not own this game session');
         return;
@@ -262,7 +262,7 @@ function registerPlayerEvents(socket: TypedSocket, io: TypedServer): void {
   ) => {
     try {
       // Find the session by PIN
-      const session = gameRepository.findByPin(data.pin);
+      const session = await gameRepository.findByPin(data.pin);
       if (!session) {
         callback({ success: false, error: 'Game not found. Check your PIN and try again.' });
         return;
@@ -275,14 +275,14 @@ function registerPlayerEvents(socket: TypedSocket, io: TypedServer): void {
       }
 
       // Check nickname uniqueness within the session
-      const nicknameTaken = playerRepository.existsNicknameInSession(session.id, data.nickname);
+      const nicknameTaken = await playerRepository.existsNicknameInSession(session.id, data.nickname);
       if (nicknameTaken) {
         callback({ success: false, error: 'That nickname is already taken. Please choose another.' });
         return;
       }
 
       // Create the player in DB
-      const player = playerRepository.create({
+      const player = await playerRepository.create({
         sessionId: session.id,
         nickname: data.nickname,
       });
@@ -366,7 +366,7 @@ function registerCommonEvents(socket: TypedSocket, io: TypedServer): void {
       );
 
       // Delegate to the dedicated reconnection handler
-      handleReconnection(socket, data.sessionId, data.playerId);
+      await handleReconnection(socket, data.sessionId, data.playerId);
     } catch (err) {
       console.error(`[socket.io] Error in reconnect-game for session ${data.sessionId}:`, err);
       socket.emit('error', 'An error occurred during reconnection');

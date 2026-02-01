@@ -50,13 +50,13 @@ class AuthService {
     }
 
     // Check if email already exists
-    const existingByEmail = userRepository.findByEmail(data.email);
+    const existingByEmail = await userRepository.findByEmail(data.email);
     if (existingByEmail) {
       throw new ConflictError('A user with this email already exists');
     }
 
     // Check if username already exists
-    const existingByUsername = userRepository.findByUsername(data.username);
+    const existingByUsername = await userRepository.findByUsername(data.username);
     if (existingByUsername) {
       throw new ConflictError('A user with this username already exists');
     }
@@ -65,7 +65,7 @@ class AuthService {
     const passwordHash = await bcrypt.hash(data.password, BCRYPT_ROUNDS);
 
     // Create user in database (unverified)
-    const user = userRepository.create({
+    const user = await userRepository.create({
       email: data.email,
       username: data.username,
       passwordHash,
@@ -83,7 +83,7 @@ class AuthService {
 
   async login(data: LoginRequest): Promise<AuthResult> {
     // Find user by email
-    const user = userRepository.findByEmail(data.email);
+    const user = await userRepository.findByEmail(data.email);
     if (!user) {
       throw new UnauthorizedError('Invalid email or password');
     }
@@ -111,12 +111,12 @@ class AuthService {
   }
 
   async verifyEmail(data: VerifyEmailRequest): Promise<AuthResponse> {
-    const user = userRepository.findByEmail(data.email);
+    const user = await userRepository.findByEmail(data.email);
     if (!user) {
       throw new BadRequestError('User not found');
     }
 
-    const codeRecord = verificationCodeRepository.findLatestUnusedByEmail(data.email);
+    const codeRecord = await verificationCodeRepository.findLatestUnusedByEmail(data.email);
     if (!codeRecord) {
       throw new BadRequestError('No verification code found. Please request a new one.');
     }
@@ -132,10 +132,10 @@ class AuthService {
     }
 
     // Mark code as used
-    verificationCodeRepository.markUsed(codeRecord.id);
+    await verificationCodeRepository.markUsed(codeRecord.id);
 
     // Mark user as verified
-    userRepository.markEmailVerified(user.id);
+    await userRepository.markEmailVerified(user.id);
 
     // Generate JWT token
     const token = this.generateHostToken(user.id, user.email);
@@ -147,7 +147,7 @@ class AuthService {
   }
 
   async resendVerificationCode(data: ResendCodeRequest): Promise<void> {
-    const user = userRepository.findByEmail(data.email);
+    const user = await userRepository.findByEmail(data.email);
     if (!user) {
       // Don't reveal whether email exists
       return;
@@ -163,7 +163,7 @@ class AuthService {
 
   async createAndSendCode(userId: string, email: string): Promise<void> {
     // Invalidate previous codes
-    verificationCodeRepository.invalidateAllForUser(userId);
+    await verificationCodeRepository.invalidateAllForUser(userId);
 
     // Generate 6-digit code
     const code = crypto.randomInt(100000, 999999).toString();
@@ -174,7 +174,7 @@ class AuthService {
     ).toISOString();
 
     // Store code
-    verificationCodeRepository.create(userId, email, code, expiresAt);
+    await verificationCodeRepository.create(userId, email, code, expiresAt);
 
     // Send email
     await sendVerificationCode(email, code);

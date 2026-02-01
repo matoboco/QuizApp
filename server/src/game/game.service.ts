@@ -14,13 +14,13 @@ class GameService {
     quizId: string
   ): Promise<CreateGameResponse> {
     // Verify the quiz exists
-    const quiz = quizRepository.findById(quizId);
+    const quiz = await quizRepository.findById(quizId);
     if (!quiz) {
       throw new NotFoundError('Quiz not found');
     }
 
     // Generate a unique PIN by collecting all existing active PINs
-    const activeGame = gameRepository.findActiveByHostId(hostId);
+    const activeGame = await gameRepository.findActiveByHostId(hostId);
     const existingPins = new Set<string>();
     if (activeGame) {
       existingPins.add(activeGame.pin);
@@ -29,7 +29,7 @@ class GameService {
     const pin = generateUniquePin(existingPins);
 
     // Create the game session
-    const session = gameRepository.create({
+    const session = await gameRepository.create({
       quizId,
       hostId,
       pin,
@@ -46,7 +46,7 @@ class GameService {
     nickname: string
   ): Promise<JoinGameResponse> {
     // Find the session by PIN
-    const session = gameRepository.findByPin(pin);
+    const session = await gameRepository.findByPin(pin);
     if (!session) {
       throw new NotFoundError('Game session not found');
     }
@@ -57,7 +57,7 @@ class GameService {
     }
 
     // Check nickname uniqueness within the session
-    const nicknameTaken = playerRepository.existsNicknameInSession(
+    const nicknameTaken = await playerRepository.existsNicknameInSession(
       session.id,
       nickname
     );
@@ -66,7 +66,7 @@ class GameService {
     }
 
     // Create the player
-    const player = playerRepository.create({
+    const player = await playerRepository.create({
       sessionId: session.id,
       nickname,
     });
@@ -81,20 +81,20 @@ class GameService {
     };
   }
 
-  getGameSession(
+  async getGameSession(
     sessionId: string
-  ): { session: GameSession; players: Player[] } {
-    const session = gameRepository.findById(sessionId);
+  ): Promise<{ session: GameSession; players: Player[] }> {
+    const session = await gameRepository.findById(sessionId);
     if (!session) {
       throw new NotFoundError('Game session not found');
     }
 
-    const players = playerRepository.findBySessionId(sessionId);
+    const players = await playerRepository.findBySessionId(sessionId);
 
     return { session, players };
   }
 
-  getActiveGameForHost(hostId: string): GameSession | undefined {
+  async getActiveGameForHost(hostId: string): Promise<GameSession | undefined> {
     return gameRepository.findActiveByHostId(hostId);
   }
 }

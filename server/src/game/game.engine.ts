@@ -51,20 +51,20 @@ class GameEngine {
    * Called when host connects so the lobby UI can render immediately.
    * Returns the GameState or undefined if session/quiz not found.
    */
-  ensureLobbyState(sessionId: string): ReturnType<typeof gameStateManager.getGameState> {
+  async ensureLobbyState(sessionId: string): Promise<ReturnType<typeof gameStateManager.getGameState>> {
     // Already in memory? Just return it.
     const existing = gameStateManager.getGameState(sessionId);
     if (existing) return existing;
 
-    const session = gameRepository.findById(sessionId);
+    const session = await gameRepository.findById(sessionId);
     if (!session) return undefined;
 
-    const quiz = quizRepository.findById(session.quizId);
+    const quiz = await quizRepository.findById(session.quizId);
     if (!quiz) return undefined;
 
     // Create in-memory state and load existing players from DB
     gameStateManager.createGameState(session, quiz);
-    const players = playerRepository.findBySessionId(sessionId);
+    const players = await playerRepository.findBySessionId(sessionId);
     for (const player of players) {
       gameStateManager.addPlayer(sessionId, player);
     }
@@ -77,13 +77,13 @@ class GameEngine {
    * update DB status, and emit state to host.
    */
   async startGame(sessionId: string): Promise<void> {
-    const session = gameRepository.findById(sessionId);
+    const session = await gameRepository.findById(sessionId);
     if (!session) {
       this.emitError(hostRoom(sessionId), 'Game session not found');
       return;
     }
 
-    const quiz = quizRepository.findById(session.quizId);
+    const quiz = await quizRepository.findById(session.quizId);
     if (!quiz) {
       this.emitError(hostRoom(sessionId), 'Quiz not found');
       return;
@@ -100,13 +100,13 @@ class GameEngine {
     }
 
     // Load existing players from DB into state (in case any are missing)
-    const players = playerRepository.findBySessionId(sessionId);
+    const players = await playerRepository.findBySessionId(sessionId);
     for (const player of players) {
       gameStateManager.addPlayer(sessionId, player);
     }
 
     // Update DB status
-    gameRepository.updateStatus(sessionId, 'starting', {
+    await gameRepository.updateStatus(sessionId, 'starting', {
       startedAt: new Date().toISOString(),
     });
     gameStateManager.setStatus(sessionId, 'starting');
@@ -143,7 +143,7 @@ class GameEngine {
     }
 
     // Update DB with current question index
-    gameRepository.updateStatus(sessionId, 'question', {
+    await gameRepository.updateStatus(sessionId, 'question', {
       currentQuestionIndex: questionIndex,
     });
 
@@ -222,7 +222,7 @@ class GameEngine {
 
     // Persist to DB (store first answerId for single answers, or first from array)
     const dbAnswerId = Array.isArray(answerId) ? answerId[0] || null : answerId;
-    playerAnswerRepository.create({
+    await playerAnswerRepository.create({
       playerId,
       sessionId,
       questionId,
@@ -235,7 +235,7 @@ class GameEngine {
     // Update player score in DB
     const playerState = gameStateManager.getPlayerGameState(sessionId, playerId);
     if (playerState) {
-      playerRepository.updateScore(
+      await playerRepository.updateScore(
         playerId,
         playerState.player.score,
         playerState.player.streak
@@ -284,7 +284,7 @@ class GameEngine {
    */
   async showAnswers(sessionId: string): Promise<void> {
     gameStateManager.setStatus(sessionId, 'answers');
-    gameRepository.updateStatus(sessionId, 'answers');
+    await gameRepository.updateStatus(sessionId, 'answers');
 
     const state = gameStateManager.getGameState(sessionId);
     if (state) {
@@ -309,7 +309,7 @@ class GameEngine {
    */
   async showResult(sessionId: string): Promise<void> {
     gameStateManager.setStatus(sessionId, 'result');
-    gameRepository.updateStatus(sessionId, 'result');
+    await gameRepository.updateStatus(sessionId, 'result');
 
     const distribution = gameStateManager.getAnswerDistribution(sessionId);
     const state = gameStateManager.getGameState(sessionId);
@@ -338,7 +338,7 @@ class GameEngine {
    */
   async showLeaderboard(sessionId: string): Promise<void> {
     gameStateManager.setStatus(sessionId, 'leaderboard');
-    gameRepository.updateStatus(sessionId, 'leaderboard');
+    await gameRepository.updateStatus(sessionId, 'leaderboard');
 
     const leaderboard = gameStateManager.getLeaderboard(sessionId);
     const state = gameStateManager.getGameState(sessionId);
@@ -377,7 +377,7 @@ class GameEngine {
     this.clearTimer(sessionId);
 
     gameStateManager.setStatus(sessionId, 'finished');
-    gameRepository.updateStatus(sessionId, 'finished', {
+    await gameRepository.updateStatus(sessionId, 'finished', {
       finishedAt: new Date().toISOString(),
     });
 
@@ -385,7 +385,7 @@ class GameEngine {
 
     // Persist final scores to DB
     for (const entry of leaderboard) {
-      playerRepository.updateScore(entry.playerId, entry.score, entry.streak);
+      await playerRepository.updateScore(entry.playerId, entry.score, entry.streak);
     }
 
     // Emit final state to host
@@ -418,7 +418,7 @@ class GameEngine {
     gameStateManager.removePlayer(sessionId, playerId);
 
     // Update DB
-    playerRepository.setConnected(playerId, false);
+    await playerRepository.setConnected(playerId, false);
 
     // Notify host
     this.io.to(hostRoom(sessionId)).emit('game:player-left', playerId);
@@ -443,7 +443,7 @@ class GameEngine {
     if (playerId) {
       // Player reconnecting
       gameStateManager.setPlayerConnected(sessionId, playerId, true);
-      playerRepository.setConnected(playerId, true);
+      await playerRepository.setConnected(playerId, true);
 
       // Rejoin rooms
       socket.join(playerRoom(sessionId));

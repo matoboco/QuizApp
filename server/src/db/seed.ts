@@ -210,7 +210,7 @@ function buildPopCultureQuestions(): CreateQuestionInput[] {
 
 export async function seedDatabase(): Promise<void> {
   // Check if seed data already exists
-  const existingUser = userRepository.findByEmail(TEST_USER.email);
+  const existingUser = await userRepository.findByEmail(TEST_USER.email);
   if (existingUser) {
     console.log('[seed] Seed data already exists (test user found). Skipping.');
     return;
@@ -220,7 +220,7 @@ export async function seedDatabase(): Promise<void> {
 
   // --- Create test user ---
   const passwordHash = await bcrypt.hash(TEST_USER.password, BCRYPT_ROUNDS);
-  const user = userRepository.create({
+  const user = await userRepository.create({
     email: TEST_USER.email,
     username: TEST_USER.username,
     passwordHash,
@@ -228,33 +228,33 @@ export async function seedDatabase(): Promise<void> {
   console.log(`[seed] Created test user: ${user.email} (id: ${user.id})`);
 
   // --- Quiz 1: World Geography ---
-  const geographyQuiz = quizRepository.create({
+  const geographyQuiz = await quizRepository.create({
     title: 'World Geography',
     description: 'Test your knowledge of world geography with these fun questions!',
     hostId: user.id,
   });
-  quizRepository.replaceQuestions(geographyQuiz.id, buildGeographyQuestions());
-  quizRepository.update(geographyQuiz.id, { isPublished: true });
+  await quizRepository.replaceQuestions(geographyQuiz.id, buildGeographyQuestions());
+  await quizRepository.update(geographyQuiz.id, { isPublished: true });
   console.log(`[seed] Created quiz: "${geographyQuiz.title}" (5 questions)`);
 
   // --- Quiz 2: Science Basics ---
-  const scienceQuiz = quizRepository.create({
+  const scienceQuiz = await quizRepository.create({
     title: 'Science Basics',
     description: 'A quick quiz on fundamental science concepts.',
     hostId: user.id,
   });
-  quizRepository.replaceQuestions(scienceQuiz.id, buildScienceQuestions());
-  quizRepository.update(scienceQuiz.id, { isPublished: true });
+  await quizRepository.replaceQuestions(scienceQuiz.id, buildScienceQuestions());
+  await quizRepository.update(scienceQuiz.id, { isPublished: true });
   console.log(`[seed] Created quiz: "${scienceQuiz.title}" (5 questions)`);
 
   // --- Quiz 3: Pop Culture ---
-  const popCultureQuiz = quizRepository.create({
+  const popCultureQuiz = await quizRepository.create({
     title: 'Pop Culture',
     description: 'How well do you know movies, music, and more?',
     hostId: user.id,
   });
-  quizRepository.replaceQuestions(popCultureQuiz.id, buildPopCultureQuestions());
-  quizRepository.update(popCultureQuiz.id, { isPublished: true });
+  await quizRepository.replaceQuestions(popCultureQuiz.id, buildPopCultureQuestions());
+  await quizRepository.update(popCultureQuiz.id, { isPublished: true });
   console.log(`[seed] Created quiz: "${popCultureQuiz.title}" (4 questions)`);
 
   console.log('[seed] Database seeded successfully!');

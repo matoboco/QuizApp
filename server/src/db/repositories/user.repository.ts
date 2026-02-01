@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getDb } from '../connection';
+import { getKysely } from '../connection';
 import { User } from '@shared/types';
 
 interface UserRow {
@@ -31,33 +31,53 @@ function rowToUser(row: UserRow): User {
 }
 
 export class UserRepository {
-  findById(id: string): User | undefined {
-    const db = getDb();
-    const row = db.prepare('SELECT * FROM users WHERE id = ?').get(id) as UserRow | undefined;
-    return row ? rowToUser(row) : undefined;
+  async findById(id: string): Promise<User | undefined> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('users')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+    return row ? rowToUser(row as UserRow) : undefined;
   }
 
-  findByEmail(email: string): User | undefined {
-    const db = getDb();
-    const row = db.prepare('SELECT * FROM users WHERE email = ?').get(email) as UserRow | undefined;
-    return row ? rowToUser(row) : undefined;
+  async findByEmail(email: string): Promise<User | undefined> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('users')
+      .selectAll()
+      .where('email', '=', email)
+      .executeTakeFirst();
+    return row ? rowToUser(row as UserRow) : undefined;
   }
 
-  findByUsername(username: string): User | undefined {
-    const db = getDb();
-    const row = db.prepare('SELECT * FROM users WHERE username = ?').get(username) as UserRow | undefined;
-    return row ? rowToUser(row) : undefined;
+  async findByUsername(username: string): Promise<User | undefined> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('users')
+      .selectAll()
+      .where('username', '=', username)
+      .executeTakeFirst();
+    return row ? rowToUser(row as UserRow) : undefined;
   }
 
-  create(data: CreateUserData): User {
-    const db = getDb();
+  async create(data: CreateUserData): Promise<User> {
+    const db = getKysely();
     const id = uuidv4();
     const now = new Date().toISOString();
 
-    db.prepare(
-      `INSERT INTO users (id, email, username, password_hash, email_verified, created_at, updated_at)
-       VALUES (?, ?, ?, ?, 0, ?, ?)`
-    ).run(id, data.email, data.username, data.passwordHash, now, now);
+    await db
+      .insertInto('users')
+      .values({
+        id,
+        email: data.email,
+        username: data.username,
+        password_hash: data.passwordHash,
+        email_verified: 0,
+        created_at: now,
+        updated_at: now,
+      })
+      .execute();
 
     return {
       id,
@@ -70,21 +90,32 @@ export class UserRepository {
     };
   }
 
-  markEmailVerified(userId: string): void {
-    const db = getDb();
-    db.prepare('UPDATE users SET email_verified = 1, updated_at = ? WHERE id = ?')
-      .run(new Date().toISOString(), userId);
+  async markEmailVerified(userId: string): Promise<void> {
+    const db = getKysely();
+    await db
+      .updateTable('users')
+      .set({ email_verified: 1, updated_at: new Date().toISOString() })
+      .where('id', '=', userId)
+      .execute();
   }
 
-  existsByEmail(email: string): boolean {
-    const db = getDb();
-    const row = db.prepare('SELECT 1 FROM users WHERE email = ?').get(email);
+  async existsByEmail(email: string): Promise<boolean> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('users')
+      .select('id')
+      .where('email', '=', email)
+      .executeTakeFirst();
     return !!row;
   }
 
-  existsByUsername(username: string): boolean {
-    const db = getDb();
-    const row = db.prepare('SELECT 1 FROM users WHERE username = ?').get(username);
+  async existsByUsername(username: string): Promise<boolean> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('users')
+      .select('id')
+      .where('username', '=', username)
+      .executeTakeFirst();
     return !!row;
   }
 }

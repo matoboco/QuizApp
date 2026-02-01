@@ -1,0 +1,12 @@
+services:
+  server:
+    environment:
+      DB_TYPE: sqlite
+      DB_PATH: /app/data/quiz.db
+    volumes:
+      - quiz-data:/app/data
+    depends_on:
+      - mailpit
+
+volumes:
+  quiz-data:

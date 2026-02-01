@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getDb } from '../connection';
+import { sql } from 'kysely';
+import { getKysely } from '../connection';
 import { Quiz, QuizSummary, Question, Answer, CreateQuestionInput, QuestionType } from '@shared/types';
 
 interface QuizRow {
@@ -34,7 +35,7 @@ interface AnswerRow {
 }
 
 interface QuizSummaryRow extends QuizRow {
-  question_count: number;
+  question_count: string | number;
 }
 
 interface CreateQuizData {
@@ -93,61 +94,90 @@ function rowToQuizSummary(row: QuizSummaryRow): QuizSummary {
     title: row.title,
     description: row.description,
     isPublished: row.is_published === 1,
-    questionCount: row.question_count,
+    questionCount: Number(row.question_count),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 }
 
 export class QuizRepository {
-  findById(id: string): Quiz | undefined {
-    const db = getDb();
+  async findById(id: string): Promise<Quiz | undefined> {
+    const db = getKysely();
 
-    const quizRow = db.prepare('SELECT * FROM quizzes WHERE id = ?').get(id) as QuizRow | undefined;
+    const quizRow = await db
+      .selectFrom('quizzes')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+
     if (!quizRow) {
       return undefined;
     }
 
-    const questionRows = db.prepare(
-      'SELECT * FROM questions WHERE quiz_id = ? ORDER BY order_index ASC'
-    ).all(id) as QuestionRow[];
+    const questionRows = await db
+      .selectFrom('questions')
+      .selectAll()
+      .where('quiz_id', '=', id)
+      .orderBy('order_index', 'asc')
+      .execute();
 
-    const questions: Question[] = questionRows.map((qRow) => {
-      const answerRows = db.prepare(
-        'SELECT * FROM answers WHERE question_id = ? ORDER BY order_index ASC'
-      ).all(qRow.id) as AnswerRow[];
+    const questions: Question[] = [];
+    for (const qRow of questionRows) {
+      const answerRows = await db
+        .selectFrom('answers')
+        .selectAll()
+        .where('question_id', '=', qRow.id)
+        .orderBy('order_index', 'asc')
+        .execute();
 
-      const answers = answerRows.map(rowToAnswer);
-      return rowToQuestion(qRow, answers);
-    });
+      const answers = answerRows.map((a) => rowToAnswer(a as AnswerRow));
+      questions.push(rowToQuestion(qRow as QuestionRow, answers));
+    }
 
-    return rowToQuiz(quizRow, questions);
+    return rowToQuiz(quizRow as QuizRow, questions);
   }
 
-  findAllByHostId(hostId: string): QuizSummary[] {
-    const db = getDb();
+  async findAllByHostId(hostId: string): Promise<QuizSummary[]> {
+    const db = getKysely();
 
-    const rows = db.prepare(
-      `SELECT q.*, COUNT(qu.id) AS question_count
-       FROM quizzes q
-       LEFT JOIN questions qu ON qu.quiz_id = q.id
-       WHERE q.host_id = ?
-       GROUP BY q.id
-       ORDER BY q.created_at DESC`
-    ).all(hostId) as QuizSummaryRow[];
+    const rows = await db
+      .selectFrom('quizzes as q')
+      .leftJoin('questions as qu', 'qu.quiz_id', 'q.id')
+      .where('q.host_id', '=', hostId)
+      .groupBy('q.id')
+      .select([
+        'q.id',
+        'q.title',
+        'q.description',
+        'q.host_id',
+        'q.is_published',
+        'q.created_at',
+        'q.updated_at',
+        sql<number>`COUNT(qu.id)`.as('question_count'),
+      ])
+      .orderBy('q.created_at', 'desc')
+      .execute();
 
-    return rows.map(rowToQuizSummary);
+    return rows.map((row) => rowToQuizSummary(row as unknown as QuizSummaryRow));
   }
 
-  create(data: CreateQuizData): Quiz {
-    const db = getDb();
+  async create(data: CreateQuizData): Promise<Quiz> {
+    const db = getKysely();
     const id = uuidv4();
     const now = new Date().toISOString();
 
-    db.prepare(
-      `INSERT INTO quizzes (id, title, description, host_id, is_published, created_at, updated_at)
-       VALUES (?, ?, ?, ?, 0, ?, ?)`
-    ).run(id, data.title, data.description || '', data.hostId, now, now);
+    await db
+      .insertInto('quizzes')
+      .values({
+        id,
+        title: data.title,
+        description: data.description || '',
+        host_id: data.hostId,
+        is_published: 0,
+        created_at: now,
+        updated_at: now,
+      })
+      .execute();
 
     return {
       id,
@@ -161,79 +191,81 @@ export class QuizRepository {
     };
   }
 
-  update(id: string, data: UpdateQuizData): Quiz | undefined {
-    const db = getDb();
+  async update(id: string, data: UpdateQuizData): Promise<Quiz | undefined> {
+    const db = getKysely();
     const now = new Date().toISOString();
 
-    const fields: string[] = [];
-    const values: (string | number)[] = [];
+    const updates: Record<string, string | number> = { updated_at: now };
 
     if (data.title !== undefined) {
-      fields.push('title = ?');
-      values.push(data.title);
+      updates.title = data.title;
     }
     if (data.description !== undefined) {
-      fields.push('description = ?');
-      values.push(data.description);
+      updates.description = data.description;
     }
     if (data.isPublished !== undefined) {
-      fields.push('is_published = ?');
-      values.push(data.isPublished ? 1 : 0);
+      updates.is_published = data.isPublished ? 1 : 0;
     }
 
-    if (fields.length === 0) {
+    if (Object.keys(updates).length === 1) {
+      // Only updated_at, no real changes
       return this.findById(id);
     }
 
-    fields.push('updated_at = ?');
-    values.push(now);
-    values.push(id);
-
-    db.prepare(
-      `UPDATE quizzes SET ${fields.join(', ')} WHERE id = ?`
-    ).run(...values);
+    await db
+      .updateTable('quizzes')
+      .set(updates)
+      .where('id', '=', id)
+      .execute();
 
     return this.findById(id);
   }
 
-  delete(id: string): boolean {
-    const db = getDb();
+  async delete(id: string): Promise<boolean> {
+    const db = getKysely();
 
-    const deleteTransaction = db.transaction(() => {
+    return await db.transaction().execute(async (trx) => {
       // Delete dependent rows that lack ON DELETE CASCADE
-      const sessionIds = db.prepare('SELECT id FROM game_sessions WHERE quiz_id = ?').all(id) as { id: string }[];
+      const sessionIds = await trx
+        .selectFrom('game_sessions')
+        .select('id')
+        .where('quiz_id', '=', id)
+        .execute();
+
       for (const s of sessionIds) {
-        db.prepare('DELETE FROM player_answers WHERE session_id = ?').run(s.id);
-        db.prepare('DELETE FROM players WHERE session_id = ?').run(s.id);
+        await trx.deleteFrom('player_answers').where('session_id', '=', s.id).execute();
+        await trx.deleteFrom('players').where('session_id', '=', s.id).execute();
       }
-      db.prepare('DELETE FROM game_sessions WHERE quiz_id = ?').run(id);
+      await trx.deleteFrom('game_sessions').where('quiz_id', '=', id).execute();
 
-      const result = db.prepare('DELETE FROM quizzes WHERE id = ?').run(id);
-      return result.changes > 0;
+      const result = await trx.deleteFrom('quizzes').where('id', '=', id).executeTakeFirst();
+      return Number(result.numDeletedRows) > 0;
     });
-
-    return deleteTransaction();
   }
 
-  replaceQuestions(quizId: string, questions: CreateQuestionInput[]): Question[] {
-    const db = getDb();
+  async replaceQuestions(quizId: string, questions: CreateQuestionInput[]): Promise<Question[]> {
+    const db = getKysely();
 
-    const replaceTransaction = db.transaction(() => {
+    return await db.transaction().execute(async (trx) => {
       // Delete player_answers referencing these questions, then questions themselves
-      db.prepare(
-        `DELETE FROM player_answers WHERE question_id IN (SELECT id FROM questions WHERE quiz_id = ?)`
-      ).run(quizId);
-      db.prepare('DELETE FROM questions WHERE quiz_id = ?').run(quizId);
+      const questionIds = await trx
+        .selectFrom('questions')
+        .select('id')
+        .where('quiz_id', '=', quizId)
+        .execute();
 
-      const insertQuestion = db.prepare(
-        `INSERT INTO questions (id, quiz_id, text, image_url, question_type, require_all, time_limit, points, order_index, created_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-      );
+      if (questionIds.length > 0) {
+        await trx
+          .deleteFrom('player_answers')
+          .where(
+            'question_id',
+            'in',
+            questionIds.map((q) => q.id)
+          )
+          .execute();
+      }
 
-      const insertAnswer = db.prepare(
-        `INSERT INTO answers (id, question_id, text, is_correct, order_index)
-         VALUES (?, ?, ?, ?, ?)`
-      );
+      await trx.deleteFrom('questions').where('quiz_id', '=', quizId).execute();
 
       const now = new Date().toISOString();
       const result: Question[] = [];
@@ -241,30 +273,36 @@ export class QuizRepository {
       for (const q of questions) {
         const questionId = q.id || uuidv4();
 
-        insertQuestion.run(
-          questionId,
-          quizId,
-          q.text,
-          q.imageUrl || null,
-          q.questionType || 'multiple-choice',
-          q.requireAll ? 1 : 0,
-          q.timeLimit,
-          q.points,
-          q.orderIndex,
-          now
-        );
+        await trx
+          .insertInto('questions')
+          .values({
+            id: questionId,
+            quiz_id: quizId,
+            text: q.text,
+            image_url: q.imageUrl || null,
+            question_type: q.questionType || 'multiple-choice',
+            require_all: q.requireAll ? 1 : 0,
+            time_limit: q.timeLimit,
+            points: q.points,
+            order_index: q.orderIndex,
+            created_at: now,
+          })
+          .execute();
 
         const answers: Answer[] = [];
         for (const a of q.answers) {
           const answerId = a.id || uuidv4();
 
-          insertAnswer.run(
-            answerId,
-            questionId,
-            a.text,
-            a.isCorrect ? 1 : 0,
-            a.orderIndex
-          );
+          await trx
+            .insertInto('answers')
+            .values({
+              id: answerId,
+              question_id: questionId,
+              text: a.text,
+              is_correct: a.isCorrect ? 1 : 0,
+              order_index: a.orderIndex,
+            })
+            .execute();
 
           answers.push({
             id: answerId,
@@ -290,19 +328,23 @@ export class QuizRepository {
       }
 
       // Update the quiz's updated_at timestamp
-      db.prepare('UPDATE quizzes SET updated_at = ? WHERE id = ?').run(now, quizId);
+      await trx
+        .updateTable('quizzes')
+        .set({ updated_at: now })
+        .where('id', '=', quizId)
+        .execute();
 
       return result;
     });
-
-    return replaceTransaction();
   }
 
-  countByHostId(hostId: string): number {
-    const db = getDb();
-    const row = db.prepare(
-      'SELECT COUNT(*) AS count FROM quizzes WHERE host_id = ?'
-    ).get(hostId) as { count: number };
-    return row.count;
+  async countByHostId(hostId: string): Promise<number> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('quizzes')
+      .select(sql<number>`COUNT(*)`.as('count'))
+      .where('host_id', '=', hostId)
+      .executeTakeFirstOrThrow();
+    return Number(row.count);
   }
 }

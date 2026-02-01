@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { getDb } from '../connection';
+import { getKysely } from '../connection';
 
 interface VerificationCodeRow {
   id: string;
@@ -34,15 +34,22 @@ function rowToVerificationCode(row: VerificationCodeRow): VerificationCode {
 }
 
 export class VerificationCodeRepository {
-  create(userId: string, email: string, code: string, expiresAt: string): VerificationCode {
-    const db = getDb();
+  async create(userId: string, email: string, code: string, expiresAt: string): Promise<VerificationCode> {
+    const db = getKysely();
     const id = uuidv4();
     const now = new Date().toISOString();
 
-    db.prepare(
-      `INSERT INTO email_verification_codes (id, user_id, email, code, expires_at, created_at)
-       VALUES (?, ?, ?, ?, ?, ?)`
-    ).run(id, userId, email, code, expiresAt, now);
+    await db
+      .insertInto('email_verification_codes')
+      .values({
+        id,
+        user_id: userId,
+        email,
+        code,
+        expires_at: expiresAt,
+        created_at: now,
+      })
+      .execute();
 
     return {
       id,
@@ -55,28 +62,36 @@ export class VerificationCodeRepository {
     };
   }
 
-  findLatestUnusedByEmail(email: string): VerificationCode | undefined {
-    const db = getDb();
-    const row = db.prepare(
-      `SELECT * FROM email_verification_codes
-       WHERE email = ? AND used_at IS NULL
-       ORDER BY created_at DESC
-       LIMIT 1`
-    ).get(email) as VerificationCodeRow | undefined;
+  async findLatestUnusedByEmail(email: string): Promise<VerificationCode | undefined> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('email_verification_codes')
+      .selectAll()
+      .where('email', '=', email)
+      .where('used_at', 'is', null)
+      .orderBy('created_at', 'desc')
+      .limit(1)
+      .executeTakeFirst();
 
-    return row ? rowToVerificationCode(row) : undefined;
+    return row ? rowToVerificationCode(row as VerificationCodeRow) : undefined;
   }
 
-  markUsed(id: string): void {
-    const db = getDb();
-    db.prepare('UPDATE email_verification_codes SET used_at = ? WHERE id = ?')
-      .run(new Date().toISOString(), id);
+  async markUsed(id: string): Promise<void> {
+    const db = getKysely();
+    await db
+      .updateTable('email_verification_codes')
+      .set({ used_at: new Date().toISOString() })
+      .where('id', '=', id)
+      .execute();
   }
 
-  invalidateAllForUser(userId: string): void {
-    const db = getDb();
-    db.prepare(
-      `UPDATE email_verification_codes SET used_at = ? WHERE user_id = ? AND used_at IS NULL`
-    ).run(new Date().toISOString(), userId);
+  async invalidateAllForUser(userId: string): Promise<void> {
+    const db = getKysely();
+    await db
+      .updateTable('email_verification_codes')
+      .set({ used_at: new Date().toISOString() })
+      .where('user_id', '=', userId)
+      .where('used_at', 'is', null)
+      .execute();
   }
 }

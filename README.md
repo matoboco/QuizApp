@@ -43,7 +43,8 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 |-------|-----------|
 | Frontend | React 18, TypeScript, Vite, Tailwind CSS |
 | Backend | Express.js, TypeScript, Socket.IO |
-| Database | SQLite (better-sqlite3) |
+| Database | SQLite (better-sqlite3) or PostgreSQL — selectable via `DB_TYPE` env |
+| Query Builder | Kysely (type-safe, dialect-agnostic) |
 | Auth | JWT (host 24h, player 4h), bcrypt, email verification |
 | Email | Nodemailer (MailPit for dev) |
 | Validation | Zod |
@@ -57,11 +58,18 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 - Code expires after 10 minutes (configurable via `VERIFICATION_CODE_EXPIRY_MINUTES`)
 - Resend button with 60-second cooldown
 
+### Database
+- **Dual database support** — switch between SQLite and PostgreSQL via a single env variable (`DB_TYPE=sqlite|postgres`)
+- Kysely query builder provides type-safe, dialect-agnostic queries — the same codebase runs against both databases
+- Built-in migration system (`001_initial_schema`) runs automatically on startup
+- Migration script to transfer existing SQLite data to PostgreSQL: `npm run migrate-to-postgres`
+
 ### Docker Deployment
 - Single command deployment with `docker compose up -d --build`
+- **PostgreSQL** included by default (with healthcheck) — server waits for DB readiness before starting
 - Nginx reverse proxy for the client
 - MailPit for email testing (web UI at `http://localhost:8025`)
-- Persistent SQLite volume
+- For SQLite mode: `docker compose -f docker-compose.yml -f docker-compose.sqlite.yml up -d --build`
 
 ## Quick Start
 
@@ -82,13 +90,25 @@ cd client && npm run dev
 
 Open `http://localhost:5173` in browser.
 
-### Docker
+### Docker (PostgreSQL — default)
 
 ```bash
 docker compose up -d --build
 ```
 
+### Docker (SQLite)
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.sqlite.yml up -d --build
+```
+
 Open `http://localhost` (app) and `http://localhost:8025` (MailPit email UI).
+
+### Migrate SQLite data to PostgreSQL
+
+```bash
+cd server && npm run migrate-to-postgres
+```
 
 ### Test Credentials
 
@@ -113,7 +133,7 @@ QuizApp/
 │   ├── quiz/            # Quiz CRUD API
 │   ├── game/            # Game engine, state manager, scoring
 │   ├── socket/          # Socket.IO handlers, auth middleware
-│   ├── db/              # SQLite schema, repositories, seed
+│   ├── db/              # Kysely connection, migrations, repositories, seed
 │   └── middleware/       # Express error handling, auth guard
 ├── client/src/
 │   ├── pages/           # Host (dashboard, editor, game) + Player (join, game)
@@ -134,7 +154,13 @@ Server `.env` (defaults work for development):
 | `PORT` | `3001` | Server port |
 | `JWT_SECRET` | `dev-secret` | JWT signing key |
 | `CORS_ORIGIN` | `http://localhost:5173` | Allowed client origin |
-| `DB_PATH` | `./data/quiz.db` | SQLite file path |
+| `DB_TYPE` | `sqlite` | Database engine: `sqlite` or `postgres` |
+| `DB_PATH` | `./data/quiz.db` | SQLite file path (only when `DB_TYPE=sqlite`) |
+| `POSTGRES_HOST` | `localhost` | PostgreSQL host |
+| `POSTGRES_PORT` | `5432` | PostgreSQL port |
+| `POSTGRES_DB` | `quizapp` | PostgreSQL database name |
+| `POSTGRES_USER` | `quizapp` | PostgreSQL user |
+| `POSTGRES_PASSWORD` | `quizapp` | PostgreSQL password |
 | `SMTP_HOST` | `localhost` | SMTP server host |
 | `SMTP_PORT` | `1025` | SMTP server port |
 | `SMTP_SECURE` | `false` | Use TLS for SMTP |
@@ -168,6 +194,7 @@ All transitions are automatic with status guards - host can also advance manuall
 - [ ] Unit and integration tests
 - [x] Docker setup for deployment
 - [x] Email verification at registration
+- [x] PostgreSQL support (dual SQLite/PostgreSQL via Kysely)
 - [ ] Production build and deployment guide
 - [ ] Configurable auto-advance timing per quiz
 - [ ] Player avatars / custom colors

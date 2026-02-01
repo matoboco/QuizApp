@@ -8,6 +8,14 @@ export const config = {
   jwtPlayerExpiry: process.env.JWT_PLAYER_EXPIRY || '4h',
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
   dbPath: process.env.DB_PATH || './data/quiz.db',
+  dbType: (process.env.DB_TYPE || 'sqlite') as 'sqlite' | 'postgres',
+  postgres: {
+    host: process.env.POSTGRES_HOST || 'localhost',
+    port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
+    database: process.env.POSTGRES_DB || 'quizapp',
+    user: process.env.POSTGRES_USER || 'quizapp',
+    password: process.env.POSTGRES_PASSWORD || 'quizapp',
+  },
   nodeEnv: process.env.NODE_ENV || 'development',
   smtp: {
     host: process.env.SMTP_HOST || 'localhost',
