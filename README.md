@@ -38,27 +38,6 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 - JWT-based session recovery
 - Automatic state sync on reconnect
 
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| Frontend | React 18, TypeScript, Vite, Tailwind CSS |
-| Backend | Express.js, TypeScript, Socket.IO |
-| Database | SQLite (better-sqlite3) or PostgreSQL — selectable via `DB_TYPE` env |
-| Query Builder | Kysely (type-safe, dialect-agnostic) |
-| Auth | JWT (host 24h, player 4h), bcrypt, email verification |
-| Email | Nodemailer (MailPit for dev) |
-| Validation | Zod |
-| Real-time | Socket.IO (WebSocket) |
-| Deployment | Docker Compose, Nginx |
-
-### Email Verification
-- New users must verify their email with a 6-digit code before accessing the app
-- Unverified users who log in receive a fresh verification code automatically
-- Configurable allowed email domains (`ALLOWED_EMAIL_DOMAINS` - comma-separated, empty = all allowed)
-- Code expires after 10 minutes (configurable via `VERIFICATION_CODE_EXPIRY_MINUTES`)
-- Resend button with 60-second cooldown
-
 ### Quiz Export / Import
 
 Export any quiz from the dashboard as a `.quiz.txt` file and import it back (or share it with others). The format is plain text, editable in any text editor:
@@ -105,118 +84,6 @@ Format rules:
 - `time:` and `points:` are optional (defaults: 20s, 1000pts)
 - `* answer` = correct, `- answer` = wrong, `1. answer` = ordering position
 
-### Database
-- **Dual database support** — switch between SQLite and PostgreSQL via a single env variable (`DB_TYPE=sqlite|postgres`)
-- Kysely query builder provides type-safe, dialect-agnostic queries — the same codebase runs against both databases
-- Built-in migration system (`001_initial_schema`) runs automatically on startup
-- Migration script to transfer existing SQLite data to PostgreSQL: `npm run migrate-to-postgres`
-
-### Docker Deployment
-- Single command deployment with `docker compose up -d --build`
-- **PostgreSQL** included by default (with healthcheck) — server waits for DB readiness before starting
-- Nginx reverse proxy for the client
-- MailPit for email testing (web UI at `http://localhost:8025`)
-- For SQLite mode: `docker compose -f docker-compose.yml -f docker-compose.sqlite.yml up -d --build`
-
-## Quick Start
-
-```bash
-# Install dependencies
-cd server && npm install
-cd ../client && npm install
-
-# Seed database with test data
-cd ../server && npm run seed
-
-# Start server (port 3001)
-npm run dev
-
-# In another terminal - start client (port 5173)
-cd client && npm run dev
-```
-
-Open `http://localhost:5173` in browser.
-
-### Docker (PostgreSQL — default)
-
-```bash
-docker compose up -d --build
-```
-
-### Docker (SQLite)
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.sqlite.yml up -d --build
-```
-
-Open `http://localhost` (app) and `http://localhost:8025` (MailPit email UI).
-
-### Migrate SQLite data to PostgreSQL
-
-```bash
-cd server && npm run migrate-to-postgres
-```
-
-### Test Credentials
-
-```
-Email:    test@example.com
-Password: password123
-```
-
-Seed data includes 3 sample quizzes (World Geography, Science Basics, Pop Culture).
-
-### Player Access
-
-Players don't need an account. Open `http://localhost:5173/play` and enter the PIN shown on the host's lobby screen.
-
-## Project Structure
-
-```
-QuizApp/
-├── shared/types/        # Shared TypeScript interfaces
-├── server/src/
-│   ├── auth/            # JWT auth, login, register
-│   ├── quiz/            # Quiz CRUD API
-│   ├── game/            # Game engine, state manager, scoring
-│   ├── socket/          # Socket.IO handlers, auth middleware
-│   ├── db/              # Kysely connection, migrations, repositories, seed
-│   └── middleware/       # Express error handling, auth guard
-├── client/src/
-│   ├── pages/           # Host (dashboard, editor, game) + Player (join, game)
-│   ├── components/      # UI components (game phases, editor, effects)
-│   ├── socket/          # Socket.IO hooks (useSocket, useGameSocket, useReconnection)
-│   ├── context/         # AuthContext
-│   ├── hooks/           # useHostGame, usePlayerGame, useQuizzes, etc.
-│   ├── api/             # Axios HTTP clients
-│   └── lib/             # Constants, utils, scoring
-```
-
-## Environment Variables
-
-Server `.env` (defaults work for development):
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `PORT` | `3001` | Server port |
-| `JWT_SECRET` | `dev-secret` | JWT signing key |
-| `CORS_ORIGIN` | `http://localhost:5173` | Allowed client origin |
-| `DB_TYPE` | `sqlite` | Database engine: `sqlite` or `postgres` |
-| `DB_PATH` | `./data/quiz.db` | SQLite file path (only when `DB_TYPE=sqlite`) |
-| `POSTGRES_HOST` | `localhost` | PostgreSQL host |
-| `POSTGRES_PORT` | `5432` | PostgreSQL port |
-| `POSTGRES_DB` | `quizapp` | PostgreSQL database name |
-| `POSTGRES_USER` | `quizapp` | PostgreSQL user |
-| `POSTGRES_PASSWORD` | `quizapp` | PostgreSQL password |
-| `SMTP_HOST` | `localhost` | SMTP server host |
-| `SMTP_PORT` | `1025` | SMTP server port |
-| `SMTP_SECURE` | `false` | Use TLS for SMTP |
-| `SMTP_USER` | | SMTP auth username |
-| `SMTP_PASS` | | SMTP auth password |
-| `SMTP_FROM` | `QuizApp <noreply@quizapp.local>` | Sender address |
-| `VERIFICATION_CODE_EXPIRY_MINUTES` | `10` | Code expiry time |
-| `ALLOWED_EMAIL_DOMAINS` | | Comma-separated allowed domains (empty = all) |
-
 ## Game Flow
 
 ```
@@ -226,6 +93,21 @@ Lobby → Get Ready (3s) → Question (timer) → Time's Up (1.5s)
 ```
 
 All transitions are automatic with status guards - host can also advance manually via on-screen controls.
+
+## Quick Start
+
+```bash
+docker compose up -d --build
+```
+
+Open `http://localhost` (app) and `http://localhost:8025` (MailPit email UI).
+
+See [Development Guide](docs/DEVELOPMENT.md) for local setup, environment variables, and test credentials.
+
+## Docs
+
+- [Tech Stack & Architecture](docs/TECH_STACK.md) — technologies, database, project structure
+- [Development Guide](docs/DEVELOPMENT.md) — local setup, Docker, environment variables
 
 ## TODO
 
