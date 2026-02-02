@@ -57,6 +57,22 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 - **Ordering partial credit**: `items in correct position / total items`
 - Individual score breakdown after each question
 
+### Admin Panel
+- First registered user is automatically promoted to **superadmin**
+- **Role-based access control** with three roles: `user`, `admin`, `superadmin`
+- Admin dashboard with platform statistics (total users, quizzes, games, activity)
+- User management: activate/deactivate accounts, reset passwords, change emails
+- Superadmins can assign roles and delete users
+- Accessible via "Admin" link in the header (admin/superadmin only)
+
+### Game History & Statistics
+- **Per-quiz history** — list of all finished games with player counts and timestamps
+- **Game detail view** — final leaderboard, per-player stats (correct answers, avg response time)
+- **Question-level analytics** — answer distribution chart for each question
+- **Ranking progression** — line chart showing how player positions evolved question by question
+- **Shareable results** — generate a public link so participants can review their game without logging in
+- "History" button on each quiz card, "View Details" button on final results screen
+
 ### Reconnection
 - Players and hosts can reconnect after page refresh or network drop
 - JWT-based session recovery
@@ -126,7 +142,7 @@ All transitions are automatic with status guards - host can also advance manuall
 docker compose up -d --build
 ```
 
-Open `http://localhost` (app) and `http://localhost:8025` (MailPit email UI).
+Open `http://localhost` (app), `http://localhost:8025` (MailPit email UI), and `http://localhost:8080` (Adminer DB UI — server: `postgres`, user: `quizapp`, password: `quizapp-secret`).
 
 See [Development Guide](docs/DEVELOPMENT.md) for local setup, environment variables, and test credentials.
 
@@ -143,8 +159,9 @@ See [Development Guide](docs/DEVELOPMENT.md) for local setup, environment variab
 - [ ] Team mode
 - [x] Quiz import/export (`.quiz.txt` plain-text format)
 - [ ] Quiz duplication
-- [ ] Post-game statistics and analytics for host
-- [ ] Password reset / forgot password
+- [x] Post-game statistics and analytics for host
+- [x] Admin panel with user/role management
+- [ ] Password reset / forgot password (self-service)
 - [ ] Rate limiting on API endpoints
 - [ ] Unit and integration tests
 - [x] Docker setup for deployment
