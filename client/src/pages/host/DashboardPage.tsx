@@ -4,9 +4,9 @@ import { useQuizzes } from '@/hooks/useQuizzes';
 import { createGameApi } from '@/api/game.api';
 import { getQuizApi, createQuizApi, updateQuizApi } from '@/api/quiz.api';
 import QuizCardGrid from '@/components/quiz/QuizCardGrid';
-import CreateQuizFab from '@/components/quiz/CreateQuizFab';
 import DeleteQuizDialog from '@/components/quiz/DeleteQuizDialog';
 import ImportQuizButton from '@/components/quiz/ImportQuizButton';
+import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { serializeQuizTxt, downloadQuizTxt, sanitizeFilename, type ParsedQuiz } from '@/lib/quizTxt';
 import type { QuizSummary } from '@shared/types/quiz';
@@ -146,7 +146,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="pb-20">
+    <div>
       {/* Page header */}
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
@@ -157,7 +157,20 @@ export default function DashboardPage() {
             Create, manage, and host your quizzes.
           </p>
         </div>
-        <ImportQuizButton onImport={handleImport} />
+        <div className="flex items-center gap-2">
+          <ImportQuizButton onImport={handleImport} />
+          <Button
+            variant="primary"
+            onClick={handleCreateQuiz}
+            isLoading={isCreating}
+            className="flex items-center gap-1.5"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            New Quiz
+          </Button>
+        </div>
       </div>
 
       {/* Action error banner */}
@@ -209,9 +222,6 @@ export default function DashboardPage() {
         onPlay={handlePlay}
         onExport={handleExport}
       />
-
-      {/* Create quiz FAB */}
-      <CreateQuizFab onClick={handleCreateQuiz} />
 
       {/* Delete confirmation dialog */}
       <DeleteQuizDialog

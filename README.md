@@ -50,7 +50,7 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 - **Base points**: 1000 per correct answer (scaled by correctness ratio for partial credit)
 - **Time bonus**: up to 500 points for fast answers
 - **Streak multiplier**: increases by 0.1x for each consecutive fully correct answer (max 2x)
-- Incorrect answers reset streak to 0; partially correct answers also reset streak but still earn points
+- Incorrect answers, partial answers, or not answering in time all reset streak to 0
 - **Multi Select partial credit**: `(correct selected - incorrect selected) / total correct` (min 0)
 - **Ordering partial credit**: `items in correct position / total items`
 - Individual score breakdown after each question

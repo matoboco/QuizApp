@@ -1,21 +1,61 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuizEditor } from '@/hooks/useQuizEditor';
-import { useAutoSave } from '@/hooks/useAutoSave';
 import QuizSettingsForm from '@/components/editor/QuizSettingsForm';
 import QuestionList from '@/components/editor/QuestionList';
 import QuestionEditor from '@/components/editor/QuestionEditor';
 import AutoSaveIndicator from '@/components/editor/AutoSaveIndicator';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import Modal from '@/components/common/Modal';
 
 export default function QuizEditorPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
 
   const editor = useQuizEditor(id!);
-  const autoSave = useAutoSave(editor.save, editor.isDirty);
+
+  // Manual save state (no autosave)
+  const [isSaving, setIsSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  const handleSave = useCallback(async () => {
+    if (isSaving) return;
+    setIsSaving(true);
+    setSaveError(null);
+    try {
+      await editor.save();
+      setLastSaved(new Date());
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : 'Failed to save');
+    } finally {
+      setIsSaving(false);
+    }
+  }, [editor, isSaving]);
+
+  // Handle back navigation with unsaved changes check
+  const handleBack = useCallback(() => {
+    if (editor.isDirty) {
+      setShowLeaveModal(true);
+    } else {
+      navigate('/dashboard');
+    }
+  }, [editor.isDirty, navigate]);
+
+  // Warn before closing tab/window with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (editor.isDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [editor.isDirty]);
 
   // Loading state
   if (editor.isLoading) {
@@ -70,7 +110,7 @@ export default function QuizEditorPage() {
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={handleBack}
             className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             title="Back to dashboard"
           >
@@ -80,21 +120,21 @@ export default function QuizEditorPage() {
           </button>
           <div className="h-6 w-px bg-gray-300" />
           <AutoSaveIndicator
-            isSaving={autoSave.isSaving}
+            isSaving={isSaving}
             isDirty={editor.isDirty}
-            lastSaved={autoSave.lastSaved}
-            error={autoSave.saveError}
+            lastSaved={lastSaved}
+            error={saveError}
           />
         </div>
 
         <Button
           variant="primary"
           size="sm"
-          onClick={autoSave.saveNow}
-          isLoading={autoSave.isSaving}
-          disabled={!editor.isDirty && !autoSave.isSaving}
+          onClick={handleSave}
+          isLoading={isSaving}
+          disabled={!editor.isDirty && !isSaving}
         >
-          Save Now
+          Save
         </Button>
       </div>
 
@@ -195,6 +235,28 @@ export default function QuizEditorPage() {
           )}
         </div>
       </div>
+
+      {/* Unsaved changes confirmation modal */}
+      <Modal
+        isOpen={showLeaveModal}
+        onClose={() => setShowLeaveModal(false)}
+        title="Unsaved Changes"
+        closeOnBackdrop={false}
+        footer={
+          <>
+            <Button variant="secondary" onClick={() => setShowLeaveModal(false)}>
+              Stay
+            </Button>
+            <Button variant="danger" onClick={() => navigate('/dashboard')}>
+              Leave Without Saving
+            </Button>
+          </>
+        }
+      >
+        <p className="text-gray-600">
+          You have unsaved changes. Are you sure you want to leave? Your changes will be lost.
+        </p>
+      </Modal>
     </div>
   );
 }

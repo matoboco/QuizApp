@@ -39,6 +39,30 @@ function ShapeIcon({ shape, className }: { shape: string; className?: string }) 
           <rect x="2" y="2" width="20" height="20" rx="2" />
         </svg>
       );
+    case 'hexagon':
+      return (
+        <svg className={classes} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" />
+        </svg>
+      );
+    case 'star':
+      return (
+        <svg className={classes} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+        </svg>
+      );
+    case 'pentagon':
+      return (
+        <svg className={classes} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L2 9l4 11h12l4-11L12 2z" />
+        </svg>
+      );
+    case 'heart':
+      return (
+        <svg className={classes} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+        </svg>
+      );
     default:
       return null;
   }

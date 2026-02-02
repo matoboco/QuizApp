@@ -191,6 +191,25 @@ class GameStateManager {
   }
 
   /**
+   * Reset streaks for players who didn't answer in time.
+   * Should be called when transitioning to answers phase.
+   * Returns array of {playerId, score} for players whose streaks were reset.
+   */
+  resetStreaksForUnanswered(sessionId: string): { playerId: string; score: number }[] {
+    const state = this.states.get(sessionId);
+    if (!state) return [];
+
+    const resetPlayers: { playerId: string; score: number }[] = [];
+    for (const player of state.players) {
+      if (!state.currentAnswers.has(player.id)) {
+        player.streak = 0;
+        resetPlayers.push({ playerId: player.id, score: player.score });
+      }
+    }
+    return resetPlayers;
+  }
+
+  /**
    * Get sorted leaderboard entries from the current state.
    */
   getLeaderboard(sessionId: string): LeaderboardEntry[] {

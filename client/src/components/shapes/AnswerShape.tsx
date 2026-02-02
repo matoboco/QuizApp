@@ -4,6 +4,10 @@ import { Triangle } from './Triangle';
 import { Diamond } from './Diamond';
 import { Circle } from './Circle';
 import { Square } from './Square';
+import { Hexagon } from './Hexagon';
+import { Star } from './Star';
+import { Pentagon } from './Pentagon';
+import { Heart } from './Heart';
 
 interface AnswerShapeProps {
   index: number;
@@ -20,6 +24,10 @@ const SHAPE_COMPONENTS: Record<
   diamond: Diamond,
   circle: Circle,
   square: Square,
+  hexagon: Hexagon,
+  star: Star,
+  pentagon: Pentagon,
+  heart: Heart,
 };
 
 export const AnswerShape: React.FC<AnswerShapeProps> = ({

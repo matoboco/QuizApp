@@ -92,24 +92,24 @@ export default function OrderingGrid({
               </svg>
             )}
 
-            {/* Touch move buttons */}
+            {/* Touch move buttons - larger for mobile usability */}
             {!submitted && !disabled && (
-              <div className="flex flex-col gap-0.5 sm:hidden">
+              <div className="flex flex-col gap-1 sm:hidden">
                 <button
                   onClick={() => index > 0 && moveItem(index, index - 1)}
                   disabled={index === 0}
-                  className="p-0.5 text-white/60 disabled:opacity-30"
+                  className="p-2 rounded-lg bg-white/20 text-white active:bg-white/40 disabled:opacity-30 disabled:active:bg-white/20 touch-manipulation"
                 >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
                   </svg>
                 </button>
                 <button
                   onClick={() => index < items.length - 1 && moveItem(index, index + 1)}
                   disabled={index === items.length - 1}
-                  className="p-0.5 text-white/60 disabled:opacity-30"
+                  className="p-2 rounded-lg bg-white/20 text-white active:bg-white/40 disabled:opacity-30 disabled:active:bg-white/20 touch-manipulation"
                 >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>

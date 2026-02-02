@@ -283,6 +283,12 @@ class GameEngine {
    * Auto-advances to result phase after 3 seconds.
    */
   async showAnswers(sessionId: string): Promise<void> {
+    // Reset streak for players who didn't answer in time and persist to DB
+    const resetPlayers = gameStateManager.resetStreaksForUnanswered(sessionId);
+    for (const { playerId, score } of resetPlayers) {
+      await playerRepository.updateScore(playerId, score, 0);
+    }
+
     gameStateManager.setStatus(sessionId, 'answers');
     await gameRepository.updateStatus(sessionId, 'answers');
 
