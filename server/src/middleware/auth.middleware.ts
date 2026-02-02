@@ -60,3 +60,57 @@ export function requireHost(
 
   next();
 }
+
+export function requireAdmin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  if (!req.user || req.user.type !== 'host') {
+    const response: ApiResponse = {
+      success: false,
+      error: 'Admin access required',
+    };
+    res.status(403).json(response);
+    return;
+  }
+
+  const role = req.user.role;
+  if (!role || !['admin', 'superadmin'].includes(role)) {
+    const response: ApiResponse = {
+      success: false,
+      error: 'Admin access required',
+    };
+    res.status(403).json(response);
+    return;
+  }
+
+  next();
+}
+
+export function requireSuperadmin(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
+  if (!req.user || req.user.type !== 'host') {
+    const response: ApiResponse = {
+      success: false,
+      error: 'Superadmin access required',
+    };
+    res.status(403).json(response);
+    return;
+  }
+
+  const role = req.user.role;
+  if (role !== 'superadmin') {
+    const response: ApiResponse = {
+      success: false,
+      error: 'Superadmin access required',
+    };
+    res.status(403).json(response);
+    return;
+  }
+
+  next();
+}

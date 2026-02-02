@@ -2,7 +2,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastProvider } from '@/context/ToastContext';
 import { AuthProvider } from '@/context/AuthContext';
 import ProtectedRoute from '@/components/guards/ProtectedRoute';
+import AdminGuard from '@/components/guards/AdminGuard';
 import MainLayout from '@/components/layout/MainLayout';
+import AdminLayout from '@/components/admin/AdminLayout';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import VerifyEmailPage from '@/pages/auth/VerifyEmailPage';
@@ -11,6 +13,11 @@ import QuizEditorPage from '@/pages/host/QuizEditorPage';
 import PlayerJoinPage from '@/pages/player/PlayerJoinPage';
 import PlayerGamePage from '@/pages/player/PlayerGamePage';
 import HostGamePage from '@/pages/host/HostGamePage';
+import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
+import AdminUsersPage from '@/pages/admin/AdminUsersPage';
+import QuizHistoryPage from '@/pages/history/QuizHistoryPage';
+import GameHistoryPage from '@/pages/history/GameHistoryPage';
+import SharedGamePage from '@/pages/history/SharedGamePage';
 
 function App() {
   return (
@@ -27,6 +34,9 @@ function App() {
             <Route path="/play" element={<PlayerJoinPage />} />
             <Route path="/play/:sessionId" element={<PlayerGamePage />} />
 
+            {/* Public shared game history */}
+            <Route path="/shared/:shareToken" element={<SharedGamePage />} />
+
             {/* Protected host routes */}
             <Route element={<ProtectedRoute />}>
               <Route element={<MainLayout />}>
@@ -34,6 +44,18 @@ function App() {
                 <Route path="/quiz/:id/edit" element={<QuizEditorPage />} />
               </Route>
               <Route path="/host/:sessionId" element={<HostGamePage />} />
+
+              {/* History routes */}
+              <Route path="/quiz/:quizId/history" element={<QuizHistoryPage />} />
+              <Route path="/game/:gameId/history" element={<GameHistoryPage />} />
+
+              {/* Admin routes */}
+              <Route element={<AdminGuard />}>
+                <Route element={<AdminLayout />}>
+                  <Route path="/admin" element={<AdminDashboardPage />} />
+                  <Route path="/admin/users" element={<AdminUsersPage />} />
+                </Route>
+              </Route>
             </Route>
 
             {/* Catch-all redirect */}

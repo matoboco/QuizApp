@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { LeaderboardEntry } from '@shared/types/game';
 import { formatScore } from '@/lib/utils';
 import Button from '@/components/common/Button';
 
 interface FinalResultsScreenProps {
   leaderboard: LeaderboardEntry[];
+  sessionId: string;
   onBackToDashboard: () => void;
 }
 
@@ -81,8 +83,10 @@ function PodiumPlace({
 
 export default function FinalResultsScreen({
   leaderboard,
+  sessionId,
   onBackToDashboard,
 }: FinalResultsScreenProps) {
+  const navigate = useNavigate();
   const [showConfetti, setShowConfetti] = useState(false);
 
   useEffect(() => {
@@ -157,19 +161,30 @@ export default function FinalResultsScreen({
         </div>
       </div>
 
-      {/* Back button */}
+      {/* Action buttons */}
       <div className="flex-shrink-0 px-4 pb-8 pt-4">
-        <div className="max-w-2xl mx-auto flex justify-center">
+        <div className="max-w-2xl mx-auto flex justify-center gap-4">
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={() => navigate(`/game/${sessionId}/history`)}
+            className="px-8 py-4 text-lg font-display font-bold shadow-lg"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+            </svg>
+            View Details
+          </Button>
           <Button
             variant="primary"
             size="lg"
             onClick={onBackToDashboard}
-            className="px-10 py-4 text-lg font-display font-bold shadow-lg"
+            className="px-8 py-4 text-lg font-display font-bold shadow-lg"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
             </svg>
-            Back to Dashboard
+            Dashboard
           </Button>
         </div>
       </div>

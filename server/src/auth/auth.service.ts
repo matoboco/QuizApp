@@ -29,12 +29,14 @@ function getJwtSecret(): string {
   return secret;
 }
 
-function toUserPublic(user: { id: string; email: string; username: string; emailVerified: boolean; createdAt: string }): UserPublic {
+function toUserPublic(user: { id: string; email: string; username: string; emailVerified: boolean; role: string; isActive: boolean; createdAt: string }): UserPublic {
   return {
     id: user.id,
     email: user.email,
     username: user.username,
     emailVerified: user.emailVerified,
+    role: user.role as UserPublic['role'],
+    isActive: user.isActive,
     createdAt: user.createdAt,
   };
 }
@@ -64,11 +66,16 @@ class AuthService {
     // Hash the password
     const passwordHash = await bcrypt.hash(data.password, BCRYPT_ROUNDS);
 
+    // Check if this is the first user - they become superadmin
+    const userCount = await userRepository.count();
+    const role = userCount === 0 ? 'superadmin' : 'user';
+
     // Create user in database (unverified)
     const user = await userRepository.create({
       email: data.email,
       username: data.username,
       passwordHash,
+      role,
     });
 
     // Generate and send verification code
@@ -88,6 +95,11 @@ class AuthService {
       throw new UnauthorizedError('Invalid email or password');
     }
 
+    // Check if user is active
+    if (!user.isActive) {
+      throw new UnauthorizedError('Your account has been deactivated. Please contact an administrator.');
+    }
+
     // Verify password
     const isPasswordValid = await bcrypt.compare(data.password, user.passwordHash);
     if (!isPasswordValid) {
@@ -105,7 +117,7 @@ class AuthService {
     }
 
     // Generate JWT token
-    const token = this.generateHostToken(user.id, user.email);
+    const token = this.generateHostToken(user.id, user.email, user.role);
 
     return { user: toUserPublic(user), token };
   }
@@ -138,7 +150,7 @@ class AuthService {
     await userRepository.markEmailVerified(user.id);
 
     // Generate JWT token
-    const token = this.generateHostToken(user.id, user.email);
+    const token = this.generateHostToken(user.id, user.email, user.role);
 
     return {
       user: { ...toUserPublic(user), emailVerified: true },
@@ -180,11 +192,12 @@ class AuthService {
     await sendVerificationCode(email, code);
   }
 
-  generateHostToken(userId: string, email: string): string {
+  generateHostToken(userId: string, email: string, role: string = 'user'): string {
     const payload: HostTokenPayload = {
       userId,
       email,
       type: 'host',
+      role: role as HostTokenPayload['role'],
     };
 
     const expiresIn = process.env.JWT_HOST_EXPIRY || '7d';

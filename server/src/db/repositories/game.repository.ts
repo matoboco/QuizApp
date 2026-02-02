@@ -12,6 +12,7 @@ interface GameSessionRow {
   created_at: string;
   started_at: string | null;
   finished_at: string | null;
+  share_token: string | null;
 }
 
 interface CreateGameData {
@@ -37,6 +38,7 @@ function rowToGameSession(row: GameSessionRow): GameSession {
     createdAt: row.created_at,
     startedAt: row.started_at ?? undefined,
     finishedAt: row.finished_at ?? undefined,
+    shareToken: row.share_token ?? undefined,
   };
 }
 

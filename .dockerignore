@@ -17,3 +17,7 @@ dist
 .vite
 data/
 **/data/
+shared/**/*.js
+shared/**/*.js.map
+shared/**/*.d.ts
+shared/**/*.d.ts.map

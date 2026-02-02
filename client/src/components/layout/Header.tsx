@@ -20,6 +20,14 @@ export default function Header() {
             </span>
           </Link>
           <div className="flex items-center gap-4">
+            {user && ['admin', 'superadmin'].includes(user.role) && (
+              <Link
+                to="/admin"
+                className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+              >
+                Admin
+              </Link>
+            )}
             <span className="text-sm text-gray-600">
               {user?.username}
             </span>

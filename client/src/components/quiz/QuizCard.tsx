@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { QuizSummary } from '@shared/types/quiz';
 import { formatDate, cn } from '@/lib/utils';
@@ -9,6 +9,50 @@ interface QuizCardProps {
   onDelete: (id: string) => void;
   onPlay: (id: string) => void;
   onExport: (id: string) => void;
+}
+
+function QuizCardMenu({ onExport, onDelete }: { onExport: () => void; onDelete: () => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative ml-auto">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+      >
+        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
+        </svg>
+      </button>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
+          <div className="absolute right-0 bottom-full z-20 mb-1 w-40 bg-white rounded-md shadow-lg border border-gray-200 py-1">
+            <button
+              onClick={() => { setIsOpen(false); onExport(); }}
+              className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Export
+            </button>
+            <div className="border-t border-gray-100 my-1" />
+            <button
+              onClick={() => { setIsOpen(false); onDelete(); }}
+              className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Delete
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
 export default function QuizCard({ quiz, onDelete, onPlay, onExport }: QuizCardProps) {
@@ -111,7 +155,7 @@ export default function QuizCard({ quiz, onDelete, onPlay, onExport }: QuizCardP
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => onExport(quiz.id)}
+          onClick={() => navigate(`/quiz/${quiz.id}/history`)}
           className="flex items-center gap-1.5"
         >
           <svg
@@ -125,10 +169,10 @@ export default function QuizCard({ quiz, onDelete, onPlay, onExport }: QuizCardP
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          Export
+          History
         </Button>
 
         <Button
@@ -159,29 +203,7 @@ export default function QuizCard({ quiz, onDelete, onPlay, onExport }: QuizCardP
           Play
         </Button>
 
-        <div className="ml-auto">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onDelete(quiz.id)}
-            className="text-red-500 hover:bg-red-50 hover:text-red-600"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-              />
-            </svg>
-          </Button>
-        </div>
+        <QuizCardMenu onExport={() => onExport(quiz.id)} onDelete={() => onDelete(quiz.id)} />
       </div>
     </div>
   );

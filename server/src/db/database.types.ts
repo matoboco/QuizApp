@@ -17,6 +17,8 @@ export interface UsersTable {
   username: string;
   password_hash: string;
   email_verified: number;
+  role: string;
+  is_active: number;
   created_at: string;
   updated_at: string;
 }
@@ -45,6 +47,7 @@ export interface QuestionsTable {
   id: string;
   quiz_id: string;
   text: string;
+  description: string | null;
   image_url: string | null;
   question_type: string;
   require_all: number;
@@ -72,6 +75,7 @@ export interface GameSessionsTable {
   created_at: string;
   started_at: string | null;
   finished_at: string | null;
+  share_token: string | null;
 }
 
 export interface PlayersTable {

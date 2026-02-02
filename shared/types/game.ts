@@ -13,6 +13,7 @@ export interface GameSession {
   createdAt: string;
   startedAt?: string;
   finishedAt?: string;
+  shareToken?: string;
 }
 
 export interface Player {

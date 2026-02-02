@@ -84,6 +84,7 @@ export default function HostGamePage() {
     return (
       <FinalResultsScreen
         leaderboard={gameState.leaderboard}
+        sessionId={sessionId!}
         onBackToDashboard={handleBackToDashboard}
       />
     );

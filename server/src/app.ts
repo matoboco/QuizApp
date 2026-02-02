@@ -4,6 +4,8 @@ import { config } from './config';
 import { authRouter } from './auth/auth.routes';
 import { quizRouter } from './quiz/quiz.routes';
 import { gameRouter } from './game/game.routes';
+import { adminRouter } from './admin/admin.routes';
+import { historyRouter } from './history/history.routes';
 import { errorMiddleware } from './middleware/error.middleware';
 
 const app = express();
@@ -57,8 +59,9 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // ---------------------------------------------------------------------------
 app.use('/api/auth', authRouter);
 app.use('/api/quizzes', quizRouter);
-
 app.use('/api/games', gameRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/history', historyRouter);
 
 // Health check
 app.get('/api/health', (_req: Request, res: Response) => {

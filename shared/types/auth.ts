@@ -1,9 +1,13 @@
+export type UserRole = 'user' | 'admin' | 'superadmin';
+
 export interface User {
   id: string;
   email: string;
   username: string;
   passwordHash: string;
   emailVerified: boolean;
+  role: UserRole;
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -13,6 +17,8 @@ export interface UserPublic {
   email: string;
   username: string;
   emailVerified: boolean;
+  role: UserRole;
+  isActive: boolean;
   createdAt: string;
 }
 
@@ -53,6 +59,7 @@ export interface HostTokenPayload {
   userId: string;
   email: string;
   type: 'host';
+  role: UserRole;
 }
 
 export interface PlayerTokenPayload {
