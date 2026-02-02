@@ -330,6 +330,11 @@ export default function PlayerGamePage() {
                 <h2 className="text-white font-display font-bold text-lg md:text-xl text-center leading-snug">
                   {currentQuestion.text}
                 </h2>
+                {currentQuestion.description && (
+                  <p className="mt-1 text-white/70 text-sm md:text-base text-center">
+                    {currentQuestion.description}
+                  </p>
+                )}
                 {currentQuestion.imageUrl && (
                   <div className="mt-3 flex justify-center">
                     <img

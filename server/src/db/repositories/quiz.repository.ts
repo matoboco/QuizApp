@@ -17,6 +17,7 @@ interface QuestionRow {
   id: string;
   quiz_id: string;
   text: string;
+  description: string | null;
   image_url: string | null;
   question_type: string;
   require_all: number;
@@ -65,6 +66,7 @@ function rowToQuestion(row: QuestionRow, answers: Answer[]): Question {
     id: row.id,
     quizId: row.quiz_id,
     text: row.text,
+    description: row.description ?? undefined,
     imageUrl: row.image_url ?? undefined,
     questionType: (row.question_type || 'multiple-choice') as QuestionType,
     requireAll: row.require_all === 1,
@@ -279,6 +281,7 @@ export class QuizRepository {
             id: questionId,
             quiz_id: quizId,
             text: q.text,
+            description: q.description || null,
             image_url: q.imageUrl || null,
             question_type: q.questionType || 'multiple-choice',
             require_all: q.requireAll ? 1 : 0,
@@ -317,6 +320,7 @@ export class QuizRepository {
           id: questionId,
           quizId,
           text: q.text,
+          description: q.description,
           imageUrl: q.imageUrl,
           questionType: q.questionType || 'multiple-choice',
           requireAll: q.requireAll || false,

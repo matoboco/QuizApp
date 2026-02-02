@@ -34,7 +34,9 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
   - **Multi Select** - 2-8 answers, multiple correct (with optional partial credit)
   - **Ordering** - 2-8 items, players arrange in the correct order (partial credit)
 - Configurable time limit per question (5-120 seconds)
+- Optional description/hint text per question (shown to players below question)
 - Optional image URL for questions
+- 8 distinct answer colors and shapes for multi-select/ordering questions
 - Draft / published quiz states
 - **Export / Import** quizzes as plain-text `.quiz.txt` files — human-readable, editable in any text editor, round-trip safe
 
@@ -69,6 +71,7 @@ Export any quiz from the dashboard as a `.quiz.txt` file and import it back (or 
 > Test your knowledge of world capitals and landmarks
 
 ## What is the capital of France?
+>> Hint: It's known as the City of Light
 type: multiple-choice
 * Paris
 - London
@@ -102,6 +105,7 @@ requireAll: true
 Format rules:
 - `# Title` and optional `> Description` at the top
 - `## Question text` starts each question
+- `>> Hint text` optional description/hint shown to players
 - `type:` is required (`multiple-choice`, `true-false`, `multi-select`, `ordering`)
 - `time:` and `points:` are optional (defaults: 20s, 1000pts)
 - `* answer` = correct, `- answer` = wrong, `1. answer` = ordering position

@@ -74,6 +74,7 @@ export interface PlayerGameState {
   currentQuestion?: {
     id: string;
     text: string;
+    description?: string;
     imageUrl?: string;
     questionType: QuestionType;
     requireAll: boolean;

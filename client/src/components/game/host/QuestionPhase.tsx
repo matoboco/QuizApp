@@ -88,6 +88,11 @@ export default function QuestionPhase({
           <h2 className="text-white font-display font-bold text-3xl md:text-4xl lg:text-5xl text-center text-shadow-lg leading-tight">
             {question.text}
           </h2>
+          {question.description && (
+            <p className="mt-3 text-white/80 text-lg md:text-xl text-center font-medium">
+              {question.description}
+            </p>
+          )}
           {question.imageUrl && (
             <div className="mt-4 flex justify-center">
               <img

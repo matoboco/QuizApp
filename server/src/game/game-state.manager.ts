@@ -292,6 +292,7 @@ class GameStateManager {
       currentQuestion = {
         id: state.currentQuestion.id,
         text: state.currentQuestion.text,
+        description: state.currentQuestion.description,
         imageUrl: state.currentQuestion.imageUrl,
         questionType: state.currentQuestion.questionType,
         requireAll: state.currentQuestion.requireAll,

@@ -299,6 +299,7 @@ export function useQuizEditor(quizId: string): UseQuizEditorReturn {
       const questionsPayload: CreateQuestionInput[] = quiz.questions.map((q) => ({
         id: q.id,
         text: q.text,
+        description: q.description,
         imageUrl: q.imageUrl,
         questionType: q.questionType,
         requireAll: q.requireAll,

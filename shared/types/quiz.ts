@@ -25,6 +25,7 @@ export interface Question {
   id: string;
   quizId: string;
   text: string;
+  description?: string; // optional hint/instruction shown to players
   imageUrl?: string;
   questionType: QuestionType;
   requireAll: boolean; // multi-select: require all correct answers
@@ -57,6 +58,7 @@ export interface UpdateQuizRequest {
 export interface CreateQuestionInput {
   id?: string;
   text: string;
+  description?: string;
   imageUrl?: string;
   questionType?: QuestionType;
   requireAll?: boolean;

@@ -55,6 +55,23 @@ export default function QuestionEditor({
         />
       </div>
 
+      {/* Description/hint (optional) */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Description / Hint (optional)
+        </label>
+        <input
+          type="text"
+          value={question.description || ''}
+          onChange={(e) => onChange({ description: e.target.value || undefined })}
+          placeholder="e.g. Select all correct answers, Double points!"
+          className="input"
+        />
+        <p className="mt-1 text-xs text-gray-500">
+          Shown to players below the question text
+        </p>
+      </div>
+
       {/* Image URL (optional) */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">

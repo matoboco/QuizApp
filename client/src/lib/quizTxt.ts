@@ -33,6 +33,9 @@ export function serializeQuizTxt(quiz: Quiz): string {
 
   for (const q of sorted) {
     lines.push(`## ${q.text}`);
+    if (q.description) {
+      lines.push(`>> ${q.description}`);
+    }
     lines.push(`type: ${q.questionType}`);
     if (q.timeLimit !== DEFAULT_TIME_LIMIT) {
       lines.push(`time: ${q.timeLimit}`);
@@ -123,6 +126,7 @@ export function parseQuizTxt(input: string): ParseResult {
 
     questions.push({
       text: currentQuestion.text!,
+      description: currentQuestion.description,
       questionType: qType,
       timeLimit: currentQuestion.timeLimit ?? DEFAULT_TIME_LIMIT,
       points: currentQuestion.points ?? DEFAULT_POINTS,
@@ -187,6 +191,20 @@ export function parseQuizTxt(input: string): ParseResult {
       currentQuestion = { text };
       currentAnswers = [];
       state = State.QUESTION_META;
+      continue;
+    }
+
+    // Question description (>> ...)
+    if (trimmed.startsWith('>> ')) {
+      if (!currentQuestion) {
+        errors.push({ line: lineNum, message: 'Question description (>> ...) outside of a question block' });
+        continue;
+      }
+      if (state !== State.QUESTION_META) {
+        errors.push({ line: lineNum, message: 'Question description (>> ...) must appear right after the question heading' });
+        continue;
+      }
+      currentQuestion.description = trimmed.slice(3).trim();
       continue;
     }
 

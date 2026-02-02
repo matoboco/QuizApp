@@ -23,6 +23,11 @@ export const questionInputSchema = z.object({
   text: z
     .string()
     .min(1, 'Question text is required'),
+  description: z
+    .string()
+    .max(500, 'Description must be at most 500 characters')
+    .optional()
+    .or(z.literal('')),
   imageUrl: z.string().url('Invalid image URL').optional().or(z.literal('')),
   questionType: z.enum(QUESTION_TYPES as [QuestionType, ...QuestionType[]]).default('multiple-choice'),
   requireAll: z.boolean().default(false),
