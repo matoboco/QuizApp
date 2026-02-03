@@ -63,6 +63,7 @@ export interface GameState {
   answerDistribution?: AnswerDistribution[];
   questionStartedAt?: number;
   totalQuestions: number;
+  answeredCount: number;
 }
 
 export interface PlayerGameState {

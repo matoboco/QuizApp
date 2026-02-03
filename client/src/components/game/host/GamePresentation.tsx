@@ -57,12 +57,10 @@ export default function GamePresentation({
         );
 
       case 'answers': {
-        // Approximate answered count from player data
-        // The server will send the definitive state, but we use what we have
         const connectedPlayers = players.filter((p) => p.isConnected).length;
         return (
           <AnswersPhase
-            totalAnswered={connectedPlayers} // will be overridden by server events
+            totalAnswered={gameState.answeredCount}
             totalPlayers={connectedPlayers}
           />
         );

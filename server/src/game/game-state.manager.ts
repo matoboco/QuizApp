@@ -390,6 +390,7 @@ class GameStateManager {
         : undefined,
       questionStartedAt: state.questionStartedAt,
       totalQuestions: state.totalQuestions,
+      answeredCount: state.currentAnswers.size,
     };
   }
 }
