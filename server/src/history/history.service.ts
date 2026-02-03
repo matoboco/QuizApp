@@ -101,6 +101,16 @@ class HistoryService {
       .orderBy('score', 'desc')
       .execute();
 
+    // Get questions
+    const questions = await db
+      .selectFrom('questions')
+      .select(['id', 'text', 'order_index'])
+      .where('quiz_id', '=', game.quiz_id as string)
+      .orderBy('order_index', 'asc')
+      .execute();
+
+    const totalQuestions = questions.length;
+
     // Get player stats (correct answers, average time)
     const playerStats = await db
       .selectFrom('player_answers')
@@ -133,18 +143,10 @@ class HistoryService {
         finalScore: player.score,
         finalRank: index + 1,
         correctAnswers: stats.correctCount,
-        totalAnswers: stats.totalCount,
+        totalAnswers: totalQuestions,
         averageTime: Math.round(stats.avgTime),
       };
     });
-
-    // Get questions
-    const questions = await db
-      .selectFrom('questions')
-      .select(['id', 'text', 'order_index'])
-      .where('quiz_id', '=', game.quiz_id as string)
-      .orderBy('order_index', 'asc')
-      .execute();
 
     const gameQuestions: GameQuestion[] = questions.map((q) => ({
       id: q.id,
