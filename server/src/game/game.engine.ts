@@ -222,12 +222,16 @@ class GameEngine {
 
     // Persist to DB (store first answerId for single answers, or first from array)
     const dbAnswerId = Array.isArray(answerId) ? answerId[0] || null : answerId;
+    // For number-guess, any answer within tolerance counts as correct for history
+    const dbIsCorrect = question.questionType === 'number-guess'
+      ? scoreBreakdown.correctRatio > 0
+      : scoreBreakdown.isCorrect;
     await playerAnswerRepository.create({
       playerId,
       sessionId,
       questionId,
       answerId: dbAnswerId,
-      isCorrect: scoreBreakdown.isCorrect,
+      isCorrect: dbIsCorrect,
       timeTaken,
       score: scoreBreakdown.totalPoints,
     });
