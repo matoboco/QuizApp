@@ -31,6 +31,12 @@ const QUESTION_TYPE_OPTIONS: { type: QuestionType; label: string; icon: string; 
     icon: 'M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12',
     description: 'Correct order',
   },
+  {
+    type: 'number-guess',
+    label: 'Number Guess',
+    icon: 'M7 20l4-16m2 16l4-16M6 9h14M4 15h14',
+    description: 'Guess the number',
+  },
 ];
 
 export default function QuestionTypeSelector({ value, onChange }: QuestionTypeSelectorProps) {
@@ -39,7 +45,7 @@ export default function QuestionTypeSelector({ value, onChange }: QuestionTypeSe
       <label className="block text-sm font-medium text-gray-700 mb-2">
         Question Type
       </label>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
         {QUESTION_TYPE_OPTIONS.map((option) => (
           <button
             key={option.type}

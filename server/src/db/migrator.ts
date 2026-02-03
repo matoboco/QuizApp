@@ -5,6 +5,7 @@ import * as migration001 from './migrations/001_initial_schema';
 import * as migration002 from './migrations/002_question_description';
 import * as migration003 from './migrations/003_user_roles';
 import * as migration004 from './migrations/004_game_share_token';
+import * as migration005 from './migrations/005_number_guess';
 
 /**
  * Inline migration provider that embeds migrations directly in the bundle.
@@ -18,6 +19,7 @@ class InlineMigrationProvider implements MigrationProvider {
       '002_question_description': migration002,
       '003_user_roles': migration003,
       '004_game_share_token': migration004,
+      '005_number_guess': migration005,
     };
   }
 }

@@ -1,4 +1,5 @@
 import type { Question, Answer, QuestionType } from '@shared/types/quiz';
+import { DEFAULT_TOLERANCE } from '@shared/types/quiz';
 import AnswerEditor from './AnswerEditor';
 import TimeLimitSlider from './TimeLimitSlider';
 import QuestionTypeSelector from './QuestionTypeSelector';
@@ -32,6 +33,7 @@ export default function QuestionEditor({
 
   const isOrdering = question.questionType === 'ordering';
   const isMultiSelect = question.questionType === 'multi-select';
+  const isNumberGuess = question.questionType === 'number-guess';
 
   return (
     <div className="space-y-6">
@@ -121,6 +123,40 @@ export default function QuestionEditor({
         </div>
       </div>
 
+      {/* Number Guess: correctNumber + tolerance */}
+      {isNumberGuess && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Correct Number
+            </label>
+            <input
+              type="number"
+              value={question.correctNumber ?? ''}
+              onChange={(e) => onChange({ correctNumber: e.target.value === '' ? undefined : Number(e.target.value) })}
+              placeholder="e.g. 863"
+              className="input"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tolerance (±)
+            </label>
+            <input
+              type="number"
+              min={1}
+              value={question.tolerance ?? DEFAULT_TOLERANCE}
+              onChange={(e) => onChange({ tolerance: e.target.value === '' ? undefined : Number(e.target.value) })}
+              placeholder={`e.g. ${DEFAULT_TOLERANCE}`}
+              className="input"
+            />
+            <p className="mt-1 text-xs text-gray-500">
+              Answers within ±{question.tolerance ?? DEFAULT_TOLERANCE} of the correct number get partial points
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Multi-select: requireAll toggle */}
       {isMultiSelect && (
         <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -157,8 +193,8 @@ export default function QuestionEditor({
         </div>
       )}
 
-      {/* Answers */}
-      <div>
+      {/* Answers (hidden for number-guess) */}
+      {!isNumberGuess && <div>
         <div className="flex items-center justify-between mb-3">
           <label className="block text-sm font-medium text-gray-700">
             {isOrdering ? 'Items (correct order, top to bottom)' : 'Answers'}
@@ -196,7 +232,7 @@ export default function QuestionEditor({
             />
           ))}
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

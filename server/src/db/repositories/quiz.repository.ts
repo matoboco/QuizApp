@@ -24,6 +24,8 @@ interface QuestionRow {
   time_limit: number;
   points: number;
   order_index: number;
+  correct_number: number | null;
+  tolerance: number | null;
   created_at: string;
 }
 
@@ -76,6 +78,8 @@ function rowToQuestion(row: QuestionRow, answers: Answer[]): Question {
     points: row.points,
     orderIndex: row.order_index,
     answers,
+    correctNumber: row.correct_number ?? undefined,
+    tolerance: row.tolerance ?? undefined,
   };
 }
 
@@ -294,6 +298,8 @@ export class QuizRepository {
             time_limit: q.timeLimit,
             points: q.points,
             order_index: q.orderIndex,
+            correct_number: q.correctNumber ?? null,
+            tolerance: q.tolerance ?? null,
             created_at: now,
           })
           .execute();
@@ -334,6 +340,8 @@ export class QuizRepository {
           points: q.points,
           orderIndex: q.orderIndex,
           answers,
+          correctNumber: q.correctNumber,
+          tolerance: q.tolerance,
         });
       }
 

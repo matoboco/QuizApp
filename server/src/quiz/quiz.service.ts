@@ -128,6 +128,8 @@ class QuizService {
         timeLimit: q.timeLimit,
         points: q.points,
         orderIndex: q.orderIndex,
+        correctNumber: q.correctNumber,
+        tolerance: q.tolerance,
         answers: q.answers.map((a) => ({
           text: a.text,
           isCorrect: a.isCorrect,

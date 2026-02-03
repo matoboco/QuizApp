@@ -28,11 +28,12 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 
 ### Quiz Management (Host)
 - Create, edit and delete quizzes with multiple questions
-- **4 question types**:
+- **5 question types**:
   - **Multiple Choice** - 2-4 answers, one correct
   - **True / False** - two fixed options
   - **Multi Select** - 2-8 answers, multiple correct (with optional partial credit)
   - **Ordering** - 2-8 items, players arrange in the correct order (partial credit)
+  - **Number Guess** - player types a number; scored by distance from the correct answer within a tolerance range
 - Configurable time limit per question (5-120 seconds)
 - Optional description/hint text per question (shown to players below question)
 - Optional image URL for questions
@@ -58,6 +59,12 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 - Incorrect answers, partial answers, or not answering in time all reset streak to 0
 - **Multi Select partial credit**: `(correct selected - incorrect selected) / total correct` (min 0)
 - **Ordering partial credit**: `items in correct position / total items`
+- **Number Guess scoring**:
+  - Linear scoring based on distance: `base_points * (1 - distance / tolerance)`
+  - **Exact answer bonus**: +50% base points (e.g. 1000 base → 1500 total)
+  - **No time bonus** — time is measured but does not affect score
+  - **Streak**: continues if answer is within tolerance, resets if outside; streak multiplier is not applied to score
+  - At or beyond tolerance boundary → 0 points
 - Individual score breakdown after each question
 
 ### Admin Panel
@@ -119,15 +126,23 @@ requireAll: true
 - 4
 * 5
 - 6
+
+## How many bones does an adult human have?
+>> Closer guess = more points
+type: number-guess
+time: 30
+answer: 206
+tolerance: 50
 ```
 
 Format rules:
 - `# Title` and optional `> Description` at the top
 - `## Question text` starts each question
 - `>> Hint text` optional description/hint shown to players
-- `type:` is required (`multiple-choice`, `true-false`, `multi-select`, `ordering`)
+- `type:` is required (`multiple-choice`, `true-false`, `multi-select`, `ordering`, `number-guess`)
 - `time:` and `points:` are optional (defaults: 20s, 1000pts)
 - `* answer` = correct, `- answer` = wrong, `1. answer` = ordering position
+- `answer:` and `tolerance:` are used for `number-guess` (no `*`/`-` answer lines)
 
 ## Game Flow
 
@@ -158,7 +173,8 @@ See [Development Guide](docs/DEVELOPMENT.md) for local setup, environment variab
 
 - [ ] Image upload for questions (currently URL only)
 - [ ] Sound effects and music
-- [ ] Open-ended question type
+- [x] Number guess question type (numeric input with tolerance-based scoring)
+- [ ] Open-ended question type (free text)
 - [ ] Team mode
 - [x] Quiz import/export (`.quiz.txt` plain-text format)
 - [x] Quiz duplication

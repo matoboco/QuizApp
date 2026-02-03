@@ -24,6 +24,9 @@ export function checkAnswer(
     case 'ordering':
       return checkOrdering(question, submittedAnswer as string[]);
 
+    case 'number-guess':
+      return checkNumberGuess(question, submittedAnswer as string);
+
     default:
       return checkSingleAnswer(question, submittedAnswer as string);
   }
@@ -77,6 +80,17 @@ function checkMultiSelect(
     isCorrect: ratio >= 1.0,
     correctRatio: Math.min(1.0, ratio),
   };
+}
+
+function checkNumberGuess(question: Question, submittedAnswer: string): AnswerCheckResult {
+  const submitted = parseFloat(submittedAnswer);
+  if (isNaN(submitted)) return { isCorrect: false, correctRatio: 0 };
+
+  const distance = Math.abs(submitted - question.correctNumber!);
+  if (distance === 0) return { isCorrect: true, correctRatio: 1.0 };
+  if (distance >= question.tolerance!) return { isCorrect: false, correctRatio: 0 };
+
+  return { isCorrect: false, correctRatio: 1 - distance / question.tolerance! };
 }
 
 function checkOrdering(question: Question, submittedOrder: string[]): AnswerCheckResult {

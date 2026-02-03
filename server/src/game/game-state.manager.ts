@@ -164,8 +164,15 @@ class GameStateManager {
     // Use answer checker for all question types
     const { isCorrect, correctRatio } = checkAnswer(question, answerId);
 
-    // Streak: only increment for fully correct answers (correctRatio === 1.0)
-    const currentStreak = correctRatio >= 1.0 ? player.streak : 0;
+    const isNumberGuess = question.questionType === 'number-guess';
+
+    // Streak logic:
+    // - Normal questions: streak continues only for fully correct (correctRatio === 1.0)
+    // - Number-guess: streak continues if within tolerance (correctRatio > 0),
+    //   but streak does NOT affect scoring (pass 0)
+    const currentStreak = isNumberGuess
+      ? 0 // number-guess: streak not used in scoring
+      : (correctRatio >= 1.0 ? player.streak : 0);
 
     // Calculate score with correctRatio
     const scoreBreakdown = calculateScore(
@@ -173,12 +180,19 @@ class GameStateManager {
       timeTaken,
       question.timeLimit,
       currentStreak,
-      correctRatio
+      correctRatio,
+      undefined,
+      isNumberGuess ? { noTimeBonus: true } : undefined
     );
 
     // Update player state
     player.score += scoreBreakdown.totalPoints;
-    player.streak = correctRatio >= 1.0 ? player.streak + 1 : 0;
+    if (isNumberGuess) {
+      // Number-guess: streak continues if answer is within tolerance
+      player.streak = correctRatio > 0 ? player.streak + 1 : 0;
+    } else {
+      player.streak = correctRatio >= 1.0 ? player.streak + 1 : 0;
+    }
 
     // Record the answer
     state.currentAnswers.set(playerId, {
@@ -244,6 +258,11 @@ class GameStateManager {
     if (!state || !state.currentQuestion) return [];
 
     const question = state.currentQuestion;
+
+    // Number-guess questions have no predefined answers
+    if (question.questionType === 'number-guess') {
+      return [];
+    }
 
     return question.answers.map((answer) => {
       let count = 0;

@@ -54,6 +54,8 @@ export interface QuestionsTable {
   time_limit: number;
   points: number;
   order_index: number;
+  correct_number: number | null;
+  tolerance: number | null;
   created_at: string;
 }
 

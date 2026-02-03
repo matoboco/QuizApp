@@ -1,4 +1,4 @@
-export type QuestionType = 'multiple-choice' | 'true-false' | 'multi-select' | 'ordering';
+export type QuestionType = 'multiple-choice' | 'true-false' | 'multi-select' | 'ordering' | 'number-guess';
 
 export interface Quiz {
   id: string;
@@ -35,6 +35,8 @@ export interface Question {
   points: number;
   orderIndex: number;
   answers: Answer[];
+  correctNumber?: number;
+  tolerance?: number;
 }
 
 export interface Answer {
@@ -68,6 +70,8 @@ export interface CreateQuestionInput {
   points: number;
   orderIndex: number;
   answers: CreateAnswerInput[];
+  correctNumber?: number;
+  tolerance?: number;
 }
 
 export interface CreateAnswerInput {
@@ -96,4 +100,5 @@ export const MAX_TIME_LIMIT = 120;
 export const DEFAULT_POINTS = 1000;
 export const MIN_ANSWERS = 2;
 export const MAX_ANSWERS = 8;
-export const QUESTION_TYPES: QuestionType[] = ['multiple-choice', 'true-false', 'multi-select', 'ordering'];
+export const QUESTION_TYPES: QuestionType[] = ['multiple-choice', 'true-false', 'multi-select', 'ordering', 'number-guess'];
+export const DEFAULT_TOLERANCE = 100;

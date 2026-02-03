@@ -47,15 +47,24 @@ export function serializeQuizTxt(quiz: Quiz): string {
       lines.push('requireAll: true');
     }
 
-    const sortedAnswers = [...q.answers].sort((a, b) => a.orderIndex - b.orderIndex);
+    if (q.questionType === 'number-guess') {
+      if (q.correctNumber !== undefined) {
+        lines.push(`answer: ${q.correctNumber}`);
+      }
+      if (q.tolerance !== undefined) {
+        lines.push(`tolerance: ${q.tolerance}`);
+      }
+    } else {
+      const sortedAnswers = [...q.answers].sort((a, b) => a.orderIndex - b.orderIndex);
 
-    for (const a of sortedAnswers) {
-      if (q.questionType === 'ordering') {
-        lines.push(`${a.orderIndex + 1}. ${a.text}`);
-      } else if (a.isCorrect) {
-        lines.push(`* ${a.text}`);
-      } else {
-        lines.push(`- ${a.text}`);
+      for (const a of sortedAnswers) {
+        if (q.questionType === 'ordering') {
+          lines.push(`${a.orderIndex + 1}. ${a.text}`);
+        } else if (a.isCorrect) {
+          lines.push(`* ${a.text}`);
+        } else {
+          lines.push(`- ${a.text}`);
+        }
       }
     }
 
@@ -93,34 +102,43 @@ export function parseQuizTxt(input: string): ParseResult {
     const qType = (currentQuestion.questionType ?? 'multiple-choice') as QuestionType;
 
     // Post-parse validation
-    if (currentAnswers.length < 2) {
-      errors.push({ line: lineNum, message: `Question "${currentQuestion.text}" must have at least 2 answers` });
-    }
+    if (qType === 'number-guess') {
+      if (currentQuestion.correctNumber === undefined) {
+        errors.push({ line: lineNum, message: `Question "${currentQuestion.text}" (number-guess) requires an answer: value` });
+      }
+      if (currentQuestion.tolerance === undefined) {
+        errors.push({ line: lineNum, message: `Question "${currentQuestion.text}" (number-guess) requires a tolerance: value` });
+      }
+    } else {
+      if (currentAnswers.length < 2) {
+        errors.push({ line: lineNum, message: `Question "${currentQuestion.text}" must have at least 2 answers` });
+      }
 
-    if (qType === 'multiple-choice' || qType === 'true-false') {
-      const correctCount = currentAnswers.filter((a) => a.isCorrect).length;
-      if (correctCount !== 1) {
+      if (qType === 'multiple-choice' || qType === 'true-false') {
+        const correctCount = currentAnswers.filter((a) => a.isCorrect).length;
+        if (correctCount !== 1) {
+          errors.push({
+            line: lineNum,
+            message: `Question "${currentQuestion.text}" (${qType}) must have exactly 1 correct answer, found ${correctCount}`,
+          });
+        }
+      }
+
+      if (qType === 'true-false' && currentAnswers.length !== 2) {
         errors.push({
           line: lineNum,
-          message: `Question "${currentQuestion.text}" (${qType}) must have exactly 1 correct answer, found ${correctCount}`,
+          message: `Question "${currentQuestion.text}" (true-false) must have exactly 2 answers`,
         });
       }
-    }
 
-    if (qType === 'true-false' && currentAnswers.length !== 2) {
-      errors.push({
-        line: lineNum,
-        message: `Question "${currentQuestion.text}" (true-false) must have exactly 2 answers`,
-      });
-    }
-
-    if (qType === 'multi-select') {
-      const correctCount = currentAnswers.filter((a) => a.isCorrect).length;
-      if (correctCount < 1) {
-        errors.push({
-          line: lineNum,
-          message: `Question "${currentQuestion.text}" (multi-select) must have at least 1 correct answer`,
-        });
+      if (qType === 'multi-select') {
+        const correctCount = currentAnswers.filter((a) => a.isCorrect).length;
+        if (correctCount < 1) {
+          errors.push({
+            line: lineNum,
+            message: `Question "${currentQuestion.text}" (multi-select) must have at least 1 correct answer`,
+          });
+        }
       }
     }
 
@@ -133,6 +151,8 @@ export function parseQuizTxt(input: string): ParseResult {
       requireAll: currentQuestion.requireAll ?? false,
       orderIndex: questionIndex,
       answers: currentAnswers,
+      correctNumber: currentQuestion.correctNumber,
+      tolerance: currentQuestion.tolerance,
     });
 
     questionIndex++;
@@ -210,7 +230,7 @@ export function parseQuizTxt(input: string): ParseResult {
 
     // Meta lines (type:, time:, points:, requireAll:)
     if (state === State.QUESTION_META || state === State.ANSWERS) {
-      const metaMatch = trimmed.match(/^(type|time|points|requireAll)\s*:\s*(.+)$/);
+      const metaMatch = trimmed.match(/^(type|time|points|requireAll|answer|tolerance)\s*:\s*(.+)$/);
       if (metaMatch && state === State.QUESTION_META) {
         const [, key, value] = metaMatch;
         if (!currentQuestion) {
@@ -220,7 +240,7 @@ export function parseQuizTxt(input: string): ParseResult {
 
         switch (key) {
           case 'type': {
-            const validTypes: QuestionType[] = ['multiple-choice', 'true-false', 'multi-select', 'ordering'];
+            const validTypes: QuestionType[] = ['multiple-choice', 'true-false', 'multi-select', 'ordering', 'number-guess'];
             if (!validTypes.includes(value.trim() as QuestionType)) {
               errors.push({ line: lineNum, message: `Invalid question type: "${value.trim()}"` });
             } else {
@@ -252,6 +272,24 @@ export function parseQuizTxt(input: string): ParseResult {
               errors.push({ line: lineNum, message: `Invalid requireAll: "${value.trim()}" (must be true or false)` });
             } else {
               currentQuestion.requireAll = v === 'true';
+            }
+            break;
+          }
+          case 'answer': {
+            const n = parseFloat(value.trim());
+            if (isNaN(n)) {
+              errors.push({ line: lineNum, message: `Invalid answer number: "${value.trim()}"` });
+            } else {
+              currentQuestion.correctNumber = n;
+            }
+            break;
+          }
+          case 'tolerance': {
+            const n = parseFloat(value.trim());
+            if (isNaN(n) || n <= 0) {
+              errors.push({ line: lineNum, message: `Invalid tolerance: "${value.trim()}" (must be > 0)` });
+            } else {
+              currentQuestion.tolerance = n;
             }
             break;
           }

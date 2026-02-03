@@ -142,10 +142,18 @@ export default function PlayerResultScreen({
               <span>Base points</span>
               <span className="font-bold">+{formatScore(result.basePoints)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>Time bonus</span>
-              <span className="font-bold">+{formatScore(result.timeBonus)}</span>
-            </div>
+            {result.timeBonus > 0 && (
+              <div className="flex justify-between">
+                <span>Time bonus</span>
+                <span className="font-bold">+{formatScore(result.timeBonus)}</span>
+              </div>
+            )}
+            {result.exactBonus > 0 && (
+              <div className="flex justify-between">
+                <span>Exact answer bonus</span>
+                <span className="font-bold">+{formatScore(result.exactBonus)}</span>
+              </div>
+            )}
             {result.streakMultiplier > 1 && (
               <div className="flex justify-between">
                 <span>Streak multiplier</span>

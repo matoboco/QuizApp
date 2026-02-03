@@ -3,6 +3,7 @@ import AnswerButton from './AnswerButton';
 import TrueFalseGrid from './TrueFalseGrid';
 import MultiSelectGrid from './MultiSelectGrid';
 import OrderingGrid from './OrderingGrid';
+import NumberGuessInput from './NumberGuessInput';
 import { ANSWER_COLORS, ANSWER_SHAPES } from '@/lib/constants';
 
 interface AnswerOption {
@@ -55,6 +56,15 @@ export default function AnswerGrid({
         <OrderingGrid
           answers={answers}
           onSubmit={(ids) => onSelect(ids)}
+          submitted={selectedId !== undefined && selectedId !== null}
+          disabled={disabled}
+        />
+      );
+
+    case 'number-guess':
+      return (
+        <NumberGuessInput
+          onSubmit={(value) => onSelect(value)}
           submitted={selectedId !== undefined && selectedId !== null}
           disabled={disabled}
         />

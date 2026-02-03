@@ -9,7 +9,7 @@ import type {
   CreateAnswerInput,
   QuestionType,
 } from '@shared/types/quiz';
-import { DEFAULT_TIME_LIMIT, DEFAULT_POINTS } from '@shared/types/quiz';
+import { DEFAULT_TIME_LIMIT, DEFAULT_POINTS, DEFAULT_TOLERANCE } from '@shared/types/quiz';
 
 function generateId(prefix: string): string {
   return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -32,6 +32,8 @@ function createDefaultAnswers(questionId: string, questionType: QuestionType): A
         { id: generateId('a'), questionId, text: 'True', isCorrect: true, orderIndex: 0 },
         { id: generateId('a'), questionId, text: 'False', isCorrect: false, orderIndex: 1 },
       ];
+    case 'number-guess':
+      return [];
     case 'multi-select':
     case 'ordering':
     case 'multiple-choice':
@@ -56,6 +58,7 @@ function createEmptyQuestion(quizId: string, orderIndex: number, questionType: Q
     points: DEFAULT_POINTS,
     orderIndex,
     answers: createDefaultAnswers(questionId, questionType),
+    ...(questionType === 'number-guess' ? { correctNumber: undefined, tolerance: DEFAULT_TOLERANCE } : {}),
   };
 }
 
@@ -71,29 +74,38 @@ function validateQuiz(quiz: Quiz): ValidationErrors {
       qErrors.push('Question text is required');
     }
 
-    const emptyAnswers = q.answers.filter((a) => !a.text.trim());
-    if (emptyAnswers.length > 0) {
-      qErrors.push('All answers must have text');
-    }
+    if (q.questionType === 'number-guess') {
+      if (q.correctNumber === undefined || q.correctNumber === null) {
+        qErrors.push('Correct number is required');
+      }
+      if (!q.tolerance || q.tolerance <= 0) {
+        qErrors.push('Tolerance must be a positive number');
+      }
+    } else {
+      const emptyAnswers = q.answers.filter((a) => !a.text.trim());
+      if (emptyAnswers.length > 0) {
+        qErrors.push('All answers must have text');
+      }
 
-    const correctCount = q.answers.filter((a) => a.isCorrect).length;
+      const correctCount = q.answers.filter((a) => a.isCorrect).length;
 
-    switch (q.questionType) {
-      case 'true-false':
-      case 'multiple-choice':
-        if (correctCount === 0) {
-          qErrors.push('Select a correct answer');
-        } else if (correctCount > 1) {
-          qErrors.push('Only 1 correct answer is allowed');
-        }
-        break;
-      case 'multi-select':
-        if (correctCount === 0) {
-          qErrors.push('Select at least 1 correct answer');
-        }
-        break;
-      case 'ordering':
-        break;
+      switch (q.questionType) {
+        case 'true-false':
+        case 'multiple-choice':
+          if (correctCount === 0) {
+            qErrors.push('Select a correct answer');
+          } else if (correctCount > 1) {
+            qErrors.push('Only 1 correct answer is allowed');
+          }
+          break;
+        case 'multi-select':
+          if (correctCount === 0) {
+            qErrors.push('Select at least 1 correct answer');
+          }
+          break;
+        case 'ordering':
+          break;
+      }
     }
 
     if (qErrors.length > 0) {
@@ -210,6 +222,9 @@ export function useQuizEditor(quizId: string, options?: UseQuizEditorOptions): U
         questionType,
         requireAll: false,
         answers: newAnswers,
+        ...(questionType === 'number-guess'
+          ? { correctNumber: question.correctNumber, tolerance: question.tolerance ?? DEFAULT_TOLERANCE }
+          : { correctNumber: undefined, tolerance: undefined }),
       };
       return { ...prev, questions };
     });
@@ -322,6 +337,8 @@ export function useQuizEditor(quizId: string, options?: UseQuizEditorOptions): U
         timeLimit: q.timeLimit,
         points: q.points,
         orderIndex: q.orderIndex,
+        correctNumber: q.correctNumber,
+        tolerance: q.tolerance,
         answers: q.answers.map(
           (a): CreateAnswerInput => ({
             id: a.id,

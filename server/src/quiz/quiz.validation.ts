@@ -44,10 +44,26 @@ export const questionInputSchema = z.object({
   orderIndex: z.number().int().min(0),
   answers: z
     .array(answerInputSchema)
-    .min(MIN_ANSWERS, `At least ${MIN_ANSWERS} answers are required`)
     .max(MAX_ANSWERS, `At most ${MAX_ANSWERS} answers are allowed`),
+  correctNumber: z.number().optional(),
+  tolerance: z.number().positive('Tolerance must be positive').optional(),
 }).superRefine((data, ctx) => {
   const { questionType, answers } = data;
+
+  if (questionType === 'number-guess') {
+    if (data.correctNumber === undefined || data.correctNumber === null) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Number guess questions require a correct number' });
+    }
+    if (data.tolerance === undefined || data.tolerance === null) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Number guess questions require a tolerance' });
+    }
+    // answers can be empty for number-guess
+    return;
+  }
+
+  if (answers.length < MIN_ANSWERS) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: `At least ${MIN_ANSWERS} answers are required` });
+  }
 
   switch (questionType) {
     case 'true-false':
