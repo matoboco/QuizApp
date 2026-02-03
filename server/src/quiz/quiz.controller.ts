@@ -109,3 +109,65 @@ export async function deleteQuiz(
     next(err);
   }
 }
+
+export async function getPublicQuizzes(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const hostId = req.user!.userId;
+    const quizzes = await quizService.getPublicQuizzes(hostId);
+
+    const response: ApiResponse<QuizSummary[]> = {
+      success: true,
+      data: quizzes,
+    };
+
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getPublicQuiz(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const quizId = req.params.id;
+    const quiz = await quizService.getPublicQuiz(quizId);
+
+    const response: ApiResponse<Quiz> = {
+      success: true,
+      data: quiz,
+    };
+
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function duplicateQuiz(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const hostId = req.user!.userId;
+    const quizId = req.params.id;
+    const quiz = await quizService.duplicateQuiz(quizId, hostId);
+
+    const response: ApiResponse<Quiz> = {
+      success: true,
+      data: quiz,
+      message: 'Quiz duplicated successfully',
+    };
+
+    res.status(201).json(response);
+  } catch (err) {
+    next(err);
+  }
+}

@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { QuizSummary, Quiz } from '@shared/types/quiz';
-import { getQuizzesApi, createQuizApi, deleteQuizApi } from '@/api/quiz.api';
+import { getQuizzesApi, getPublicQuizzesApi, createQuizApi, deleteQuizApi } from '@/api/quiz.api';
 
 interface UseQuizzesReturn {
   quizzes: QuizSummary[];
+  publicQuizzes: QuizSummary[];
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
@@ -13,6 +14,7 @@ interface UseQuizzesReturn {
 
 export function useQuizzes(): UseQuizzesReturn {
   const [quizzes, setQuizzes] = useState<QuizSummary[]>([]);
+  const [publicQuizzes, setPublicQuizzes] = useState<QuizSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,8 +22,12 @@ export function useQuizzes(): UseQuizzesReturn {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await getQuizzesApi();
-      setQuizzes(data);
+      const [myData, pubData] = await Promise.all([
+        getQuizzesApi(),
+        getPublicQuizzesApi(),
+      ]);
+      setQuizzes(myData);
+      setPublicQuizzes(pubData);
     } catch (err: any) {
       const message =
         err?.response?.data?.error || err?.message || 'Failed to load quizzes';
@@ -50,6 +56,7 @@ export function useQuizzes(): UseQuizzesReturn {
         description: quiz.description,
         isPublished: quiz.isPublished,
         questionCount: quiz.questions.length,
+        gameCount: 0,
         createdAt: quiz.createdAt,
         updatedAt: quiz.updatedAt,
       },
@@ -60,6 +67,7 @@ export function useQuizzes(): UseQuizzesReturn {
 
   return {
     quizzes,
+    publicQuizzes,
     isLoading,
     error,
     refetch: fetchQuizzes,

@@ -17,6 +17,8 @@ export interface QuizSummary {
   description: string;
   isPublished: boolean;
   questionCount: number;
+  gameCount: number;
+  hostUsername?: string;
   createdAt: string;
   updatedAt: string;
 }

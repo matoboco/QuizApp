@@ -1,6 +1,6 @@
 import { Quiz, QuizSummary } from '@shared/types';
 import { quizRepository } from '../db/repositories';
-import { NotFoundError, ForbiddenError } from '../middleware/error.middleware';
+import { NotFoundError, ForbiddenError, BadRequestError } from '../middleware/error.middleware';
 import { CreateQuizInput, UpdateQuizInput } from './quiz.validation';
 
 class QuizService {
@@ -39,6 +39,12 @@ class QuizService {
       throw new ForbiddenError('You do not have access to this quiz');
     }
 
+    // Check if quiz has been played — if so, block editing
+    const hasGames = await quizRepository.hasGames(quizId);
+    if (hasGames) {
+      throw new BadRequestError('This quiz has been played and cannot be edited. Duplicate it to make changes.');
+    }
+
     // If questions are provided, replace them all in a transaction
     if (data.questions) {
       await quizRepository.replaceQuestions(quizId, data.questions);
@@ -74,6 +80,66 @@ class QuizService {
     }
 
     return quiz;
+  }
+
+  async getPublicQuizzes(currentHostId: string): Promise<QuizSummary[]> {
+    return quizRepository.findAllPublic(currentHostId);
+  }
+
+  async getPublicQuiz(quizId: string): Promise<Quiz> {
+    const quiz = await quizRepository.findById(quizId);
+    if (!quiz) {
+      throw new NotFoundError('Quiz not found');
+    }
+
+    if (!quiz.isPublished) {
+      throw new NotFoundError('Quiz not found');
+    }
+
+    return quiz;
+  }
+
+  async duplicateQuiz(quizId: string, hostId: string): Promise<Quiz> {
+    const quiz = await quizRepository.findById(quizId);
+    if (!quiz) {
+      throw new NotFoundError('Quiz not found');
+    }
+
+    // Allow duplicating own quizzes or public quizzes from other users
+    if (quiz.hostId !== hostId && !quiz.isPublished) {
+      throw new ForbiddenError('You do not have access to this quiz');
+    }
+
+    // Create a new quiz as a copy
+    const newQuiz = await quizRepository.create({
+      title: `${quiz.title} (Copy)`,
+      description: quiz.description,
+      hostId,
+    });
+
+    // Copy questions and answers if any exist
+    if (quiz.questions.length > 0) {
+      const questionsInput = quiz.questions.map((q) => ({
+        text: q.text,
+        description: q.description,
+        imageUrl: q.imageUrl,
+        questionType: q.questionType,
+        requireAll: q.requireAll,
+        timeLimit: q.timeLimit,
+        points: q.points,
+        orderIndex: q.orderIndex,
+        answers: q.answers.map((a) => ({
+          text: a.text,
+          isCorrect: a.isCorrect,
+          orderIndex: a.orderIndex,
+        })),
+      }));
+      await quizRepository.replaceQuestions(newQuiz.id, questionsInput);
+    }
+
+    // Return the full new quiz
+    const result = await quizRepository.findById(newQuiz.id);
+    return result!;
   }
 }
 

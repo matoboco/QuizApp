@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getQuizApi, updateQuizApi } from '@/api/quiz.api';
+import { getQuizApi, getPublicQuizApi, updateQuizApi } from '@/api/quiz.api';
 import type {
   Quiz,
   Question,
@@ -109,6 +109,7 @@ export interface UseQuizEditorReturn {
   isLoading: boolean;
   error: string | null;
   isDirty: boolean;
+  readOnly: boolean;
   validationErrors: ValidationErrors;
   updateTitle: (title: string) => void;
   updateDescription: (description: string) => void;
@@ -124,7 +125,12 @@ export interface UseQuizEditorReturn {
   save: () => Promise<void>;
 }
 
-export function useQuizEditor(quizId: string): UseQuizEditorReturn {
+interface UseQuizEditorOptions {
+  readOnly?: boolean;
+}
+
+export function useQuizEditor(quizId: string, options?: UseQuizEditorOptions): UseQuizEditorReturn {
+  const forceReadOnly = options?.readOnly ?? false;
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -138,7 +144,17 @@ export function useQuizEditor(quizId: string): UseQuizEditorReturn {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await getQuizApi(quizId);
+        let data: Quiz;
+        if (forceReadOnly) {
+          // Try public endpoint first, fall back to own quiz
+          try {
+            data = await getPublicQuizApi(quizId);
+          } catch {
+            data = await getQuizApi(quizId);
+          }
+        } else {
+          data = await getQuizApi(quizId);
+        }
         if (!cancelled) {
           setQuiz(data);
           initialLoadDone.current = true;
@@ -157,7 +173,7 @@ export function useQuizEditor(quizId: string): UseQuizEditorReturn {
     return () => {
       cancelled = true;
     };
-  }, [quizId]);
+  }, [quizId, forceReadOnly]);
 
   const updateTitle = useCallback((title: string) => {
     setQuiz((prev) => (prev ? { ...prev, title } : prev));
@@ -338,6 +354,7 @@ export function useQuizEditor(quizId: string): UseQuizEditorReturn {
     isLoading,
     error,
     isDirty,
+    readOnly: forceReadOnly,
     validationErrors,
     updateTitle,
     updateDescription,

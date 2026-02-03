@@ -37,6 +37,8 @@ interface AnswerRow {
 
 interface QuizSummaryRow extends QuizRow {
   question_count: string | number;
+  game_count: string | number;
+  host_username?: string;
 }
 
 interface CreateQuizData {
@@ -97,6 +99,8 @@ function rowToQuizSummary(row: QuizSummaryRow): QuizSummary {
     description: row.description,
     isPublished: row.is_published === 1,
     questionCount: Number(row.question_count),
+    gameCount: Number(row.game_count || 0),
+    hostUsername: row.host_username,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -145,6 +149,7 @@ export class QuizRepository {
     const rows = await db
       .selectFrom('quizzes as q')
       .leftJoin('questions as qu', 'qu.quiz_id', 'q.id')
+      .leftJoin('game_sessions as gs', 'gs.quiz_id', 'q.id')
       .where('q.host_id', '=', hostId)
       .groupBy('q.id')
       .select([
@@ -155,7 +160,8 @@ export class QuizRepository {
         'q.is_published',
         'q.created_at',
         'q.updated_at',
-        sql<number>`COUNT(qu.id)`.as('question_count'),
+        sql<number>`COUNT(DISTINCT qu.id)`.as('question_count'),
+        sql<number>`COUNT(DISTINCT gs.id)`.as('game_count'),
       ])
       .orderBy('q.created_at', 'desc')
       .execute();
@@ -350,5 +356,47 @@ export class QuizRepository {
       .where('host_id', '=', hostId)
       .executeTakeFirstOrThrow();
     return Number(row.count);
+  }
+
+  async hasGames(quizId: string): Promise<boolean> {
+    const db = getKysely();
+    const row = await db
+      .selectFrom('game_sessions')
+      .select(sql<number>`COUNT(*)`.as('count'))
+      .where('quiz_id', '=', quizId)
+      .executeTakeFirstOrThrow();
+    return Number(row.count) > 0;
+  }
+
+  async findAllPublic(excludeHostId?: string): Promise<QuizSummary[]> {
+    const db = getKysely();
+
+    let query = db
+      .selectFrom('quizzes as q')
+      .leftJoin('questions as qu', 'qu.quiz_id', 'q.id')
+      .leftJoin('game_sessions as gs', 'gs.quiz_id', 'q.id')
+      .innerJoin('users as u', 'u.id', 'q.host_id')
+      .where('q.is_published', '=', 1)
+      .groupBy(['q.id', 'u.username'])
+      .select([
+        'q.id',
+        'q.title',
+        'q.description',
+        'q.host_id',
+        'q.is_published',
+        'q.created_at',
+        'q.updated_at',
+        sql<number>`COUNT(DISTINCT qu.id)`.as('question_count'),
+        sql<number>`COUNT(DISTINCT gs.id)`.as('game_count'),
+        'u.username as host_username',
+      ])
+      .orderBy('q.created_at', 'desc');
+
+    if (excludeHostId) {
+      query = query.where('q.host_id', '!=', excludeHostId);
+    }
+
+    const rows = await query.execute();
+    return rows.map((row) => rowToQuizSummary(row as unknown as QuizSummaryRow));
   }
 }

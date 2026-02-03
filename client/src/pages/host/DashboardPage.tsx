@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuizzes } from '@/hooks/useQuizzes';
 import { createGameApi } from '@/api/game.api';
-import { getQuizApi, createQuizApi, updateQuizApi } from '@/api/quiz.api';
+import { getQuizApi, getPublicQuizApi, createQuizApi, updateQuizApi, duplicateQuizApi } from '@/api/quiz.api';
 import QuizCardGrid from '@/components/quiz/QuizCardGrid';
 import DeleteQuizDialog from '@/components/quiz/DeleteQuizDialog';
 import ImportQuizButton from '@/components/quiz/ImportQuizButton';
@@ -11,10 +11,13 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { serializeQuizTxt, downloadQuizTxt, sanitizeFilename, type ParsedQuiz } from '@/lib/quizTxt';
 import type { QuizSummary } from '@shared/types/quiz';
 
+type DashboardTab = 'my' | 'public';
+
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { quizzes, isLoading, error, refetch, deleteQuiz, createQuiz } = useQuizzes();
+  const { quizzes, publicQuizzes, isLoading, error, refetch, deleteQuiz, createQuiz } = useQuizzes();
 
+  const [activeTab, setActiveTab] = useState<DashboardTab>('my');
   const [deleteTarget, setDeleteTarget] = useState<QuizSummary | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
@@ -84,7 +87,13 @@ export default function DashboardPage() {
   const handleExport = useCallback(async (id: string) => {
     try {
       setActionError(null);
-      const quiz = await getQuizApi(id);
+      // Try own quiz first, fall back to public
+      let quiz;
+      try {
+        quiz = await getQuizApi(id);
+      } catch {
+        quiz = await getPublicQuizApi(id);
+      }
       const content = serializeQuizTxt(quiz);
       const filename = `${sanitizeFilename(quiz.title)}.quiz.txt`;
       downloadQuizTxt(filename, content);
@@ -94,6 +103,18 @@ export default function DashboardPage() {
       setActionError(message);
     }
   }, []);
+
+  const handleDuplicate = useCallback(async (id: string) => {
+    try {
+      setActionError(null);
+      await duplicateQuizApi(id);
+      await refetch();
+    } catch (err: any) {
+      const message =
+        err?.response?.data?.error || err?.message || 'Failed to duplicate quiz';
+      setActionError(message);
+    }
+  }, [refetch]);
 
   const handleImport = useCallback(async (parsed: ParsedQuiz) => {
     try {
@@ -148,10 +169,10 @@ export default function DashboardPage() {
   return (
     <div>
       {/* Page header */}
-      <div className="mb-8 flex items-start justify-between gap-4">
+      <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-3xl font-display font-bold text-gray-900">
-            My Quizzes
+            Quizzes
           </h1>
           <p className="mt-1 text-gray-500">
             Create, manage, and host your quizzes.
@@ -171,6 +192,42 @@ export default function DashboardPage() {
             New Quiz
           </Button>
         </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="mb-6 border-b border-gray-200">
+        <nav className="-mb-px flex gap-6">
+          <button
+            onClick={() => setActiveTab('my')}
+            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'my'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            My Quizzes
+            {quizzes.length > 0 && (
+              <span className="ml-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                {quizzes.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('public')}
+            className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'public'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Public Quizzes
+            {publicQuizzes.length > 0 && (
+              <span className="ml-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+                {publicQuizzes.length}
+              </span>
+            )}
+          </button>
+        </nav>
       </div>
 
       {/* Action error banner */}
@@ -215,13 +272,26 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Quiz grid */}
-      <QuizCardGrid
-        quizzes={quizzes}
-        onDelete={handleDeleteClick}
-        onPlay={handlePlay}
-        onExport={handleExport}
-      />
+      {/* Quiz grids */}
+      {activeTab === 'my' ? (
+        <QuizCardGrid
+          quizzes={quizzes}
+          mode="own"
+          onDelete={handleDeleteClick}
+          onPlay={handlePlay}
+          onExport={handleExport}
+          onDuplicate={handleDuplicate}
+          emptyMessage="No quizzes yet"
+        />
+      ) : (
+        <QuizCardGrid
+          quizzes={publicQuizzes}
+          mode="public"
+          onExport={handleExport}
+          onDuplicate={handleDuplicate}
+          emptyMessage="No public quizzes available"
+        />
+      )}
 
       {/* Delete confirmation dialog */}
       <DeleteQuizDialog

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useQuizEditor } from '@/hooks/useQuizEditor';
 import QuizSettingsForm from '@/components/editor/QuizSettingsForm';
 import QuestionList from '@/components/editor/QuestionList';
@@ -9,13 +9,18 @@ import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Modal from '@/components/common/Modal';
 
-export default function QuizEditorPage() {
+export default function QuizEditorPage({ readOnly: propReadOnly }: { readOnly?: boolean }) {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
 
-  const editor = useQuizEditor(id!);
+  // Determine if read-only from prop or route
+  const isViewRoute = location.pathname.includes('/view');
+  const isReadOnly = propReadOnly || isViewRoute;
+
+  const editor = useQuizEditor(id!, { readOnly: isReadOnly });
 
   // Manual save state (no autosave)
   const [isSaving, setIsSaving] = useState(false);
@@ -23,7 +28,7 @@ export default function QuizEditorPage() {
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const handleSave = useCallback(async () => {
-    if (isSaving) return;
+    if (isSaving || isReadOnly) return;
     setIsSaving(true);
     setSaveError(null);
     try {
@@ -34,19 +39,20 @@ export default function QuizEditorPage() {
     } finally {
       setIsSaving(false);
     }
-  }, [editor, isSaving]);
+  }, [editor, isSaving, isReadOnly]);
 
   // Handle back navigation with unsaved changes check
   const handleBack = useCallback(() => {
-    if (editor.isDirty) {
+    if (editor.isDirty && !isReadOnly) {
       setShowLeaveModal(true);
     } else {
       navigate('/dashboard');
     }
-  }, [editor.isDirty, navigate]);
+  }, [editor.isDirty, isReadOnly, navigate]);
 
   // Warn before closing tab/window with unsaved changes
   useEffect(() => {
+    if (isReadOnly) return;
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (editor.isDirty) {
         e.preventDefault();
@@ -55,7 +61,7 @@ export default function QuizEditorPage() {
     };
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [editor.isDirty]);
+  }, [editor.isDirty, isReadOnly]);
 
   // Loading state
   if (editor.isLoading) {
@@ -104,6 +110,9 @@ export default function QuizEditorPage() {
     setActiveQuestionIndex(safeActiveIndex);
   }
 
+  // No-op handlers for read-only mode
+  const noop = () => {};
+
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
       {/* Header bar */}
@@ -119,24 +128,45 @@ export default function QuizEditorPage() {
             </svg>
           </button>
           <div className="h-6 w-px bg-gray-300" />
-          <AutoSaveIndicator
-            isSaving={isSaving}
-            isDirty={editor.isDirty}
-            lastSaved={lastSaved}
-            error={saveError}
-          />
+          {isReadOnly ? (
+            <div className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+              <span className="text-sm text-amber-600 font-medium">Read-only view</span>
+            </div>
+          ) : (
+            <AutoSaveIndicator
+              isSaving={isSaving}
+              isDirty={editor.isDirty}
+              lastSaved={lastSaved}
+              error={saveError}
+            />
+          )}
         </div>
 
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={handleSave}
-          isLoading={isSaving}
-          disabled={!editor.isDirty && !isSaving}
-        >
-          Save
-        </Button>
+        {!isReadOnly && (
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleSave}
+            isLoading={isSaving}
+            disabled={!editor.isDirty && !isSaving}
+          >
+            Save
+          </Button>
+        )}
       </div>
+
+      {/* Read-only info banner */}
+      {isReadOnly && (
+        <div className="px-4 py-2 bg-amber-50 border-b border-amber-200">
+          <p className="text-sm text-amber-700">
+            This quiz is in read-only mode. Duplicate it to make your own editable copy.
+          </p>
+        </div>
+      )}
 
       {/* Quiz settings */}
       <div className="px-4 py-4 bg-white border-b border-gray-200">
@@ -144,9 +174,10 @@ export default function QuizEditorPage() {
           title={quiz.title}
           description={quiz.description}
           isPublished={quiz.isPublished}
-          onTitleChange={editor.updateTitle}
-          onDescriptionChange={editor.updateDescription}
-          onPublishedChange={editor.updatePublished}
+          readOnly={isReadOnly}
+          onTitleChange={isReadOnly ? noop : editor.updateTitle}
+          onDescriptionChange={isReadOnly ? noop : editor.updateDescription}
+          onPublishedChange={isReadOnly ? noop : editor.updatePublished}
         />
       </div>
 
@@ -159,17 +190,17 @@ export default function QuizEditorPage() {
             activeIndex={activeQuestionIndex}
             validationErrors={editor.validationErrors}
             onSelect={setActiveQuestionIndex}
-            onAdd={() => {
+            onAdd={isReadOnly ? noop : () => {
               editor.addQuestion();
               setActiveQuestionIndex(quiz.questions.length);
             }}
-            onRemove={(index) => {
+            onRemove={isReadOnly ? noop : (index) => {
               editor.removeQuestion(index);
               if (activeQuestionIndex >= quiz.questions.length - 1) {
                 setActiveQuestionIndex(Math.max(0, quiz.questions.length - 2));
               }
             }}
-            onMove={(from, to) => {
+            onMove={isReadOnly ? noop : (from, to) => {
               editor.moveQuestion(from, to);
               if (activeQuestionIndex === from) {
                 setActiveQuestionIndex(to);
@@ -191,13 +222,13 @@ export default function QuizEditorPage() {
                 <QuestionEditor
                   question={activeQuestion}
                   errors={editor.validationErrors[activeQuestionIndex]}
-                  onChange={(data) => editor.updateQuestion(activeQuestionIndex, data)}
-                  onChangeType={(type) => editor.changeQuestionType(activeQuestionIndex, type)}
-                  onAnswerChange={(answerIndex, data) =>
+                  onChange={isReadOnly ? noop : (data) => editor.updateQuestion(activeQuestionIndex, data)}
+                  onChangeType={isReadOnly ? noop : (type) => editor.changeQuestionType(activeQuestionIndex, type)}
+                  onAnswerChange={isReadOnly ? noop : (answerIndex, data) =>
                     editor.updateAnswer(activeQuestionIndex, answerIndex, data)
                   }
-                  onAddAnswer={() => editor.addAnswer(activeQuestionIndex)}
-                  onRemoveAnswer={(answerIndex) =>
+                  onAddAnswer={isReadOnly ? noop : () => editor.addAnswer(activeQuestionIndex)}
+                  onRemoveAnswer={isReadOnly ? noop : (answerIndex) =>
                     editor.removeAnswer(activeQuestionIndex, answerIndex)
                   }
                 />
@@ -212,24 +243,28 @@ export default function QuizEditorPage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-display font-bold text-gray-800">
-                  Add your first question
+                  {isReadOnly ? 'No questions in this quiz' : 'Add your first question'}
                 </h3>
-                <p className="mt-1 text-gray-500 text-sm">
-                  Click the button below to get started
-                </p>
-                <Button
-                  variant="primary"
-                  className="mt-4"
-                  onClick={() => {
-                    editor.addQuestion();
-                    setActiveQuestionIndex(0);
-                  }}
-                >
-                  <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-                  </svg>
-                  Add Question
-                </Button>
+                {!isReadOnly && (
+                  <>
+                    <p className="mt-1 text-gray-500 text-sm">
+                      Click the button below to get started
+                    </p>
+                    <Button
+                      variant="primary"
+                      className="mt-4"
+                      onClick={() => {
+                        editor.addQuestion();
+                        setActiveQuestionIndex(0);
+                      }}
+                    >
+                      <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                      Add Question
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           )}
@@ -237,26 +272,28 @@ export default function QuizEditorPage() {
       </div>
 
       {/* Unsaved changes confirmation modal */}
-      <Modal
-        isOpen={showLeaveModal}
-        onClose={() => setShowLeaveModal(false)}
-        title="Unsaved Changes"
-        closeOnBackdrop={false}
-        footer={
-          <>
-            <Button variant="secondary" onClick={() => setShowLeaveModal(false)}>
-              Stay
-            </Button>
-            <Button variant="danger" onClick={() => navigate('/dashboard')}>
-              Leave Without Saving
-            </Button>
-          </>
-        }
-      >
-        <p className="text-gray-600">
-          You have unsaved changes. Are you sure you want to leave? Your changes will be lost.
-        </p>
-      </Modal>
+      {!isReadOnly && (
+        <Modal
+          isOpen={showLeaveModal}
+          onClose={() => setShowLeaveModal(false)}
+          title="Unsaved Changes"
+          closeOnBackdrop={false}
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => setShowLeaveModal(false)}>
+                Stay
+              </Button>
+              <Button variant="danger" onClick={() => navigate('/dashboard')}>
+                Leave Without Saving
+              </Button>
+            </>
+          }
+        >
+          <p className="text-gray-600">
+            You have unsaved changes. Are you sure you want to leave? Your changes will be lost.
+          </p>
+        </Modal>
+      )}
     </div>
   );
 }

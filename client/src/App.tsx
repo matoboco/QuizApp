@@ -42,6 +42,7 @@ function App() {
               <Route element={<MainLayout />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/quiz/:id/edit" element={<QuizEditorPage />} />
+                <Route path="/quiz/:id/view" element={<QuizEditorPage readOnly />} />
               </Route>
               <Route path="/host/:sessionId" element={<HostGamePage />} />
 

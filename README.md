@@ -37,7 +37,10 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 - Optional description/hint text per question (shown to players below question)
 - Optional image URL for questions
 - 8 distinct answer colors and shapes for multi-select/ordering questions
-- Draft / published quiz states
+- **Public / Private** quiz visibility — public quizzes are visible to all users, private quizzes are only visible to the owner
+- **Quiz duplication** — duplicate your own or any public quiz to create an editable copy
+- **Edit lock** — quizzes that have been played at least once become read-only; duplicate to make changes
+- **Public quiz browser** — "Public Quizzes" tab on the dashboard shows all public quizzes from other users with View, Duplicate, and Export actions
 - **Export / Import** quizzes as plain-text `.quiz.txt` files — human-readable, editable in any text editor, round-trip safe
 
 ### Real-time Gameplay
@@ -158,7 +161,7 @@ See [Development Guide](docs/DEVELOPMENT.md) for local setup, environment variab
 - [ ] Open-ended question type
 - [ ] Team mode
 - [x] Quiz import/export (`.quiz.txt` plain-text format)
-- [ ] Quiz duplication
+- [x] Quiz duplication
 - [x] Post-game statistics and analytics for host
 - [x] Admin panel with user/role management
 - [ ] Password reset / forgot password (self-service)

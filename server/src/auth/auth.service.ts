@@ -47,7 +47,7 @@ class AuthService {
     if (config.allowedEmailDomains.length > 0) {
       const domain = data.email.split('@')[1]?.toLowerCase();
       if (!domain || !config.allowedEmailDomains.includes(domain)) {
-        throw new BadRequestError(`Email domain not allowed. Allowed domains: ${config.allowedEmailDomains.join(', ')}`);
+        throw new BadRequestError('The email domain you entered is not among the allowed domains.');
       }
     }
 

@@ -4,12 +4,23 @@ import QuizCard from './QuizCard';
 
 interface QuizCardGridProps {
   quizzes: QuizSummary[];
-  onDelete: (id: string) => void;
-  onPlay: (id: string) => void;
-  onExport: (id: string) => void;
+  mode?: 'own' | 'public';
+  onDelete?: (id: string) => void;
+  onPlay?: (id: string) => void;
+  onExport?: (id: string) => void;
+  onDuplicate?: (id: string) => void;
+  emptyMessage?: string;
 }
 
-export default function QuizCardGrid({ quizzes, onDelete, onPlay, onExport }: QuizCardGridProps) {
+export default function QuizCardGrid({
+  quizzes,
+  mode = 'own',
+  onDelete,
+  onPlay,
+  onExport,
+  onDuplicate,
+  emptyMessage = 'No quizzes yet',
+}: QuizCardGridProps) {
   if (quizzes.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
@@ -28,11 +39,13 @@ export default function QuizCardGrid({ quizzes, onDelete, onPlay, onExport }: Qu
           />
         </svg>
         <h3 className="mt-4 text-lg font-display font-semibold text-gray-700">
-          No quizzes yet
+          {emptyMessage}
         </h3>
-        <p className="mt-1 text-sm text-gray-500">
-          Create your first quiz by clicking the + button below.
-        </p>
+        {mode === 'own' && (
+          <p className="mt-1 text-sm text-gray-500">
+            Create your first quiz by clicking the + button below.
+          </p>
+        )}
       </div>
     );
   }
@@ -43,9 +56,11 @@ export default function QuizCardGrid({ quizzes, onDelete, onPlay, onExport }: Qu
         <QuizCard
           key={quiz.id}
           quiz={quiz}
+          mode={mode}
           onDelete={onDelete}
           onPlay={onPlay}
           onExport={onExport}
+          onDuplicate={onDuplicate}
         />
       ))}
     </div>

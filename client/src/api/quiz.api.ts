@@ -25,3 +25,18 @@ export async function updateQuizApi(id: string, data: UpdateQuizRequest): Promis
 export async function deleteQuizApi(id: string): Promise<void> {
   await apiClient.delete(`/quizzes/${id}`);
 }
+
+export async function getPublicQuizzesApi(): Promise<QuizSummary[]> {
+  const response = await apiClient.get<ApiResponse<QuizSummary[]>>('/quizzes/public');
+  return response.data.data!;
+}
+
+export async function getPublicQuizApi(id: string): Promise<Quiz> {
+  const response = await apiClient.get<ApiResponse<Quiz>>(`/quizzes/public/${id}`);
+  return response.data.data!;
+}
+
+export async function duplicateQuizApi(id: string): Promise<Quiz> {
+  const response = await apiClient.post<ApiResponse<Quiz>>(`/quizzes/${id}/duplicate`);
+  return response.data.data!;
+}
