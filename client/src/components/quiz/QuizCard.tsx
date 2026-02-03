@@ -243,6 +243,7 @@ export default function QuizCard({ quiz, mode = 'own', onDelete, onPlay, onExpor
               variant="ghost"
               size="sm"
               onClick={() => navigate(`/quiz/${quiz.id}/history`)}
+              disabled={quiz.gameCount === 0}
               className="flex items-center gap-1.5"
             >
               <svg
