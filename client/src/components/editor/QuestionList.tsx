@@ -75,10 +75,13 @@ export default function QuestionList({
                         : question.questionType === 'true-false' ? 'T/F'
                         : question.questionType === 'multi-select' ? 'Multi'
                         : question.questionType === 'ordering' ? 'Order'
+                        : question.questionType === 'number-guess' ? '#'
                         : 'MC'}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {question.answers.length} answers
+                      {question.questionType === 'number-guess'
+                        ? `±${question.tolerance ?? 100}`
+                        : `${question.answers.length} answers`}
                     </span>
                   </div>
                 </div>
