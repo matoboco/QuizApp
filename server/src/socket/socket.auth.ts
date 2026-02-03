@@ -51,6 +51,12 @@ export function socketAuthMiddleware(
         sessionId: payload.sessionId,
         type: 'player',
       };
+    } else if (payload.type === 'display') {
+      socket.data = {
+        displayId: payload.displayId,
+        sessionId: payload.sessionId,
+        type: 'display',
+      };
     } else {
       socket.data = {
         type: 'player',

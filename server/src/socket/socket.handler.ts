@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { Server, Socket } from 'socket.io';
 import type {
   ClientToServerEvents,
@@ -52,7 +53,7 @@ export function setupSocketHandlers(io: TypedServer): void {
 
   io.on('connection', async (socket: TypedSocket) => {
     console.log(
-      `[socket.io] Client connected: ${socket.id} (type: ${socket.data.type}, userId: ${socket.data.userId || 'none'}, playerId: ${socket.data.playerId || 'none'})`
+      `[socket.io] Client connected: ${socket.id} (type: ${socket.data.type}, userId: ${socket.data.userId || 'none'}, playerId: ${socket.data.playerId || 'none'}, displayId: ${socket.data.displayId || 'none'})`
     );
 
     // --- Join appropriate rooms on connection ---
@@ -87,6 +88,22 @@ export function setupSocketHandlers(io: TypedServer): void {
         if (playerState) {
           socket.emit('player:state-update', playerState);
         }
+      } else if (socket.data.type === 'display' && socket.data.displayId && socket.data.sessionId) {
+        // Returning display with token: rejoin host room
+        const { displayId, sessionId } = socket.data;
+        socket.join(hostRoom(sessionId));
+
+        console.log(`[socket.io] Display ${displayId} rejoined room ${hostRoom(sessionId)}`);
+
+        // Send current game state
+        const state = await gameEngine.ensureLobbyState(sessionId);
+        if (state) {
+          socket.emit('game:state-update', state);
+        }
+
+        // Notify host of display count
+        const displayCount = await getDisplayCount(io, sessionId);
+        io.to(hostRoom(sessionId)).emit('display:count-update', displayCount);
       }
     } catch (err) {
       console.error(`[socket.io] Error during connection setup for ${socket.id}:`, err);
@@ -98,6 +115,9 @@ export function setupSocketHandlers(io: TypedServer): void {
 
     // --- Register player events ---
     registerPlayerEvents(socket, io);
+
+    // --- Register display events ---
+    registerDisplayEvents(socket, io);
 
     // --- Register common events ---
     registerCommonEvents(socket, io);
@@ -122,6 +142,14 @@ export function setupSocketHandlers(io: TypedServer): void {
           }
 
           console.log(`[socket.io] Player ${playerId} disconnected from session ${sessionId}`);
+        } else if (socket.data.type === 'display' && socket.data.sessionId) {
+          const { displayId, sessionId } = socket.data;
+
+          // Notify host of updated display count
+          const displayCount = await getDisplayCount(io, sessionId);
+          io.to(hostRoom(sessionId)).emit('display:count-update', displayCount);
+
+          console.log(`[socket.io] Display ${displayId || 'unknown'} disconnected from session ${sessionId}`);
         }
       } catch (err) {
         console.error(`[socket.io] Error handling disconnect for ${socket.id}:`, err);
@@ -352,6 +380,75 @@ function registerPlayerEvents(socket: TypedSocket, io: TypedServer): void {
       socket.emit('error', 'An error occurred while submitting your answer');
     }
   });
+}
+
+// ---------------------------------------------------------------------------
+// Display event handlers
+// ---------------------------------------------------------------------------
+
+function registerDisplayEvents(socket: TypedSocket, io: TypedServer): void {
+  socket.on('display:attach', async (
+    data: { pin: string },
+    callback: (response: { success: boolean; error?: string; sessionId?: string; displayId?: string; token?: string }) => void
+  ) => {
+    try {
+      // Find session by PIN
+      const session = await gameRepository.findByPin(data.pin);
+      if (!session) {
+        callback({ success: false, error: 'Game not found. Check your PIN and try again.' });
+        return;
+      }
+
+      // Allow attaching during any phase except finished
+      if (session.status === 'finished') {
+        callback({ success: false, error: 'This game has already finished.' });
+        return;
+      }
+
+      // Generate display ID and token
+      const displayId = crypto.randomUUID();
+      const token = authService.generateDisplayToken(displayId, session.id);
+
+      // Update socket data
+      socket.data.displayId = displayId;
+      socket.data.sessionId = session.id;
+      socket.data.type = 'display';
+
+      // Join host room to receive all game events
+      socket.join(hostRoom(session.id));
+
+      // Send current game state
+      const state = await gameEngine.ensureLobbyState(session.id);
+      if (state) {
+        socket.emit('game:state-update', state);
+      }
+
+      // Notify host of display count
+      const displayCount = await getDisplayCount(io, session.id);
+      io.to(hostRoom(session.id)).emit('display:count-update', displayCount);
+
+      console.log(`[socket.io] Display ${displayId} attached to session ${session.id}`);
+
+      callback({
+        success: true,
+        sessionId: session.id,
+        displayId,
+        token,
+      });
+    } catch (err) {
+      console.error('[socket.io] Error in display:attach:', err);
+      callback({ success: false, error: 'An unexpected error occurred. Please try again.' });
+    }
+  });
+}
+
+/**
+ * Count the number of display sockets connected to a session's host room.
+ */
+async function getDisplayCount(io: TypedServer, sessionId: string): Promise<number> {
+  const room = hostRoom(sessionId);
+  const sockets = await io.in(room).fetchSockets();
+  return sockets.filter((s) => s.data.type === 'display').length;
 }
 
 // ---------------------------------------------------------------------------

@@ -17,6 +17,9 @@ export interface ClientToServerEvents {
   'player:join': (data: { pin: string; nickname: string }, callback: (response: { success: boolean; error?: string; playerId?: string; sessionId?: string; token?: string }) => void) => void;
   'player:submit-answer': (data: { sessionId: string; questionId: string; answerId: string | string[] }) => void;
 
+  // Display events
+  'display:attach': (data: { pin: string }, callback: (response: { success: boolean; error?: string; sessionId?: string; displayId?: string; token?: string }) => void) => void;
+
   // Common events
   'reconnect-game': (data: { sessionId: string; playerId?: string }) => void;
 }
@@ -41,6 +44,9 @@ export interface ServerToClientEvents {
   'player:kicked': () => void;
   'player:game-finished': (data: { rank: number; totalScore: number; leaderboard: LeaderboardEntry[] }) => void;
 
+  // Display events
+  'display:count-update': (count: number) => void;
+
   // Common events
   'error': (message: string) => void;
   'game:countdown': (seconds: number) => void;
@@ -54,6 +60,7 @@ export interface InterServerEvents {
 export interface SocketData {
   userId?: string;
   playerId?: string;
+  displayId?: string;
   sessionId?: string;
-  type: 'host' | 'player';
+  type: 'host' | 'player' | 'display';
 }

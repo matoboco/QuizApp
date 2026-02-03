@@ -136,6 +136,16 @@ class GameStateManager {
   }
 
   /**
+   * Set the share token on the session.
+   */
+  setShareToken(sessionId: string, shareToken: string): void {
+    const state = this.states.get(sessionId);
+    if (!state) return;
+
+    state.session.shareToken = shareToken;
+  }
+
+  /**
    * Record a player's answer for the current question.
    * Calculates score using the shared scoring function with correctRatio support.
    * Updates the player's score and streak in state.

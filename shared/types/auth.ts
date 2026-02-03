@@ -68,4 +68,10 @@ export interface PlayerTokenPayload {
   type: 'player';
 }
 
-export type TokenPayload = HostTokenPayload | PlayerTokenPayload;
+export interface DisplayTokenPayload {
+  displayId: string;
+  sessionId: string;
+  type: 'display';
+}
+
+export type TokenPayload = HostTokenPayload | PlayerTokenPayload | DisplayTokenPayload;

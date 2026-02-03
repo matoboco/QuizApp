@@ -30,6 +30,7 @@ interface UseHostGameSocketReturn {
   reconnectAttempt: number;
   maxAttempts: number;
   isPermanentlyDisconnected: boolean;
+  displayCount: number;
   startGame: () => void;
   nextQuestion: () => void;
   showAnswers: () => void;
@@ -49,6 +50,7 @@ export function useHostGameSocket(sessionId: string): UseHostGameSocketReturn {
 
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [displayCount, setDisplayCount] = useState(0);
 
   // Reconnection support
   const {
@@ -163,6 +165,10 @@ export function useHostGameSocket(sessionId: string): UseHostGameSocketReturn {
       setError(message);
     };
 
+    const onDisplayCountUpdate = (count: number) => {
+      setDisplayCount(count);
+    };
+
     socket.on('game:state-update', onStateUpdate);
     socket.on('game:player-joined', onPlayerJoined);
     socket.on('game:player-left', onPlayerLeft);
@@ -172,6 +178,7 @@ export function useHostGameSocket(sessionId: string): UseHostGameSocketReturn {
     socket.on('game:leaderboard', onLeaderboard);
     socket.on('game:finished', onFinished);
     socket.on('error', onError);
+    socket.on('display:count-update', onDisplayCountUpdate);
 
     return () => {
       socket.off('game:state-update', onStateUpdate);
@@ -183,6 +190,7 @@ export function useHostGameSocket(sessionId: string): UseHostGameSocketReturn {
       socket.off('game:leaderboard', onLeaderboard);
       socket.off('game:finished', onFinished);
       socket.off('error', onError);
+      socket.off('display:count-update', onDisplayCountUpdate);
     };
   }, [socket]);
 
@@ -230,6 +238,7 @@ export function useHostGameSocket(sessionId: string): UseHostGameSocketReturn {
     reconnectAttempt,
     maxAttempts,
     isPermanentlyDisconnected,
+    displayCount,
     startGame,
     nextQuestion,
     showAnswers,

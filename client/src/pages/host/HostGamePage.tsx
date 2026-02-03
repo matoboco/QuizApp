@@ -16,6 +16,7 @@ export default function HostGamePage() {
     error,
     currentPhase,
     isLastQuestion,
+    displayCount,
     startGame,
     nextQuestion,
     showAnswers,
@@ -75,6 +76,7 @@ export default function HostGamePage() {
         players={gameState.players}
         onStart={startGame}
         onKickPlayer={kickPlayer}
+        displayCount={displayCount}
       />
     );
   }
@@ -86,6 +88,7 @@ export default function HostGamePage() {
         leaderboard={gameState.leaderboard}
         sessionId={sessionId!}
         onBackToDashboard={handleBackToDashboard}
+        shareToken={gameState.session.shareToken}
       />
     );
   }

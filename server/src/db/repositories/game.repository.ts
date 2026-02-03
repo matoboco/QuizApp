@@ -118,6 +118,15 @@ export class GameRepository {
     return this.findById(id);
   }
 
+  async setShareToken(id: string, shareToken: string): Promise<void> {
+    const db = getKysely();
+    await db
+      .updateTable('game_sessions')
+      .set({ share_token: shareToken })
+      .where('id', '=', id)
+      .execute();
+  }
+
   async findActiveByHostId(hostId: string): Promise<GameSession | undefined> {
     const db = getKysely();
     const row = await db

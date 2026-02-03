@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { Server } from 'socket.io';
 import type {
   ClientToServerEvents,
@@ -390,6 +391,11 @@ class GameEngine {
     await gameRepository.updateStatus(sessionId, 'finished', {
       finishedAt: new Date().toISOString(),
     });
+
+    // Auto-generate share token so results can be shared immediately
+    const shareToken = crypto.randomBytes(16).toString('hex');
+    await gameRepository.setShareToken(sessionId, shareToken);
+    gameStateManager.setShareToken(sessionId, shareToken);
 
     const leaderboard = gameStateManager.getLeaderboard(sessionId);
 

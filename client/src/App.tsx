@@ -18,6 +18,7 @@ import AdminUsersPage from '@/pages/admin/AdminUsersPage';
 import QuizHistoryPage from '@/pages/history/QuizHistoryPage';
 import GameHistoryPage from '@/pages/history/GameHistoryPage';
 import SharedGamePage from '@/pages/history/SharedGamePage';
+import DisplayPage from '@/pages/display/DisplayPage';
 
 function App() {
   return (
@@ -33,6 +34,9 @@ function App() {
             {/* Public player routes (no auth required) */}
             <Route path="/play" element={<PlayerJoinPage />} />
             <Route path="/play/:sessionId" element={<PlayerGamePage />} />
+
+            {/* Public display route (no auth required) */}
+            <Route path="/display" element={<DisplayPage />} />
 
             {/* Public shared game history */}
             <Route path="/shared/:shareToken" element={<SharedGamePage />} />

@@ -51,6 +51,8 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 - Live player list with connection status
 - Automatic game flow: question → answers → results → leaderboard → next question
 - Host can kick players from the lobby
+- **Remote Display** — open `/display` on a projector, enter the game PIN, and it mirrors the host screen (lobby, questions, results, leaderboard) in read-only mode; multiple displays supported simultaneously
+- **Share QR code on final results** — automatically generated QR code on both host and display screens links to detailed game results so players can scan and review their performance
 
 ### Scoring System
 - **Base points**: 1000 per correct answer (scaled by correctness ratio for partial credit)
@@ -189,4 +191,5 @@ See [Development Guide](docs/DEVELOPMENT.md) for local setup, environment variab
 - [ ] Production build and deployment guide
 - [ ] Configurable auto-advance timing per quiz
 - [ ] Player avatars / custom colors
+- [x] Remote display screen for projectors (`/display`)
 - [ ] Lobby chat

@@ -12,6 +12,7 @@ import {
   UserPublic,
   HostTokenPayload,
   PlayerTokenPayload,
+  DisplayTokenPayload,
   TokenPayload,
 } from '@shared/types';
 import { userRepository, verificationCodeRepository } from '../db/repositories';
@@ -210,6 +211,18 @@ class AuthService {
       playerId,
       sessionId,
       type: 'player',
+    };
+
+    const expiresIn = process.env.JWT_PLAYER_EXPIRY || '4h';
+
+    return jwt.sign(payload, getJwtSecret(), { expiresIn });
+  }
+
+  generateDisplayToken(displayId: string, sessionId: string): string {
+    const payload: DisplayTokenPayload = {
+      displayId,
+      sessionId,
+      type: 'display',
     };
 
     const expiresIn = process.env.JWT_PLAYER_EXPIRY || '4h';
