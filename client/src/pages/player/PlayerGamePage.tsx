@@ -373,6 +373,8 @@ export default function PlayerGamePage() {
               result={lastResult}
               totalScore={player.score}
               rank={currentRank}
+              correctNumber={currentQuestion?.correctNumber}
+              tolerance={currentQuestion?.tolerance}
             />
           );
         }

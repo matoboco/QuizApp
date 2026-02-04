@@ -8,6 +8,8 @@ interface PlayerResultScreenProps {
   result: ScoreBreakdown;
   totalScore: number;
   rank?: number;
+  correctNumber?: number;
+  tolerance?: number;
 }
 
 function AnimatedCounter({
@@ -53,6 +55,8 @@ export default function PlayerResultScreen({
   result,
   totalScore,
   rank,
+  correctNumber,
+  tolerance,
 }: PlayerResultScreenProps) {
   const isCorrect = result.isCorrect;
   const isPartial = !isCorrect && result.correctRatio > 0 && result.correctRatio < 1;
@@ -132,6 +136,17 @@ export default function PlayerResultScreen({
         <p className="text-white/80 text-lg mb-2">
           {Math.round(result.correctRatio * 100)}% correct
         </p>
+      )}
+
+      {/* Correct answer for number-guess */}
+      {correctNumber !== undefined && (
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl px-6 py-3 mt-2 mb-2 text-center animate-fade-in">
+          <p className="text-white/70 text-xs uppercase tracking-wider mb-1">Correct Answer</p>
+          <p className="text-2xl font-display font-bold text-white">{correctNumber}</p>
+          {tolerance !== undefined && tolerance > 0 && (
+            <p className="text-white/50 text-sm mt-1">&plusmn; {tolerance} tolerance</p>
+          )}
+        </div>
       )}
 
       {/* Score breakdown */}

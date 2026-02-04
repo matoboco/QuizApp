@@ -396,9 +396,10 @@ class GameStateManager {
     const player = state.players.find((p) => p.id === playerId);
     if (!player) return undefined;
 
-    // Build question data without correct answer info
+    // Build question data — reveal correct answer for number-guess after answer phase
     let currentQuestion: PlayerGameState['currentQuestion'] | undefined;
     if (state.currentQuestion) {
+      const revealAnswer = state.session.status !== 'question' && state.session.status !== 'starting';
       currentQuestion = {
         id: state.currentQuestion.id,
         text: state.currentQuestion.text,
@@ -412,6 +413,10 @@ class GameStateManager {
           text: a.text,
           orderIndex: a.orderIndex,
         })),
+        ...(revealAnswer && state.currentQuestion.questionType === 'number-guess' ? {
+          correctNumber: state.currentQuestion.correctNumber,
+          tolerance: state.currentQuestion.tolerance,
+        } : {}),
       };
     }
 

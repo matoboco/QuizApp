@@ -82,6 +82,10 @@ export interface PlayerGameState {
     requireAll: boolean;
     timeLimit: number;
     answers: { id: string; text: string; orderIndex: number }[];
+    /** Revealed after answer phase for number-guess questions */
+    correctNumber?: number;
+    /** Revealed after answer phase for number-guess questions */
+    tolerance?: number;
   };
   questionStartedAt?: number;
   lastResult?: ScoreBreakdown;
