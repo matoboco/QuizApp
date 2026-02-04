@@ -106,7 +106,7 @@ export default function PinInput({ onSubmit, error, isLoading }: PinInputProps) 
         </p>
       )}
 
-      <p className="mt-4 text-center text-purple-200 text-sm">
+      <p className="mt-4 text-center text-sky-200 text-sm">
         Enter the 6-digit PIN shown on the host screen
       </p>
     </form>

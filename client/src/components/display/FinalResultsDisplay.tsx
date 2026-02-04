@@ -148,7 +148,7 @@ export default function FinalResultsDisplay({ leaderboard, shareToken }: FinalRe
                   value={shareUrl}
                   size={100}
                   bgColor="#ffffff"
-                  fgColor="#46178f"
+                  fgColor="#0f172a"
                   level="M"
                   includeMargin={false}
                 />

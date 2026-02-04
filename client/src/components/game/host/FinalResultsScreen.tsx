@@ -175,7 +175,7 @@ export default function FinalResultsScreen({
                   value={shareUrl}
                   size={80}
                   bgColor="#ffffff"
-                  fgColor="#46178f"
+                  fgColor="#0f172a"
                   level="M"
                   includeMargin={false}
                 />

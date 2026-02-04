@@ -91,7 +91,7 @@ export default function PlayerJoinPage() {
         <h1 className="text-5xl md:text-6xl font-display font-bold text-white text-shadow-lg">
           {APP_NAME}
         </h1>
-        <p className="text-purple-300 mt-2 text-lg">
+        <p className="text-sky-300 mt-2 text-lg">
           Join the game and test your knowledge!
         </p>
       </div>
@@ -191,7 +191,7 @@ export default function PlayerJoinPage() {
             />
             <button
               onClick={handleBackToPin}
-              className="mt-4 w-full text-center text-purple-300 hover:text-white text-sm transition-colors"
+              className="mt-4 w-full text-center text-sky-300 hover:text-white text-sm transition-colors"
             >
               &larr; Change PIN ({pin})
             </button>

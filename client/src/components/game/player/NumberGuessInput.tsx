@@ -42,7 +42,7 @@ export default function NumberGuessInput({ onSubmit, disabled, submitted }: Numb
         <button
           onClick={handleSubmit}
           disabled={disabled || value.trim() === '' || isNaN(Number(value.trim()))}
-          className="px-8 py-3 bg-white text-purple-700 font-bold text-lg rounded-xl shadow-lg hover:bg-white/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          className="px-8 py-3 bg-white text-game-bg font-bold text-lg rounded-xl shadow-lg hover:bg-white/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Submit
         </button>

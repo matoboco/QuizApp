@@ -48,7 +48,7 @@ export default function DisplayAttachForm({ onAttach, error, isLoading }: Displa
         <h1 className="text-4xl md:text-5xl font-display font-bold text-white text-shadow-lg">
           Remote Display
         </h1>
-        <p className="text-purple-300 mt-2 text-lg">
+        <p className="text-sky-300 mt-2 text-lg">
           Enter the game PIN to mirror the host screen
         </p>
       </div>
@@ -111,7 +111,7 @@ export default function DisplayAttachForm({ onAttach, error, isLoading }: Displa
           </p>
         )}
 
-        <p className="mt-6 text-center text-purple-200 text-base">
+        <p className="mt-6 text-center text-sky-200 text-base">
           Enter the 6-digit PIN displayed on the host screen
         </p>
       </form>

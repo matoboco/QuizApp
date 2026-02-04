@@ -104,7 +104,7 @@ export default function LoginPage() {
           <div className="mt-4 pt-4 border-t border-gray-200 text-center">
             <Link
               to="/play"
-              className="inline-flex items-center justify-center gap-3 w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-display font-bold text-lg rounded-xl transition-colors shadow-md hover:shadow-lg"
+              className="inline-flex items-center justify-center gap-3 w-full px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-display font-bold text-lg rounded-xl transition-colors shadow-md hover:shadow-lg"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />

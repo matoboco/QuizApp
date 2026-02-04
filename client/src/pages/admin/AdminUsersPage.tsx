@@ -126,7 +126,7 @@ function UserActionsDropdown({
 
 function RoleBadge({ role }: { role: string }) {
   const styles = {
-    superadmin: 'bg-purple-100 text-purple-700',
+    superadmin: 'bg-cyan-100 text-cyan-700',
     admin: 'bg-blue-100 text-blue-700',
     user: 'bg-gray-100 text-gray-700',
   };

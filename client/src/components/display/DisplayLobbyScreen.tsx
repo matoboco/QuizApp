@@ -38,7 +38,7 @@ export default function DisplayLobbyScreen({ pin, players }: DisplayLobbyScreenP
                   value={joinUrl}
                   size={160}
                   bgColor="#ffffff"
-                  fgColor="#46178f"
+                  fgColor="#0f172a"
                   level="M"
                   includeMargin={false}
                 />

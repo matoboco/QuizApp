@@ -32,7 +32,7 @@ function ReconnectingOverlay() {
           />
         </svg>
         <p className="text-white font-display font-bold text-lg">Reconnecting...</p>
-        <p className="text-purple-300 text-sm mt-1">Please wait</p>
+        <p className="text-sky-300 text-sm mt-1">Please wait</p>
       </div>
     </div>
   );
@@ -117,7 +117,7 @@ function WaitingForResultsScreen({ selectedId }: { selectedId?: string | string[
           <h2 className="text-2xl font-display font-bold text-white mb-2">
             Answer submitted!
           </h2>
-          <p className="text-purple-300">
+          <p className="text-sky-300">
             Waiting for all players to answer...
           </p>
         </>
@@ -142,7 +142,7 @@ function WaitingForResultsScreen({ selectedId }: { selectedId?: string | string[
           <h2 className="text-2xl font-display font-bold text-white mb-2">
             Time's up!
           </h2>
-          <p className="text-purple-300">
+          <p className="text-sky-300">
             Waiting for results...
           </p>
         </>
@@ -151,15 +151,15 @@ function WaitingForResultsScreen({ selectedId }: { selectedId?: string | string[
       {/* Pulsing dots */}
       <div className="flex space-x-1 mt-6">
         <span
-          className="inline-block w-2 h-2 bg-purple-400 rounded-full animate-bounce"
+          className="inline-block w-2 h-2 bg-sky-400 rounded-full animate-bounce"
           style={{ animationDelay: '0ms' }}
         />
         <span
-          className="inline-block w-2 h-2 bg-purple-400 rounded-full animate-bounce"
+          className="inline-block w-2 h-2 bg-sky-400 rounded-full animate-bounce"
           style={{ animationDelay: '150ms' }}
         />
         <span
-          className="inline-block w-2 h-2 bg-purple-400 rounded-full animate-bounce"
+          className="inline-block w-2 h-2 bg-sky-400 rounded-full animate-bounce"
           style={{ animationDelay: '300ms' }}
         />
       </div>
@@ -172,7 +172,7 @@ function LeaderboardWaitScreen({ rank, score, streak }: { rank?: number; score: 
     <div className="min-h-screen bg-game-bg flex flex-col items-center justify-center px-6 text-center">
       {rank !== undefined && (
         <div className="mb-4 animate-bounce-in">
-          <p className="text-purple-300 text-sm uppercase tracking-wider">Your rank</p>
+          <p className="text-sky-300 text-sm uppercase tracking-wider">Your rank</p>
           <p className="text-6xl font-display font-bold text-white text-shadow">
             #{rank}
           </p>
@@ -180,7 +180,7 @@ function LeaderboardWaitScreen({ rank, score, streak }: { rank?: number; score: 
       )}
 
       <div className="bg-white/10 backdrop-blur-sm rounded-xl px-8 py-4 mb-6">
-        <p className="text-purple-300 text-xs uppercase tracking-wider mb-1">Score</p>
+        <p className="text-sky-300 text-xs uppercase tracking-wider mb-1">Score</p>
         <p className="text-3xl font-display font-bold text-white">
           {score.toLocaleString()}
         </p>
@@ -192,19 +192,19 @@ function LeaderboardWaitScreen({ rank, score, streak }: { rank?: number; score: 
         </div>
       )}
 
-      <p className="text-purple-200 text-lg flex items-center gap-2">
+      <p className="text-sky-200 text-lg flex items-center gap-2">
         Next question coming
         <span className="flex space-x-1">
           <span
-            className="inline-block w-2 h-2 bg-purple-300 rounded-full animate-bounce"
+            className="inline-block w-2 h-2 bg-sky-300 rounded-full animate-bounce"
             style={{ animationDelay: '0ms' }}
           />
           <span
-            className="inline-block w-2 h-2 bg-purple-300 rounded-full animate-bounce"
+            className="inline-block w-2 h-2 bg-sky-300 rounded-full animate-bounce"
             style={{ animationDelay: '150ms' }}
           />
           <span
-            className="inline-block w-2 h-2 bg-purple-300 rounded-full animate-bounce"
+            className="inline-block w-2 h-2 bg-sky-300 rounded-full animate-bounce"
             style={{ animationDelay: '300ms' }}
           />
         </span>
@@ -264,7 +264,7 @@ export default function PlayerGamePage() {
             <p className="text-white font-display font-bold text-xl">
               Connecting to game...
             </p>
-            <p className="text-purple-300 text-sm mt-2">
+            <p className="text-sky-300 text-sm mt-2">
               Please wait while we connect you
             </p>
           </>
@@ -275,7 +275,7 @@ export default function PlayerGamePage() {
             </p>
             <button
               onClick={() => navigate('/play')}
-              className="text-purple-300 hover:text-white text-sm underline transition-colors"
+              className="text-sky-300 hover:text-white text-sm underline transition-colors"
             >
               Back to join page
             </button>
@@ -310,7 +310,7 @@ export default function PlayerGamePage() {
                 <span className="font-bold">
                   Q{playerState.currentQuestionIndex + 1}
                 </span>
-                <span className="text-purple-300">
+                <span className="text-sky-300">
                   /{playerState.totalQuestions}
                 </span>
               </div>

@@ -93,7 +93,7 @@ export default function NicknameInput({
         Join!
       </Button>
 
-      <p className="mt-3 text-center text-purple-200 text-xs">
+      <p className="mt-3 text-center text-sky-200 text-xs">
         {nickname.length}/{MAX_NICKNAME_LENGTH} characters
       </p>
     </form>
