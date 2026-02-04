@@ -4,25 +4,11 @@ Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and 
 
 ## Screenshots
 
-### Host
-
-| Login | Registration |
+| Quiz Dashboard | Player — answering on mobile |
 |:---:|:---:|
-| ![Login screen](docs/login-screen.png) | ![Create account](docs/create-account.png) |
+| ![Dashboard](docs/dashboard.png) | ![Player question](docs/player-question.png) |
 
-| Dashboard with Export / Import | Quiz editor |
-|:---:|:---:|
-| ![Dashboard](docs/dashboard.png) | ![Quiz editor](docs/quiz-editor.png) |
-
-| Game lobby — PIN + QR code | Live question with timer |
-|:---:|:---:|
-| ![Host lobby](docs/presenter-lobby.png) | ![Host question view](docs/presenter-question.png) |
-
-### Player (mobile)
-
-| Enter PIN | Lobby — waiting for host | Answering a question |
-|:---:|:---:|:---:|
-| ![PIN entry](docs/mobile-pin-screen.jpeg) | ![Player lobby](docs/mobile-lobby.jpeg) | ![Player question](docs/mobile-question.jpeg) |
+See [all screenshots](docs/SCREENSHOTS.md) for a complete walkthrough of every screen.
 
 ## Features
 
