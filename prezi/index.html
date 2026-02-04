@@ -190,6 +190,22 @@
   .text-center{text-align:center}
   .text-sm{font-size:clamp(1rem,1.3vw,1.2rem)}
   .flex-center{display:flex;align-items:center;justify-content:center;flex:1}
+
+  /* Question type mockups */
+  .mockup{
+    background:#2d1b69;border-radius:10px;padding:.8vw;
+    font-family:system-ui,sans-serif;color:#fff;
+    display:flex;flex-direction:column;gap:.4vw;
+    margin-bottom:1vh;overflow:hidden;
+  }
+  .mockup-q{text-align:center;font-weight:700;font-size:clamp(.7rem,.9vw,.85rem);padding:.3vw 0;color:#ddd}
+  .mockup-bar{border-radius:6px;padding:.35vw .6vw;font-weight:700;font-size:clamp(.6rem,.75vw,.7rem);display:flex;align-items:center;gap:.4vw}
+  .mockup-bar .shape{width:1.1em;height:1.1em;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+  .mockup-btn{border-radius:8px;padding:.5vw;text-align:center;font-weight:700;font-size:clamp(.65rem,.8vw,.75rem)}
+  .mockup-input{background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25);border-radius:8px;padding:.5vw;text-align:center;color:rgba(255,255,255,.4);font-size:clamp(.6rem,.75vw,.7rem)}
+  .mockup-order{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:.3vw .6vw;font-size:clamp(.6rem,.75vw,.7rem);display:flex;align-items:center;gap:.4vw}
+  .mockup-order .num{background:rgba(255,255,255,.2);width:1.4em;height:1.4em;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:.8em;flex-shrink:0}
+  .mockup-cb{width:1em;height:1em;border:2px solid rgba(255,255,255,.5);border-radius:3px;flex-shrink:0;margin-left:auto}
 </style>
 </head>
 <body>
@@ -248,26 +264,57 @@
 <!-- ==================== SLIDE 4: Question Types ==================== -->
 <div class="slide" data-slide="3">
   <h2>Typy otazok</h2>
-  <div class="cols cols-auto" style="gap:1.5vw">
+  <div class="cols cols-auto" style="gap:1.5vw;grid-template-columns:repeat(5,1fr)">
     <div class="card">
-      <h3>&#9989; Multiple Choice</h3>
-      <p>Jedna spravna odpoved z 2-8 moznosti. Farebne a tvarove odlisenie odpovedov.</p>
+      <div class="mockup">
+        <div class="mockup-q">What is the capital of France?</div>
+        <div class="mockup-bar" style="background:#e21b3c"><span class="shape">&#9650;</span> Paris</div>
+        <div class="mockup-bar" style="background:#1368ce"><span class="shape">&#9670;</span> London</div>
+        <div class="mockup-bar" style="background:#d89e00"><span class="shape">&#9679;</span> Berlin</div>
+        <div class="mockup-bar" style="background:#26890c"><span class="shape">&#9632;</span> Madrid</div>
+      </div>
+      <h3>Multiple Choice</h3>
+      <p>Jedna spravna odpoved z 2-8 moznosti s farebnym odlisenim.</p>
     </div>
     <div class="card">
-      <h3>&#9898; True / False</h3>
-      <p>Binarna volba - pravda alebo nepravda. Jednoduche a rychle otazky.</p>
+      <div class="mockup">
+        <div class="mockup-q">The Great Wall is in China</div>
+        <div class="mockup-btn" style="background:#22c55e">True</div>
+        <div class="mockup-btn" style="background:#ef4444">False</div>
+      </div>
+      <h3>True / False</h3>
+      <p>Binarna volba &ndash; pravda alebo nepravda.</p>
     </div>
     <div class="card">
-      <h3>&#9745; Multi-Select</h3>
-      <p>Viacero spravnych odpovedov. Podpora parcialneho bodoveho hodnotenia alebo "all or nothing".</p>
+      <div class="mockup">
+        <div class="mockup-q">Select all prime numbers</div>
+        <div class="mockup-bar" style="background:#e21b3c"><span class="shape">&#9650;</span> 2<span class="mockup-cb"></span></div>
+        <div class="mockup-bar" style="background:#1368ce"><span class="shape">&#9670;</span> 3<span class="mockup-cb"></span></div>
+        <div class="mockup-bar" style="background:#d89e00"><span class="shape">&#9679;</span> 4<span class="mockup-cb"></span></div>
+        <div class="mockup-bar" style="background:#26890c"><span class="shape">&#9632;</span> 5<span class="mockup-cb"></span></div>
+      </div>
+      <h3>Multi-Select</h3>
+      <p>Viacero spravnych odpovedov. Parcialny kredit.</p>
     </div>
     <div class="card">
-      <h3>&#8645; Ordering</h3>
-      <p>Drag-and-drop zoradenie do spravneho poradia. Parcialny kredit za kazdu spravnu poziciu.</p>
+      <div class="mockup">
+        <div class="mockup-q">Rank planets by distance</div>
+        <div class="mockup-order"><span class="num">1</span> Venus <span style="margin-left:auto;opacity:.5">&#8645;</span></div>
+        <div class="mockup-order"><span class="num">2</span> Mars <span style="margin-left:auto;opacity:.5">&#8645;</span></div>
+        <div class="mockup-order"><span class="num">3</span> Earth <span style="margin-left:auto;opacity:.5">&#8645;</span></div>
+        <div class="mockup-order"><span class="num">4</span> Mercury <span style="margin-left:auto;opacity:.5">&#8645;</span></div>
+      </div>
+      <h3>Ordering</h3>
+      <p>Drag-and-drop zoradenie. Kredit za kazdu spravnu poziciu.</p>
     </div>
     <div class="card">
-      <h3>&#128290; Number Guess</h3>
-      <p>Ciselna odpoved s toleranciou. Skore proporcionalne vzdialenosti od spravnej hodnoty.</p>
+      <div class="mockup">
+        <div class="mockup-q">Radius of the Earth (km)?</div>
+        <div class="mockup-input">Type a number...</div>
+        <div class="mockup-btn" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3)">Submit</div>
+      </div>
+      <h3>Number Guess</h3>
+      <p>Ciselna odpoved s toleranciou. Proporcionalne skore.</p>
     </div>
   </div>
 </div>
