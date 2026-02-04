@@ -413,8 +413,8 @@ class GameEngine {
     // Remove from in-memory state
     gameStateManager.removePlayer(sessionId, playerId);
 
-    // Update DB
-    await playerRepository.setConnected(playerId, false);
+    // Remove from DB (cascade deletes any player_answers)
+    await playerRepository.delete(playerId);
 
     // Notify host
     this.io.to(hostRoom(sessionId)).emit('game:player-left', playerId);

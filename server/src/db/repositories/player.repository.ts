@@ -114,6 +114,14 @@ export class PlayerRepository {
       .execute();
   }
 
+  async delete(playerId: string): Promise<void> {
+    const db = getKysely();
+    await db
+      .deleteFrom('players')
+      .where('id', '=', playerId)
+      .execute();
+  }
+
   async deleteBySessionId(sessionId: string): Promise<number> {
     const db = getKysely();
     const result = await db
