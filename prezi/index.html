@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizApp - Technicka prezentacia</title>
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0f172a;--surface:#1e293b;--border:#334155;
+    --text:#e2e8f0;--muted:#94a3b8;--accent:#6366f1;
+    --accent2:#818cf8;--green:#22c55e;--orange:#f59e0b;
+    --red:#ef4444;--cyan:#06b6d4;--pink:#ec4899;
+  }
+  html,body{height:100%;overflow:hidden;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+
+  /* Slide container */
+  .deck{position:relative;width:100vw;height:100vh}
+  .slide{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;
+    padding:3.5vh 5vw;
+    opacity:0;visibility:hidden;
+    transition:opacity .4s ease,transform .4s ease;
+    transform:translateX(60px);
+  }
+  .slide.active{opacity:1;visibility:visible;transform:translateX(0)}
+  .slide.exit{opacity:0;visibility:visible;transform:translateX(-60px)}
+
+  /* Typography */
+  h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;line-height:1.15;margin-bottom:1vh}
+  h2{font-size:clamp(2.2rem,4vw,3.5rem);font-weight:700;line-height:1.2;margin-bottom:2vh}
+  h3{font-size:clamp(1.5rem,2.5vw,2.2rem);font-weight:600;margin-bottom:1vh}
+  p,.desc{font-size:clamp(1.2rem,1.9vw,1.7rem);line-height:1.55;color:var(--muted)}
+  .subtitle{font-size:clamp(1.4rem,2.4vw,2.2rem);color:var(--muted);margin-bottom:2vh}
+  .accent{color:var(--accent2)}
+  .green{color:var(--green)}.orange{color:var(--orange)}.red{color:var(--red)}.cyan{color:var(--cyan)}.pink{color:var(--pink)}
+  strong{color:var(--text);font-weight:600}
+
+  /* Grid layouts */
+  .cols{display:grid;gap:2vw;flex:1;align-content:stretch;align-items:stretch}
+  .cols-2{grid-template-columns:1fr 1fr}
+  .cols-3{grid-template-columns:1fr 1fr 1fr}
+  .cols-23{grid-template-columns:2fr 3fr}
+  .cols-32{grid-template-columns:3fr 2fr}
+  .cols-auto{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+
+  /* Cards */
+  .card{
+    background:var(--surface);border:1px solid var(--border);border-radius:12px;
+    padding:clamp(1.5rem,3vh,2.5rem) clamp(1.8rem,3vw,2.5rem);
+  }
+  .card h3{margin-bottom:.8vh}
+  .card p,.card li{font-size:clamp(1.2rem,1.7vw,1.5rem);color:var(--muted)}
+
+  /* Lists */
+  ul,ol{list-style:none;padding:0}
+  li{
+    position:relative;padding-left:1.6em;margin-bottom:1vh;
+    font-size:clamp(1.25rem,1.8vw,1.6rem);line-height:1.5;color:var(--muted);
+  }
+  li::before{
+    content:'';position:absolute;left:0;top:.55em;
+    width:10px;height:10px;border-radius:50%;background:var(--accent);
+  }
+  ol{counter-reset:ol}
+  ol li{counter-increment:ol}
+  ol li::before{
+    content:counter(ol);background:var(--accent);color:#fff;
+    width:1.4em;height:1.4em;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.75em;font-weight:700;top:.25em;
+  }
+
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:clamp(1.1rem,1.6vw,1.4rem)}
+  th,td{text-align:left;padding:.8vh 1vw;border-bottom:1px solid var(--border)}
+  th{color:var(--accent2);font-weight:600;font-size:clamp(1.05rem,1.4vw,1.25rem);text-transform:uppercase;letter-spacing:.04em}
+  td{color:var(--muted)}
+  tr:last-child td{border-bottom:none}
+  .tbl-highlight td{color:var(--text);font-weight:600}
+
+  /* Code */
+  code{
+    font-family:'Fira Code','Cascadia Code',monospace;
+    background:#0d1117;border:1px solid var(--border);border-radius:6px;
+    padding:.15em .4em;font-size:.9em;color:var(--cyan);
+  }
+  pre{
+    background:#0d1117;border:1px solid var(--border);border-radius:10px;
+    padding:2vh 2vw;overflow-x:auto;font-size:clamp(1rem,1.4vw,1.25rem);
+    line-height:1.6;color:var(--muted);font-family:'Fira Code','Cascadia Code',monospace;
+  }
+  pre .kw{color:var(--pink)}
+  pre .fn{color:var(--accent2)}
+  pre .str{color:var(--green)}
+  pre .cmt{color:#475569;font-style:italic}
+  pre .num{color:var(--orange)}
+
+  /* Badges */
+  .badge{
+    display:inline-block;padding:.2em .7em;border-radius:6px;
+    font-size:clamp(1rem,1.3vw,1.15rem);font-weight:600;margin:.2em .3em;
+  }
+  .badge-indigo{background:#312e81;color:var(--accent2)}
+  .badge-green{background:#14532d;color:var(--green)}
+  .badge-orange{background:#451a03;color:var(--orange)}
+  .badge-red{background:#450a0a;color:var(--red)}
+  .badge-cyan{background:#083344;color:var(--cyan)}
+  .badge-pink{background:#500724;color:var(--pink)}
+
+  /* Diagram box */
+  .diagram{
+    background:#0d1117;border:1px solid var(--border);border-radius:10px;
+    padding:2vh 2vw;font-family:'Fira Code','Cascadia Code',monospace;
+    font-size:clamp(1rem,1.4vw,1.25rem);line-height:1.7;color:var(--muted);
+    white-space:pre;overflow-x:auto;
+  }
+  .diagram .hl{color:var(--accent2);font-weight:600}
+  .diagram .g{color:var(--green)}
+  .diagram .o{color:var(--orange)}
+  .diagram .c{color:var(--cyan)}
+
+  /* Progress bar */
+  .progress{
+    position:fixed;bottom:0;left:0;height:3px;
+    background:var(--accent);transition:width .4s ease;z-index:100;
+  }
+
+  /* Slide counter */
+  .counter{
+    position:fixed;bottom:1.2vh;right:2vw;
+    font-size:clamp(.85rem,1.1vw,1rem);color:var(--muted);
+    font-family:'Fira Code',monospace;z-index:100;
+  }
+
+  /* Nav hint */
+  .nav-hint{
+    position:fixed;bottom:1.2vh;left:2vw;
+    font-size:clamp(.8rem,1.05vw,.95rem);color:#475569;z-index:100;
+  }
+
+  /* Title slide special */
+  .title-slide{justify-content:center;align-items:center;text-align:center}
+  .title-slide h1{font-size:clamp(3.2rem,6vw,5rem);margin-bottom:2vh}
+  .title-slide .subtitle{font-size:clamp(1.4rem,2.4vw,2.2rem)}
+  .logo{font-size:clamp(3rem,6vw,5rem);margin-bottom:2vh}
+
+  /* Section divider */
+  .section-slide{justify-content:center;align-items:center;text-align:center}
+  .section-slide h2{font-size:clamp(2.4rem,4.5vw,3.8rem);margin-bottom:1vh}
+  .section-number{
+    font-size:clamp(5rem,10vw,9rem);font-weight:900;
+    color:var(--accent);opacity:.15;position:absolute;
+    top:50%;left:50%;transform:translate(-50%,-60%);
+    line-height:1;
+  }
+
+  /* Chart bars */
+  .bar-chart{display:flex;flex-direction:column;gap:1.2vh}
+  .bar-row{display:flex;align-items:center;gap:1vw}
+  .bar-label{width:14vw;text-align:right;font-size:clamp(1.1rem,1.5vw,1.3rem);color:var(--muted);flex-shrink:0}
+  .bar-track{flex:1;height:clamp(2.2rem,3.5vh,3rem);background:#0d1117;border-radius:6px;overflow:hidden;position:relative}
+  .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:.8vw;font-size:clamp(1rem,1.3vw,1.2rem);font-weight:600;color:#fff;white-space:nowrap;transition:width 1s ease}
+  .bar-fill.indigo{background:var(--accent)}
+  .bar-fill.green{background:var(--green)}
+  .bar-fill.orange{background:var(--orange)}
+  .bar-fill.cyan{background:var(--cyan)}
+  .bar-fill.pink{background:var(--pink)}
+  .bar-fill.red{background:var(--red)}
+
+  /* Timeline */
+  .timeline{position:relative;padding-left:2vw}
+  .timeline::before{content:'';position:absolute;left:.6vw;top:0;bottom:0;width:2px;background:var(--border)}
+  .tl-item{position:relative;margin-bottom:2.2vh;padding-left:1.5vw}
+  .tl-item::before{
+    content:'';position:absolute;left:calc(-1.5vw + .1vw);top:.4em;
+    width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);
+  }
+  .tl-item.done::before{background:var(--green)}
+  .tl-item h3{font-size:clamp(1.2rem,1.6vw,1.45rem);margin-bottom:.3vh}
+  .tl-item p{font-size:clamp(1.05rem,1.4vw,1.25rem)}
+
+  .spacer{flex:1}
+  .mt-auto{margin-top:auto}
+  .mt-1{margin-top:1vh}
+  .mt-2{margin-top:2vh}
+  .mb-1{margin-bottom:1vh}
+  .mb-2{margin-bottom:2vh}
+  .text-center{text-align:center}
+  .text-sm{font-size:clamp(1rem,1.3vw,1.2rem)}
+  .flex-center{display:flex;align-items:center;justify-content:center;flex:1}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+<!-- ==================== SLIDE 1: Title ==================== -->
+<div class="slide title-slide active" data-slide="0">
+  <div class="logo">&#127891;</div>
+  <h1>Quiz<span class="accent">App</span></h1>
+  <p class="subtitle">Real-time multiplayerova kvizova platforma</p>
+  <p class="desc mt-2">Technicka prezentacia projektu</p>
+</div>
+
+<!-- ==================== SLIDE 2: Section - Features ==================== -->
+<div class="slide section-slide" data-slide="1">
+  <div class="section-number">01</div>
+  <h2>Funkcionalita <span class="accent">aplikacie</span></h2>
+  <p class="subtitle">Co QuizApp ponuka uzivatelom</p>
+</div>
+
+<!-- ==================== SLIDE 3: Overview ==================== -->
+<div class="slide" data-slide="2">
+  <h2>Prehlad aplikacie</h2>
+  <div class="cols cols-2">
+    <div>
+      <p class="desc mb-2">QuizApp umoznuje hostitelom vytvarat interaktivne kvizy a hracom suazit v realnom case. Hry sa spustaju cez 6-ciferny PIN alebo QR kod a nevyzaduju registraciu hracov.</p>
+      <div class="card mt-1">
+        <h3>Klucove cisla</h3>
+        <ul>
+          <li><strong>5</strong> typov otazok</li>
+          <li><strong>7</strong> hernych faz (lobby &rarr; finished)</li>
+          <li><strong>32</strong> REST API endpointov</li>
+          <li><strong>24+</strong> Socket.IO real-time eventov</li>
+          <li><strong>~14 900</strong> riadkov TypeScript kodu</li>
+          <li><strong>162</strong> zdrojovych suborov</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card mb-1">
+        <h3 class="accent">Host (organizator)</h3>
+        <ul>
+          <li>Vytvara a spravuje kvizy</li>
+          <li>Spusta hru a riadi priebeh</li>
+          <li>Vidi leaderboard a statistiky</li>
+          <li>Nezdielanie vysledkov cez verejny link</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="green">Hrac (ucastnik)</h3>
+        <ul>
+          <li>Pripaja sa cez PIN / QR kod</li>
+          <li>Odpoveda na otazky v realnom case</li>
+          <li>Vidi skore, rank a streak</li>
+          <li>Nevyzaduje registraciu</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 4: Question Types ==================== -->
+<div class="slide" data-slide="3">
+  <h2>Typy otazok</h2>
+  <div class="cols cols-auto" style="gap:1.5vw">
+    <div class="card">
+      <h3>&#9989; Multiple Choice</h3>
+      <p>Jedna spravna odpoved z 2-8 moznosti. Farebne a tvarove odlisenie odpovedov.</p>
+    </div>
+    <div class="card">
+      <h3>&#9898; True / False</h3>
+      <p>Binarna volba - pravda alebo nepravda. Jednoduche a rychle otazky.</p>
+    </div>
+    <div class="card">
+      <h3>&#9745; Multi-Select</h3>
+      <p>Viacero spravnych odpovedov. Podpora parcialneho bodoveho hodnotenia alebo "all or nothing".</p>
+    </div>
+    <div class="card">
+      <h3>&#8645; Ordering</h3>
+      <p>Drag-and-drop zoradenie do spravneho poradia. Parcialny kredit za kazdu spravnu poziciu.</p>
+    </div>
+    <div class="card">
+      <h3>&#128290; Number Guess</h3>
+      <p>Ciselna odpoved s toleranciou. Skore proporcionalne vzdialenosti od spravnej hodnoty.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 5: Game Flow ==================== -->
+<div class="slide" data-slide="4">
+  <h2>Herny priebeh</h2>
+  <div class="diagram" style="text-align:center;font-size:clamp(1.1rem,1.5vw,1.35rem)">
+  <span class="hl">LOBBY</span>  &rarr;  <span class="hl">STARTING</span>  &rarr;  <span class="hl">QUESTION</span>  &rarr;  <span class="hl">ANSWERS</span>  &rarr;  <span class="hl">RESULT</span>  &rarr;  <span class="hl">LEADERBOARD</span>  &rarr;  <span class="hl">FINISHED</span>
+    |                                    |                                          |
+    |   Hraci sa                    Countdown                               Opakovanie
+    |   pripajaju                   + odpovede                              pre dalsiu
+    |   cez PIN                     hracov                                  otazku
+  </div>
+  <div class="cols cols-3 mt-2">
+    <div class="card">
+      <h3>Scoring system</h3>
+      <ul>
+        <li><strong>Zakladne body</strong> za spravnu odpoved</li>
+        <li><strong>Casovy bonus</strong> za rychlejsiu odpoved</li>
+        <li><strong>Streak bonus</strong> za serie spravnych odpovedov</li>
+        <li><strong>Parcialny kredit</strong> pre multi-select a ordering</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Host ovladanie</h3>
+      <ul>
+        <li>Automaticky postup medzi fazami</li>
+        <li>Manualne preskocenie (override)</li>
+        <li>Kick hraca z hry</li>
+        <li>Casovac 5-120 sekund na otazku</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Hracske funkcie</h3>
+      <ul>
+        <li>Animovane zobrazenie skore</li>
+        <li>Streak indikator</li>
+        <li>Podium animacia top 3</li>
+        <li>Confetti efekt pre vitaza</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 6: More features ==================== -->
+<div class="slide" data-slide="5">
+  <h2>Dalsie funkcionality</h2>
+  <div class="cols cols-3" style="gap:1.5vw">
+    <div class="card">
+      <h3>&#128272; Autentifikacia</h3>
+      <ul>
+        <li>JWT tokeny (host 24h, hrac 4h)</li>
+        <li>Registracia s email verifikaciou</li>
+        <li>Role: user, admin, superadmin</li>
+        <li>Hraci bez registracie</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>&#128221; Sprava kvizov</h3>
+      <ul>
+        <li>WYSIWYG editor s auto-save</li>
+        <li>Public / Private viditelnost</li>
+        <li>Duplikacia kvizov</li>
+        <li>Import / Export <code>.quiz.txt</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>&#128202; Historia a statistiky</h3>
+      <ul>
+        <li>Prehlad odohanych hier</li>
+        <li>Per-question answer distribucne grafy</li>
+        <li>Ranking progresny chart</li>
+        <li>Zdielatelny public link</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>&#128274; Admin panel</h3>
+      <ul>
+        <li>Sprava uzivatelov (CRUD)</li>
+        <li>Aktivacia / deaktivacia uctov</li>
+        <li>Reset hesiel a zmena roli</li>
+        <li>Dashboard s KPI statistikami</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>&#128259; Reconnection</h3>
+      <ul>
+        <li>Automaticke znovupripojenie</li>
+        <li>Obnovenie herneho stavu</li>
+        <li>Session storage perzistencia</li>
+        <li>JWT token pre reconnect</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>&#128230; Deployment</h3>
+      <ul>
+        <li>Docker Compose (PostgreSQL)</li>
+        <li>Docker Compose (SQLite)</li>
+        <li>Nginx reverse proxy</li>
+        <li>MailPit pre testovanie emailov</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 7: Section - Tech ==================== -->
+<div class="slide section-slide" data-slide="6">
+  <div class="section-number">02</div>
+  <h2>Technicka <span class="accent">implementacia</span></h2>
+  <p class="subtitle">Architektura, tech stack a dizajnove rozhodnutia</p>
+</div>
+
+<!-- ==================== SLIDE 8: Architecture ==================== -->
+<div class="slide" data-slide="7">
+  <h2>Architektura</h2>
+  <div class="cols cols-23">
+    <div>
+      <p class="desc mb-2">Monorepo s cisto oddelenym frontend, backend a shared types.</p>
+      <div class="card mb-1">
+        <h3 class="accent">Client (SPA)</h3>
+        <p>React 18 &bull; Vite &bull; Tailwind CSS</p>
+        <p>~99 suborov, ~10 200 LOC</p>
+      </div>
+      <div class="card mb-1">
+        <h3 class="green">Server (API + WS)</h3>
+        <p>Express &bull; Socket.IO &bull; Kysely</p>
+        <p>~47 suborov, ~6 000 LOC</p>
+      </div>
+      <div class="card">
+        <h3 class="cyan">Shared Types</h3>
+        <p>TypeScript type definitions</p>
+        <p>9 suborov, ~500 LOC</p>
+      </div>
+    </div>
+    <div class="diagram" style="font-size:clamp(1rem,1.35vw,1.2rem)">
+<span class="hl">CLIENT (React SPA)</span>                       <span class="hl">SERVER (Node.js)</span>
+ Port 5173 (dev) / 80 (prod)                Port 3001
+ +--------------------------+               +---------------------------+
+ |                          |  <span class="c">HTTP /api/*</span>  |                           |
+ |  React Router (13 pages) | &lt;----------&gt; |  Express REST API         |
+ |  Axios HTTP client       |               |  32 endpointov            |
+ |                          |               |                           |
+ |  Socket.IO client        |  <span class="g">WebSocket</span>   |  Socket.IO server         |
+ |  useGameSocket hooks     | &lt;----------&gt; |  24+ event handlerov      |
+ |                          |               |                           |
+ |  Auth / Toast Context    |               |  Game Engine (in-memory)  |
+ |  Tailwind CSS styling    |               |  State Manager + Cache    |
+ +--------------------------+               +-------------+-------------+
+                                                          |
+                                            +-------------+-------------+
+                                            |   <span class="o">Kysely (Query Builder)</span>   |
+                                            |   SQLite / PostgreSQL     |
+                                            |   8 tabuliek, 5 migracii  |
+                                            +---------------------------+
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 9: Tech Stack ==================== -->
+<div class="slide" data-slide="8">
+  <h2>Tech Stack</h2>
+  <div class="cols cols-2">
+    <div>
+      <h3 class="mb-1">Frontend</h3>
+      <table>
+        <tr><th>Technologia</th><th>Verzia</th><th>Ucel</th></tr>
+        <tr><td><strong>React</strong></td><td>18.3</td><td>UI framework</td></tr>
+        <tr><td><strong>TypeScript</strong></td><td>5.5</td><td>Typova bezpecnost</td></tr>
+        <tr><td><strong>Vite</strong></td><td>5.4</td><td>Build tool & dev server</td></tr>
+        <tr><td><strong>Tailwind CSS</strong></td><td>3.4</td><td>Utility-first styling</td></tr>
+        <tr><td><strong>Socket.IO Client</strong></td><td>4.7</td><td>WebSocket komunikacia</td></tr>
+        <tr><td><strong>Axios</strong></td><td>1.7</td><td>HTTP klient</td></tr>
+        <tr><td><strong>React Router</strong></td><td>6.26</td><td>Client-side routing</td></tr>
+        <tr><td><strong>QRCode.React</strong></td><td>4.0</td><td>QR kod generovanie</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3 class="mb-1">Backend</h3>
+      <table>
+        <tr><th>Technologia</th><th>Verzia</th><th>Ucel</th></tr>
+        <tr><td><strong>Express</strong></td><td>4.21</td><td>HTTP framework</td></tr>
+        <tr><td><strong>TypeScript</strong></td><td>5.5</td><td>Typova bezpecnost</td></tr>
+        <tr><td><strong>Socket.IO</strong></td><td>4.7</td><td>Real-time komunikacia</td></tr>
+        <tr><td><strong>Kysely</strong></td><td>0.28</td><td>Type-safe SQL query builder</td></tr>
+        <tr><td><strong>SQLite / PostgreSQL</strong></td><td>-</td><td>Databaza (dual support)</td></tr>
+        <tr><td><strong>JWT (jsonwebtoken)</strong></td><td>9.0</td><td>Autentifikacia</td></tr>
+        <tr><td><strong>Zod</strong></td><td>3.23</td><td>Input validacia</td></tr>
+        <tr><td><strong>Nodemailer</strong></td><td>7.0</td><td>Email verifikacia</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 10: Backend Deep Dive ==================== -->
+<div class="slide" data-slide="9">
+  <h2>Backend - Modularna struktura</h2>
+  <div class="cols cols-2">
+    <div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <span class="bar-label">Game Engine</span>
+          <div class="bar-track"><div class="bar-fill red" style="width:85%">1 395 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Databaza (DB)</span>
+          <div class="bar-track"><div class="bar-fill orange" style="width:88%">1 456 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Socket.IO</span>
+          <div class="bar-track"><div class="bar-fill pink" style="width:36%">586 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Historia</span>
+          <div class="bar-track"><div class="bar-fill cyan" style="width:35%">579 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Auth</span>
+          <div class="bar-track"><div class="bar-fill indigo" style="width:30%">486 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Quiz CRUD</span>
+          <div class="bar-track"><div class="bar-fill indigo" style="width:30%">484 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Admin</span>
+          <div class="bar-track"><div class="bar-fill green" style="width:30%">484 LOC</div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card mb-1">
+        <h3>Databazova schema</h3>
+        <p><strong>8 tabuliek:</strong> users, quizzes, questions, answers, game_sessions, players, player_answers, email_verification_codes</p>
+        <p class="mt-1"><strong>5 migracii:</strong> initial schema &rarr; question description &rarr; user roles &rarr; share token &rarr; number guess</p>
+      </div>
+      <div class="card">
+        <h3>API dizajn</h3>
+        <ul>
+          <li><strong>REST</strong> pre CRUD operacie (kvizy, admin, historia)</li>
+          <li><strong>Socket.IO</strong> pre real-time herny stav</li>
+          <li><strong>Zod</strong> validacia na vsetkych vstupoch</li>
+          <li><strong>Repository pattern</strong> pre databazovy pristup</li>
+          <li><strong>Middleware</strong> pre auth, error handling, validaciu</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 11: Game Engine ==================== -->
+<div class="slide" data-slide="10">
+  <h2>Game Engine - jadro aplikacie</h2>
+  <div class="cols cols-2">
+    <div>
+      <div class="card mb-1">
+        <h3 class="red">Stavovy automat (In-Memory)</h3>
+        <p>Celkovy herny stav sa drzi v pamati (<code>Map&lt;sessionId, GameState&gt;</code>). Databaza sluzi len na perzistenciu.</p>
+        <ul class="mt-1">
+          <li>Fazove prechody s auto-advance casovacmi</li>
+          <li>Konfigurovatelne casove limity (5-120s)</li>
+          <li>Automaticky cleanup po 5 minutach</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="green">Optimalizacie pre skalovanie</h3>
+        <ul>
+          <li><strong>Batch DB zapisy</strong> - odpovede sa ukladaju do pamati a zapisuju sa davkovo az po skonceni otazky</li>
+          <li><strong>Leaderboard cache</strong> s dirty flag - prepocet len pri zmene skore</li>
+          <li><strong>Precomputed broadcast</strong> - leaderboard sa pocita 1x, nie N-krat</li>
+          <li><strong>PostgreSQL pool</strong> - konfigurovatelna velkost (default 20)</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card mb-1">
+        <h3 class="orange">Answer Checker</h3>
+        <p>Univerzalny kontrolor spravnosti pre 5 typov:</p>
+        <ul class="mt-1">
+          <li><strong>Single:</strong> MC + T/F &rarr; presna zhoda</li>
+          <li><strong>Multi-Select:</strong> parcialny kredit alebo all-or-nothing</li>
+          <li><strong>Ordering:</strong> kredit per spravna pozicia</li>
+          <li><strong>Number Guess:</strong> linearny kredit podla tolerancie</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="cyan">Reconnection</h3>
+        <ul>
+          <li>JWT player token ulozeny v SessionStorage</li>
+          <li>Pri reconnect: obnovenie Socket.IO rooms</li>
+          <li>Kompletna rekonstrukcia stavu hraca</li>
+          <li>Host aj hrac mozu reconnectnud kedykolvek</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 12: Frontend Deep Dive ==================== -->
+<div class="slide" data-slide="11">
+  <h2>Frontend - komponentova architektura</h2>
+  <div class="cols cols-2">
+    <div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <span class="bar-label">Player game</span>
+          <div class="bar-track"><div class="bar-fill green" style="width:80%">1 300 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Host game</span>
+          <div class="bar-track"><div class="bar-fill indigo" style="width:72%">1 177 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Socket / RT</span>
+          <div class="bar-track"><div class="bar-fill pink" style="width:53%">862 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Quiz editor</span>
+          <div class="bar-track"><div class="bar-fill orange" style="width:49%">790 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Hooks</span>
+          <div class="bar-track"><div class="bar-fill cyan" style="width:43%">704 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Efekty</span>
+          <div class="bar-track"><div class="bar-fill red" style="width:37%">596 LOC</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Quiz mgmt</span>
+          <div class="bar-track"><div class="bar-fill indigo" style="width:36%">592 LOC</div></div>
+        </div>
+      </div>
+      <p class="desc mt-2"><strong>63</strong> komponentov &bull; <strong>13</strong> stranok &bull; <strong>7</strong> custom hooks &bull; <strong>3</strong> context providery</p>
+    </div>
+    <div>
+      <div class="card mb-1">
+        <h3>State Management</h3>
+        <ul>
+          <li><strong>React Context</strong> - Auth, Toast, Socket (globalny)</li>
+          <li><strong>Custom hooks</strong> - useQuizEditor (390 LOC), usePlayerGame, useHostGame</li>
+          <li><strong>Socket hooks</strong> - useGameSocket (525 LOC) pre real-time state</li>
+          <li><strong>SessionStorage</strong> - reconnection data</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Vizualne efekty</h3>
+        <ul>
+          <li>PodiumAnimation - 3D podium s animaciou top 3</li>
+          <li>ConfettiExplosion - oslavny efekt</li>
+          <li>CountdownCircle - kruhovy odpocet</li>
+          <li>ScorePopup - animovane zobrazenie bodov</li>
+          <li>9 SVG shape komponentov pre odpovede</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 13: Real-time Communication ==================== -->
+<div class="slide" data-slide="12">
+  <h2>Real-time komunikacia</h2>
+  <div class="cols cols-2">
+    <div>
+      <h3 class="mb-1">Socket.IO event flow</h3>
+      <div class="diagram" style="font-size:clamp(1rem,1.35vw,1.2rem)">
+<span class="hl">HOST</span>                     <span class="o">SERVER</span>                    <span class="g">PLAYER</span>
+
+start-game        &rarr;   GameEngine.startGame()
+                       emit state-update      &rarr;   player:game-status
+                       emit player:question    &rarr;   zobraz otazku
+
+                       startCountdown()
+                       emit game:countdown     &rarr;   countdown kazdych 1s
+
+                  &larr;   submit-answer            &larr;   player:submit-answer
+game:player-answered   recordAnswer()
+                       emit answer-result      &rarr;   skore breakdown
+
+host:show-result  &rarr;   flushToDB() <span class="c">[batch]</span>
+                       emit answer-distribution
+                       emit game:leaderboard   &rarr;   game:leaderboard
+                       emit player:state-update &rarr;  per-player stav
+      </div>
+    </div>
+    <div>
+      <div class="card mb-1">
+        <h3>Host &rarr; Server <span class="badge badge-indigo">7 eventov</span></h3>
+        <p>start-game, next-question, show-answers, show-result, show-leaderboard, end-game, kick-player</p>
+      </div>
+      <div class="card mb-1">
+        <h3>Player &rarr; Server <span class="badge badge-green">2 eventy</span></h3>
+        <p>join, submit-answer</p>
+      </div>
+      <div class="card mb-1">
+        <h3>Server &rarr; Klienti <span class="badge badge-orange">14+ eventov</span></h3>
+        <p>state-update, player-joined, countdown, time-up, answer-result, leaderboard, answer-distribution, finished, kicked...</p>
+      </div>
+      <div class="card">
+        <h3>Spolocne <span class="badge badge-cyan">1 event</span></h3>
+        <p>reconnect-game (host aj hrac)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 14: Database ==================== -->
+<div class="slide" data-slide="13">
+  <h2>Databazova vrstva</h2>
+  <div class="cols cols-2">
+    <div>
+      <div class="card mb-1">
+        <h3>Dual DB podpora cez Kysely</h3>
+        <p>Jeden codebase, prepinanie cez <code>DB_TYPE</code> environment variable. Kysely generuje SQL specificke pre kazdy dialekt.</p>
+      </div>
+      <table>
+        <tr><th>Tabulka</th><th>Ucel</th><th>Vztahy</th></tr>
+        <tr><td><strong>users</strong></td><td>Ucty hostitelov</td><td>1:N quizzes, sessions</td></tr>
+        <tr><td><strong>quizzes</strong></td><td>Kviz metadata</td><td>1:N questions</td></tr>
+        <tr><td><strong>questions</strong></td><td>Otazky s type-specific fieldami</td><td>1:N answers</td></tr>
+        <tr><td><strong>answers</strong></td><td>Odpovede k otazkam</td><td>N:1 questions</td></tr>
+        <tr><td><strong>game_sessions</strong></td><td>Herny sessions</td><td>1:N players</td></tr>
+        <tr><td><strong>players</strong></td><td>Hraci v sessions</td><td>1:N player_answers</td></tr>
+        <tr><td><strong>player_answers</strong></td><td>Zaznam odpovedov</td><td>N:1 players, questions</td></tr>
+        <tr><td><strong>verification_codes</strong></td><td>Email verifikacia</td><td>N:1 users</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="card mb-1">
+        <h3 class="orange">Batch operacie (optimalizacia)</h3>
+        <p>Pre velke eventy (50+ hracov) sa pouzivaju:</p>
+        <ul class="mt-1">
+          <li><code>createMany()</code> - jeden INSERT pre vsetky odpovede</li>
+          <li><code>updateScoreBatch()</code> - transakcny UPDATE vsetkych skore</li>
+          <li>Z ~200 sekvencnych DB dotazov na <strong>2 batch operacie</strong></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3 class="green">Repository pattern</h3>
+        <p>6 repository tried zapuzdruje vsetok DB pristup:</p>
+        <ul class="mt-1">
+          <li>UserRepository (CRUD, role management)</li>
+          <li>QuizRepository (kvizy, otazky, odpovede)</li>
+          <li>GameRepository (sessions, statusy)</li>
+          <li>PlayerRepository (hraci, skore, batch)</li>
+          <li>PlayerAnswerRepository (odpovede, batch, distribucne)</li>
+          <li>VerificationCodeRepository</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 15: Section - Estimation ==================== -->
+<div class="slide section-slide" data-slide="14">
+  <div class="section-number">03</div>
+  <h2>Odhad <span class="accent">pracnosti</span></h2>
+  <p class="subtitle">Trojclenny tim: BE developer, FE developer, analytik/tester</p>
+</div>
+
+<!-- ==================== SLIDE 16: Estimation Overview ==================== -->
+<div class="slide" data-slide="15">
+  <h2>Odhad pracnosti - prehlad</h2>
+  <div class="cols cols-32">
+    <div>
+      <div class="bar-chart">
+        <div class="bar-row">
+          <span class="bar-label">Herny engine</span>
+          <div class="bar-track"><div class="bar-fill red" style="width:83%">100 cd</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Sprava kvizov</span>
+          <div class="bar-track"><div class="bar-fill orange" style="width:39%">47 cd</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Historia / stats</span>
+          <div class="bar-track"><div class="bar-fill cyan" style="width:20%">24 cd</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Testovanie</span>
+          <div class="bar-track"><div class="bar-fill green" style="width:19%">23 cd</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Admin panel</span>
+          <div class="bar-track"><div class="bar-fill indigo" style="width:18%">22 cd</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Auth + UI</span>
+          <div class="bar-track"><div class="bar-fill indigo" style="width:18%">22 cd</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Infrastruktura</span>
+          <div class="bar-track"><div class="bar-fill pink" style="width:18%">22 cd</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Analyza / navrh</span>
+          <div class="bar-track"><div class="bar-fill pink" style="width:17%">21 cd</div></div>
+        </div>
+        <div class="bar-row">
+          <span class="bar-label">Viz. efekty</span>
+          <div class="bar-track"><div class="bar-fill cyan" style="width:11%">13 cd</div></div>
+        </div>
+      </div>
+      <p class="desc mt-2 text-sm"><strong>cd</strong> = clovekodni</p>
+    </div>
+    <div>
+      <div class="card mb-1">
+        <h3>Celkovy odhad</h3>
+        <table>
+          <tr><th>Scenar</th><th>Clovekodni</th><th>Trvanie</th></tr>
+          <tr><td>Optimisticky</td><td>250</td><td>~5 mesiacov</td></tr>
+          <tr class="tbl-highlight"><td><strong>Realisticky</strong></td><td><strong>294</strong></td><td><strong>~6 mesiacov</strong></td></tr>
+          <tr><td>Pesimisticky (+30%)</td><td>382</td><td>~7 mesiacov</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Rozlozenie podla roli</h3>
+        <table>
+          <tr><th>Rola</th><th>Clovekodni</th><th>Podiel</th></tr>
+          <tr><td>BE Developer</td><td>115</td><td>39%</td></tr>
+          <tr><td>FE Developer</td><td>131</td><td>45%</td></tr>
+          <tr><td>Analytik / Tester</td><td>48</td><td>16%</td></tr>
+          <tr class="tbl-highlight"><td><strong>Celkom</strong></td><td><strong>294</strong></td><td><strong>100%</strong></td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 17: Timeline ==================== -->
+<div class="slide" data-slide="16">
+  <h2>Casovy plan - 9 faz vyvoja</h2>
+  <div class="cols cols-2">
+    <div>
+      <div class="timeline">
+        <div class="tl-item done"><h3>Faza 1: Analyza a navrh <span class="badge badge-pink">21 cd</span></h3><p>Poziadavky, architektura, wireframy, DB schema &bull; 2 tyzdne</p></div>
+        <div class="tl-item done"><h3>Faza 2: Infrastruktura <span class="badge badge-pink">22 cd</span></h3><p>Monorepo, Express, React, Kysely, Docker &bull; 2 tyzdne</p></div>
+        <div class="tl-item done"><h3>Faza 3: Autentifikacia <span class="badge badge-indigo">22 cd</span></h3><p>JWT, registracia, email verifikacia, login UI &bull; 2 tyzdne</p></div>
+        <div class="tl-item done"><h3>Faza 4: Sprava kvizov <span class="badge badge-orange">47 cd</span></h3><p>CRUD API, editor, import/export, 5 typov otazok &bull; 3.5 tyzdna</p></div>
+        <div class="tl-item"><h3>Faza 5: Herny engine <span class="badge badge-red">100 cd</span></h3><p>WebSocket, stavovy automat, scoring, reconnection &bull; <strong>7 tyzdnov</strong></p></div>
+      </div>
+    </div>
+    <div>
+      <div class="timeline">
+        <div class="tl-item"><h3>Faza 6: Vizualne efekty <span class="badge badge-cyan">13 cd</span></h3><p>Shapes, podium, confetti, countdown animacie &bull; 1 tyzden</p></div>
+        <div class="tl-item"><h3>Faza 7: Admin panel <span class="badge badge-indigo">22 cd</span></h3><p>User management, role, KPI dashboard &bull; 2 tyzdne</p></div>
+        <div class="tl-item"><h3>Faza 8: Historia <span class="badge badge-cyan">24 cd</span></h3><p>Statistiky, grafy, zdielanie vysledkov &bull; 2 tyzdne</p></div>
+        <div class="tl-item"><h3>Faza 9: Testovanie <span class="badge badge-green">23 cd</span></h3><p>Integracne testy, mobile, deployment, bug fixes &bull; 2 tyzdne</p></div>
+      </div>
+      <div class="card mt-2">
+        <h3>Kriticka cesta</h3>
+        <p><strong>Faza 5 (herny engine)</strong> je najdlhsia a tvori <strong>34%</strong> celkoveho usilia. Vyzaduje uzku spolupracu BE a FE pre real-time synchronizaciu.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 18: Summary ==================== -->
+<div class="slide" data-slide="17">
+  <h2>Zhrnutie</h2>
+  <div class="cols cols-3" style="gap:1.5vw">
+    <div class="card">
+      <h3 class="accent">Funkcionalita</h3>
+      <ul>
+        <li>5 typov otazok s roznym scoringom</li>
+        <li>Real-time multiplayer cez WebSocket</li>
+        <li>Komplexny quiz editor s auto-save</li>
+        <li>Admin panel s user managementom</li>
+        <li>Historia hier a zdielatelne vysledky</li>
+        <li>Docker-ready deployment</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="green">Technicke silne stranky</h3>
+      <ul>
+        <li>Full TypeScript (client + server + shared)</li>
+        <li>Type-safe DB cez Kysely</li>
+        <li>Dual DB podpora (SQLite + PG)</li>
+        <li>Batch DB operacie pre skalovanie</li>
+        <li>Leaderboard cache s dirty flag</li>
+        <li>Robustna reconnection logika</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 class="orange">Odhad pracnosti</h3>
+      <ul>
+        <li><strong>294 clovekodni</strong> (realisticky)</li>
+        <li><strong>~6 mesiacov</strong> pre 3-clenny tim</li>
+        <li>BE: 39% | FE: 45% | QA: 16%</li>
+        <li>Najnarocnejsie: herny engine (34%)</li>
+        <li>~14 900 LOC, 162 suborov</li>
+        <li>32 API + 24 socket eventov</li>
+      </ul>
+    </div>
+  </div>
+  <div class="text-center mt-2">
+    <p class="desc" style="font-size:clamp(1.3rem,1.9vw,1.7rem)">QuizApp je <strong>stredne az vysoko komplexny projekt</strong>, ktoreho hlavnou vyzvou je real-time herny engine s WebSocket komunikaciou, stavovym automatom a viacerymi typmi otazok s roznym scoring algoritmom.</p>
+  </div>
+</div>
+
+<!-- ==================== SLIDE 19: End ==================== -->
+<div class="slide title-slide" data-slide="18">
+  <div class="logo">&#128640;</div>
+  <h1>Dakujem za <span class="accent">pozornost</span></h1>
+  <p class="subtitle">Otazky?</p>
+  <div class="mt-2" style="display:flex;gap:1vw;justify-content:center;flex-wrap:wrap">
+    <span class="badge badge-indigo">React 18</span>
+    <span class="badge badge-green">Express</span>
+    <span class="badge badge-orange">Socket.IO</span>
+    <span class="badge badge-cyan">TypeScript</span>
+    <span class="badge badge-pink">Kysely</span>
+    <span class="badge badge-red">Real-time</span>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<div class="progress" id="progress"></div>
+<div class="counter" id="counter"></div>
+<div class="nav-hint">&larr; &rarr; sipky na navigaciu &bull; Home/End na zaciatok/koniec</div>
+
+<script>
+(function(){
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+
+  function show(n, direction) {
+    if (n < 0 || n >= total || n === current) return;
+    const prev = slides[current];
+    const next = slides[n];
+
+    prev.classList.remove('active');
+    prev.classList.add('exit');
+    setTimeout(() => prev.classList.remove('exit'), 400);
+
+    next.style.transform = direction > 0 ? 'translateX(60px)' : 'translateX(-60px)';
+    // Force reflow
+    void next.offsetWidth;
+    next.classList.add('active');
+
+    current = n;
+    history.replaceState(null, '', '#' + (current + 1));
+    updateUI();
+  }
+
+  function goTo(n) {
+    if (n < 0 || n >= total) return;
+    slides[current].classList.remove('active');
+    slides[n].classList.add('active');
+    current = n;
+    history.replaceState(null, '', '#' + (current + 1));
+    updateUI();
+  }
+
+  function updateUI() {
+    document.getElementById('counter').textContent = (current + 1) + ' / ' + total;
+    document.getElementById('progress').style.width = ((current + 1) / total * 100) + '%';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      show(current + 1, 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      show(current - 1, -1);
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      show(0, -1);
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      show(total - 1, 1);
+    }
+  });
+
+  // Touch support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+  });
+  document.addEventListener('touchend', function(e) {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) show(current + 1, 1);
+      else show(current - 1, -1);
+    }
+  });
+
+  // Click on left/right half
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('a, button, input, code')) return;
+    const x = e.clientX / window.innerWidth;
+    if (x > 0.65) show(current + 1, 1);
+    else if (x < 0.35) show(current - 1, -1);
+  });
+
+  // Restore slide from URL hash on load
+  var hash = parseInt(location.hash.replace('#', ''), 10);
+  if (hash >= 1 && hash <= total) {
+    goTo(hash - 1);
+  }
+
+  // Handle browser back/forward
+  window.addEventListener('hashchange', function() {
+    var h = parseInt(location.hash.replace('#', ''), 10);
+    if (h >= 1 && h <= total && h - 1 !== current) {
+      goTo(h - 1);
+    }
+  });
+
+  updateUI();
+})();
+</script>
+</body>
+</html>

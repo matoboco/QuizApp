@@ -91,6 +91,20 @@ export class PlayerRepository {
       .execute();
   }
 
+  async updateScoreBatch(updates: { id: string; score: number; streak: number }[]): Promise<void> {
+    if (updates.length === 0) return;
+    const db = getKysely();
+    await db.transaction().execute(async (trx) => {
+      for (const update of updates) {
+        await trx
+          .updateTable('players')
+          .set({ score: update.score, streak: update.streak })
+          .where('id', '=', update.id)
+          .execute();
+      }
+    });
+  }
+
   async setConnected(id: string, connected: boolean): Promise<void> {
     const db = getKysely();
     await db

@@ -70,6 +70,7 @@ Server `.env` (defaults work for development):
 | `POSTGRES_DB` | `quizapp` | PostgreSQL database name |
 | `POSTGRES_USER` | `quizapp` | PostgreSQL user |
 | `POSTGRES_PASSWORD` | `quizapp` | PostgreSQL password |
+| `POSTGRES_POOL_MAX` | `20` | Connection pool size (increase for 50+ players) |
 | `SMTP_HOST` | `localhost` | SMTP server host |
 | `SMTP_PORT` | `1025` | SMTP server port |
 | `SMTP_SECURE` | `false` | Use TLS for SMTP |

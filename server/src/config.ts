@@ -15,6 +15,7 @@ export const config = {
     database: process.env.POSTGRES_DB || 'quizapp',
     user: process.env.POSTGRES_USER || 'quizapp',
     password: process.env.POSTGRES_PASSWORD || 'quizapp',
+    poolMax: parseInt(process.env.POSTGRES_POOL_MAX || '20', 10),
   },
   nodeEnv: process.env.NODE_ENV || 'development',
   smtp: {
