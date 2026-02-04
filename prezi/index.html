@@ -204,13 +204,6 @@
   <p class="desc mt-2">Technicka prezentacia projektu</p>
 </div>
 
-<!-- ==================== SLIDE 2: Section - Features ==================== -->
-<div class="slide section-slide" data-slide="1">
-  <div class="section-number">01</div>
-  <h2>Funkcionalita <span class="accent">aplikacie</span></h2>
-  <p class="subtitle">Co QuizApp ponuka uzivatelom</p>
-</div>
-
 <!-- ==================== SLIDE 3: Overview ==================== -->
 <div class="slide" data-slide="2">
   <h2>Prehlad aplikacie</h2>
@@ -381,13 +374,6 @@
   </div>
 </div>
 
-<!-- ==================== SLIDE 7: Section - Tech ==================== -->
-<div class="slide section-slide" data-slide="6">
-  <div class="section-number">02</div>
-  <h2>Technicka <span class="accent">implementacia</span></h2>
-  <p class="subtitle">Architektura, tech stack a dizajnove rozhodnutia</p>
-</div>
-
 <!-- ==================== SLIDE 8: Architecture ==================== -->
 <div class="slide" data-slide="7">
   <h2>Architektura</h2>
@@ -441,29 +427,29 @@
     <div>
       <h3 class="mb-1">Frontend</h3>
       <table>
-        <tr><th>Technologia</th><th>Verzia</th><th>Ucel</th></tr>
-        <tr><td><strong>React</strong></td><td>18.3</td><td>UI framework</td></tr>
-        <tr><td><strong>TypeScript</strong></td><td>5.5</td><td>Typova bezpecnost</td></tr>
-        <tr><td><strong>Vite</strong></td><td>5.4</td><td>Build tool & dev server</td></tr>
-        <tr><td><strong>Tailwind CSS</strong></td><td>3.4</td><td>Utility-first styling</td></tr>
-        <tr><td><strong>Socket.IO Client</strong></td><td>4.7</td><td>WebSocket komunikacia</td></tr>
-        <tr><td><strong>Axios</strong></td><td>1.7</td><td>HTTP klient</td></tr>
-        <tr><td><strong>React Router</strong></td><td>6.26</td><td>Client-side routing</td></tr>
-        <tr><td><strong>QRCode.React</strong></td><td>4.0</td><td>QR kod generovanie</td></tr>
+        <tr><th>Technologia</th><th>Ucel</th></tr>
+        <tr><td><strong>React</strong></td><td>UI framework</td></tr>
+        <tr><td><strong>TypeScript</strong></td><td>Typova bezpecnost</td></tr>
+        <tr><td><strong>Vite</strong></td><td>Build tool & dev server</td></tr>
+        <tr><td><strong>Tailwind CSS</strong></td><td>Utility-first styling</td></tr>
+        <tr><td><strong>Socket.IO Client</strong></td><td>WebSocket komunikacia</td></tr>
+        <tr><td><strong>Axios</strong></td><td>HTTP klient</td></tr>
+        <tr><td><strong>React Router</strong></td><td>Client-side routing</td></tr>
+        <tr><td><strong>QRCode.React</strong></td><td>QR kod generovanie</td></tr>
       </table>
     </div>
     <div>
       <h3 class="mb-1">Backend</h3>
       <table>
-        <tr><th>Technologia</th><th>Verzia</th><th>Ucel</th></tr>
-        <tr><td><strong>Express</strong></td><td>4.21</td><td>HTTP framework</td></tr>
-        <tr><td><strong>TypeScript</strong></td><td>5.5</td><td>Typova bezpecnost</td></tr>
-        <tr><td><strong>Socket.IO</strong></td><td>4.7</td><td>Real-time komunikacia</td></tr>
-        <tr><td><strong>Kysely</strong></td><td>0.28</td><td>Type-safe SQL query builder</td></tr>
-        <tr><td><strong>SQLite / PostgreSQL</strong></td><td>-</td><td>Databaza (dual support)</td></tr>
-        <tr><td><strong>JWT (jsonwebtoken)</strong></td><td>9.0</td><td>Autentifikacia</td></tr>
-        <tr><td><strong>Zod</strong></td><td>3.23</td><td>Input validacia</td></tr>
-        <tr><td><strong>Nodemailer</strong></td><td>7.0</td><td>Email verifikacia</td></tr>
+        <tr><th>Technologia</th><th>Ucel</th></tr>
+        <tr><td><strong>Express</strong></td><td>HTTP framework</td></tr>
+        <tr><td><strong>TypeScript</strong></td><td>Typova bezpecnost</td></tr>
+        <tr><td><strong>Socket.IO</strong></td><td>Real-time komunikacia</td></tr>
+        <tr><td><strong>Kysely</strong></td><td>Type-safe SQL query builder</td></tr>
+        <tr><td><strong>SQLite / PostgreSQL</strong></td><td>Databaza (dual support)</td></tr>
+        <tr><td><strong>JWT</strong></td><td>Autentifikacia</td></tr>
+        <tr><td><strong>Zod</strong></td><td>Input validacia</td></tr>
+        <tr><td><strong>Nodemailer</strong></td><td>Email verifikacia</td></tr>
       </table>
     </div>
   </div>
@@ -681,60 +667,6 @@ host:show-result  &rarr;   flushToDB() <span class="c">[batch]</span>
   </div>
 </div>
 
-<!-- ==================== SLIDE 14: Database ==================== -->
-<div class="slide" data-slide="13">
-  <h2>Databazova vrstva</h2>
-  <div class="cols cols-2">
-    <div>
-      <div class="card mb-1">
-        <h3>Dual DB podpora cez Kysely</h3>
-        <p>Jeden codebase, prepinanie cez <code>DB_TYPE</code> environment variable. Kysely generuje SQL specificke pre kazdy dialekt.</p>
-      </div>
-      <table>
-        <tr><th>Tabulka</th><th>Ucel</th><th>Vztahy</th></tr>
-        <tr><td><strong>users</strong></td><td>Ucty hostitelov</td><td>1:N quizzes, sessions</td></tr>
-        <tr><td><strong>quizzes</strong></td><td>Kviz metadata</td><td>1:N questions</td></tr>
-        <tr><td><strong>questions</strong></td><td>Otazky s type-specific fieldami</td><td>1:N answers</td></tr>
-        <tr><td><strong>answers</strong></td><td>Odpovede k otazkam</td><td>N:1 questions</td></tr>
-        <tr><td><strong>game_sessions</strong></td><td>Herny sessions</td><td>1:N players</td></tr>
-        <tr><td><strong>players</strong></td><td>Hraci v sessions</td><td>1:N player_answers</td></tr>
-        <tr><td><strong>player_answers</strong></td><td>Zaznam odpovedov</td><td>N:1 players, questions</td></tr>
-        <tr><td><strong>verification_codes</strong></td><td>Email verifikacia</td><td>N:1 users</td></tr>
-      </table>
-    </div>
-    <div>
-      <div class="card mb-1">
-        <h3 class="orange">Batch operacie (optimalizacia)</h3>
-        <p>Pre velke eventy (50+ hracov) sa pouzivaju:</p>
-        <ul class="mt-1">
-          <li><code>createMany()</code> - jeden INSERT pre vsetky odpovede</li>
-          <li><code>updateScoreBatch()</code> - transakcny UPDATE vsetkych skore</li>
-          <li>Z ~200 sekvencnych DB dotazov na <strong>2 batch operacie</strong></li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3 class="green">Repository pattern</h3>
-        <p>6 repository tried zapuzdruje vsetok DB pristup:</p>
-        <ul class="mt-1">
-          <li>UserRepository (CRUD, role management)</li>
-          <li>QuizRepository (kvizy, otazky, odpovede)</li>
-          <li>GameRepository (sessions, statusy)</li>
-          <li>PlayerRepository (hraci, skore, batch)</li>
-          <li>PlayerAnswerRepository (odpovede, batch, distribucne)</li>
-          <li>VerificationCodeRepository</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== SLIDE 15: Section - Estimation ==================== -->
-<div class="slide section-slide" data-slide="14">
-  <div class="section-number">03</div>
-  <h2>Odhad <span class="accent">pracnosti</span></h2>
-  <p class="subtitle">Trojclenny tim: BE developer, FE developer, analytik/tester</p>
-</div>
-
 <!-- ==================== SLIDE 16: Estimation Overview ==================== -->
 <div class="slide" data-slide="15">
   <h2>Odhad pracnosti - prehlad</h2>
@@ -832,6 +764,56 @@ host:show-result  &rarr;   flushToDB() <span class="c">[batch]</span>
   </div>
 </div>
 
+<!-- ==================== SLIDE: Codex Estimation Comparison ==================== -->
+<div class="slide" data-slide="codex">
+  <h2>Porovnanie odhadov: <span class="accent">Claude</span> vs <span class="green">Codex</span></h2>
+  <div class="cols cols-2">
+    <div>
+      <div class="card mb-1">
+        <h3>Odhad podla roli (clovekodni)</h3>
+        <table>
+          <tr><th>Faza</th><th class="accent">Claude</th><th class="green">Codex</th></tr>
+          <tr><td>Analyza + navrh</td><td>21</td><td>10–17</td></tr>
+          <tr><td>Core backend + DB</td><td>44</td><td>18–25</td></tr>
+          <tr><td>Real-time engine</td><td>100</td><td>22–32</td></tr>
+          <tr><td>Frontend (editor, dashboard, hra)</td><td>57</td><td>39–55</td></tr>
+          <tr><td>Admin panel</td><td>22</td><td>14–19</td></tr>
+          <tr><td>Historia + statistiky</td><td>24</td><td>16–26</td></tr>
+          <tr><td>QA, testovanie</td><td>23</td><td>22–29</td></tr>
+          <tr><td>Vizualne efekty</td><td>3</td><td>–</td></tr>
+          <tr class="tbl-highlight"><td><strong>Celkom</strong></td><td><strong>294</strong></td><td><strong>142–205</strong></td></tr>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="card mb-1">
+        <h3>Kalendarne trvanie</h3>
+        <table>
+          <tr><th></th><th class="accent">Claude</th><th class="green">Codex</th></tr>
+          <tr><td>Realisticky odhad</td><td><strong>~6 mesiacov</strong></td><td><strong>~2.5–3.5 mesiaca</strong></td></tr>
+          <tr><td>Predpoklad</td><td>vrr. rezerv a rizik</td><td>min. zavislosti</td></tr>
+        </table>
+      </div>
+      <div class="card mb-1">
+        <h3>Hlavne rozdiely</h3>
+        <ul>
+          <li><strong>Real-time engine:</strong> Claude 100 cd vs Codex 22-32 cd &ndash; najvacsi rozdiel, Claude zapocital full reconnection + edge cases</li>
+          <li><strong>Rizikova rezerva:</strong> Claude +30% pesimisticky scenar, Codex uvadza cisty vyvoj</li>
+          <li><strong>Infrastruktura:</strong> Claude pocita 22 cd na setup, Codex predpoklada hotovu infra</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:var(--green)">
+        <h3 class="green">Realita: vyvoj s AI</h3>
+        <ul>
+          <li><strong>3 dni</strong> po veceroch, par promptov denne</li>
+          <li>Vysledok: <strong>~14 900 LOC</strong>, plne funkcny produkt</li>
+          <li>Oproti odhadu: <strong>50-100x rychlejsie</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ==================== SLIDE 18: Summary ==================== -->
 <div class="slide" data-slide="17">
   <h2>Zhrnutie</h2>
@@ -859,14 +841,13 @@ host:show-result  &rarr;   flushToDB() <span class="c">[batch]</span>
       </ul>
     </div>
     <div class="card">
-      <h3 class="orange">Odhad pracnosti</h3>
+      <h3 class="orange">Odhad vs realita</h3>
       <ul>
-        <li><strong>294 clovekodni</strong> (realisticky)</li>
-        <li><strong>~6 mesiacov</strong> pre 3-clenny tim</li>
-        <li>BE: 39% | FE: 45% | QA: 16%</li>
-        <li>Najnarocnejsie: herny engine (34%)</li>
+        <li><strong>Claude: 294 cd</strong> (~6 mesiacov)</li>
+        <li><strong>Codex: 142-205 cd</strong> (~2.5-3.5 mesiaca)</li>
+        <li><strong>Realita s AI: 3 dni</strong> po veceroch</li>
         <li>~14 900 LOC, 162 suborov</li>
-        <li>32 API + 24 socket eventov</li>
+        <li>AI ako multiplikator produktivity</li>
       </ul>
     </div>
   </div>
