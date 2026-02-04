@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { TokenPayload } from '@shared/types';
 import { authService } from '../auth/auth.service';
 import { ApiResponse } from '@shared/types';
+import { userRepository } from '../db/repositories';
 
 // Extend Express Request to include user
 declare global {
@@ -12,11 +13,11 @@ declare global {
   }
 }
 
-export function authenticate(
+export async function authenticate(
   req: Request,
   res: Response,
   next: NextFunction
-): void {
+): Promise<void> {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -32,6 +33,22 @@ export function authenticate(
 
   try {
     const decoded = authService.verifyToken(token);
+
+    // For host tokens, verify user still exists and is active
+    if (decoded.type === 'host') {
+      const user = await userRepository.findById(decoded.userId);
+      if (!user || !user.isActive) {
+        const response: ApiResponse = {
+          success: false,
+          error: 'Invalid or expired token',
+        };
+        res.status(401).json(response);
+        return;
+      }
+      // Sync role from database (reflects admin changes immediately)
+      decoded.role = user.role;
+    }
+
     req.user = decoded;
     next();
   } catch {

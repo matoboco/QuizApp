@@ -234,6 +234,12 @@ class AuthService {
     const decoded = jwt.verify(token, getJwtSecret()) as TokenPayload;
     return decoded;
   }
+
+  async getUserPublic(userId: string): Promise<UserPublic | null> {
+    const user = await userRepository.findById(userId);
+    if (!user || !user.isActive) return null;
+    return toUserPublic(user);
+  }
 }
 
 export const authService = new AuthService();

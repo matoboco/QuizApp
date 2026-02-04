@@ -129,13 +129,26 @@ export async function resendCode(
   }
 }
 
-export function me(req: Request, res: Response): void {
-  const user = req.user;
+export async function me(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (!req.user || req.user.type !== 'host') {
+      res.status(401).json({ success: false, error: 'Invalid token' });
+      return;
+    }
 
-  const response: ApiResponse<typeof user> = {
-    success: true,
-    data: user,
-  };
+    const user = await authService.getUserPublic(req.user.userId);
+    if (!user) {
+      res.status(401).json({ success: false, error: 'Invalid or expired token' });
+      return;
+    }
 
-  res.status(200).json(response);
+    const response: ApiResponse<typeof user> = {
+      success: true,
+      data: user,
+    };
+
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  }
 }
