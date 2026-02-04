@@ -28,40 +28,40 @@
   .slide.exit{opacity:0;visibility:visible;transform:translateX(-60px)}
 
   /* Typography */
-  h1{font-size:clamp(2.6rem,4.5vw,4rem);font-weight:800;line-height:1.15;margin-bottom:1.5vh}
-  h2{font-size:clamp(2rem,3.5vw,3rem);font-weight:700;line-height:1.2;margin-bottom:2.5vh}
-  h3{font-size:clamp(1.3rem,2.2vw,1.9rem);font-weight:600;margin-bottom:1.2vh}
-  p,.desc{font-size:clamp(1.1rem,1.7vw,1.5rem);line-height:1.55;color:var(--muted)}
-  .subtitle{font-size:clamp(1.3rem,2.2vw,2rem);color:var(--muted);margin-bottom:2vh}
+  h1{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:800;line-height:1.15;margin-bottom:1vh}
+  h2{font-size:clamp(2.2rem,4vw,3.5rem);font-weight:700;line-height:1.2;margin-bottom:2vh}
+  h3{font-size:clamp(1.5rem,2.5vw,2.2rem);font-weight:600;margin-bottom:1vh}
+  p,.desc{font-size:clamp(1.2rem,1.9vw,1.7rem);line-height:1.55;color:var(--muted)}
+  .subtitle{font-size:clamp(1.4rem,2.4vw,2.2rem);color:var(--muted);margin-bottom:2vh}
   .accent{color:var(--accent2)}
   .green{color:var(--green)}.orange{color:var(--orange)}.red{color:var(--red)}.cyan{color:var(--cyan)}.pink{color:var(--pink)}
   strong{color:var(--text);font-weight:600}
 
   /* Grid layouts */
-  .cols{display:grid;gap:2.5vw;flex:1;align-content:start}
+  .cols{display:grid;gap:2vw;flex:1;align-content:stretch;align-items:stretch}
   .cols-2{grid-template-columns:1fr 1fr}
   .cols-3{grid-template-columns:1fr 1fr 1fr}
   .cols-23{grid-template-columns:2fr 3fr}
   .cols-32{grid-template-columns:3fr 2fr}
-  .cols-auto{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .cols-auto{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
 
   /* Cards */
   .card{
     background:var(--surface);border:1px solid var(--border);border-radius:12px;
-    padding:clamp(1.3rem,2.5vh,2rem) clamp(1.5rem,2.5vw,2.2rem);
+    padding:clamp(1.5rem,3vh,2.5rem) clamp(1.8rem,3vw,2.5rem);
   }
   .card h3{margin-bottom:.8vh}
-  .card p,.card li{font-size:clamp(1.05rem,1.5vw,1.3rem);color:var(--muted)}
+  .card p,.card li{font-size:clamp(1.2rem,1.7vw,1.5rem);color:var(--muted)}
 
   /* Lists */
   ul,ol{list-style:none;padding:0}
   li{
-    position:relative;padding-left:1.6em;margin-bottom:.6vh;
-    font-size:clamp(1.1rem,1.6vw,1.35rem);line-height:1.5;color:var(--muted);
+    position:relative;padding-left:1.6em;margin-bottom:1vh;
+    font-size:clamp(1.25rem,1.8vw,1.6rem);line-height:1.5;color:var(--muted);
   }
   li::before{
     content:'';position:absolute;left:0;top:.55em;
-    width:8px;height:8px;border-radius:50%;background:var(--accent);
+    width:10px;height:10px;border-radius:50%;background:var(--accent);
   }
   ol{counter-reset:ol}
   ol li{counter-increment:ol}
@@ -73,9 +73,9 @@
   }
 
   /* Table */
-  table{width:100%;border-collapse:collapse;font-size:clamp(1rem,1.4vw,1.25rem)}
-  th,td{text-align:left;padding:.55vh 1vw;border-bottom:1px solid var(--border)}
-  th{color:var(--accent2);font-weight:600;font-size:clamp(.95rem,1.3vw,1.15rem);text-transform:uppercase;letter-spacing:.04em}
+  table{width:100%;border-collapse:collapse;font-size:clamp(1.1rem,1.6vw,1.4rem)}
+  th,td{text-align:left;padding:.8vh 1vw;border-bottom:1px solid var(--border)}
+  th{color:var(--accent2);font-weight:600;font-size:clamp(1.05rem,1.4vw,1.25rem);text-transform:uppercase;letter-spacing:.04em}
   td{color:var(--muted)}
   tr:last-child td{border-bottom:none}
   .tbl-highlight td{color:var(--text);font-weight:600}
@@ -88,7 +88,7 @@
   }
   pre{
     background:#0d1117;border:1px solid var(--border);border-radius:10px;
-    padding:1.5vh 1.5vw;overflow-x:auto;font-size:clamp(.9rem,1.3vw,1.15rem);
+    padding:2vh 2vw;overflow-x:auto;font-size:clamp(1rem,1.4vw,1.25rem);
     line-height:1.6;color:var(--muted);font-family:'Fira Code','Cascadia Code',monospace;
   }
   pre .kw{color:var(--pink)}
@@ -100,7 +100,7 @@
   /* Badges */
   .badge{
     display:inline-block;padding:.2em .7em;border-radius:6px;
-    font-size:clamp(.85rem,1.15vw,1.05rem);font-weight:600;margin:.2em .2em;
+    font-size:clamp(1rem,1.3vw,1.15rem);font-weight:600;margin:.2em .3em;
   }
   .badge-indigo{background:#312e81;color:var(--accent2)}
   .badge-green{background:#14532d;color:var(--green)}
@@ -113,7 +113,7 @@
   .diagram{
     background:#0d1117;border:1px solid var(--border);border-radius:10px;
     padding:2vh 2vw;font-family:'Fira Code','Cascadia Code',monospace;
-    font-size:clamp(.85rem,1.2vw,1.1rem);line-height:1.7;color:var(--muted);
+    font-size:clamp(1rem,1.4vw,1.25rem);line-height:1.7;color:var(--muted);
     white-space:pre;overflow-x:auto;
   }
   .diagram .hl{color:var(--accent2);font-weight:600}
@@ -142,13 +142,13 @@
 
   /* Title slide special */
   .title-slide{justify-content:center;align-items:center;text-align:center}
-  .title-slide h1{font-size:clamp(2.8rem,5.5vw,4.5rem);margin-bottom:2vh}
-  .title-slide .subtitle{font-size:clamp(1.2rem,2vw,1.8rem)}
+  .title-slide h1{font-size:clamp(3.2rem,6vw,5rem);margin-bottom:2vh}
+  .title-slide .subtitle{font-size:clamp(1.4rem,2.4vw,2.2rem)}
   .logo{font-size:clamp(3rem,6vw,5rem);margin-bottom:2vh}
 
   /* Section divider */
   .section-slide{justify-content:center;align-items:center;text-align:center}
-  .section-slide h2{font-size:clamp(2rem,4vw,3.2rem);margin-bottom:1vh}
+  .section-slide h2{font-size:clamp(2.4rem,4.5vw,3.8rem);margin-bottom:1vh}
   .section-number{
     font-size:clamp(5rem,10vw,9rem);font-weight:900;
     color:var(--accent);opacity:.15;position:absolute;
@@ -157,11 +157,11 @@
   }
 
   /* Chart bars */
-  .bar-chart{display:flex;flex-direction:column;gap:.8vh}
+  .bar-chart{display:flex;flex-direction:column;gap:1.2vh}
   .bar-row{display:flex;align-items:center;gap:1vw}
-  .bar-label{width:14vw;text-align:right;font-size:clamp(.95rem,1.3vw,1.15rem);color:var(--muted);flex-shrink:0}
-  .bar-track{flex:1;height:clamp(1.8rem,3vh,2.5rem);background:#0d1117;border-radius:6px;overflow:hidden;position:relative}
-  .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:.8vw;font-size:clamp(.85rem,1.15vw,1.05rem);font-weight:600;color:#fff;white-space:nowrap;transition:width 1s ease}
+  .bar-label{width:14vw;text-align:right;font-size:clamp(1.1rem,1.5vw,1.3rem);color:var(--muted);flex-shrink:0}
+  .bar-track{flex:1;height:clamp(2.2rem,3.5vh,3rem);background:#0d1117;border-radius:6px;overflow:hidden;position:relative}
+  .bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:.8vw;font-size:clamp(1rem,1.3vw,1.2rem);font-weight:600;color:#fff;white-space:nowrap;transition:width 1s ease}
   .bar-fill.indigo{background:var(--accent)}
   .bar-fill.green{background:var(--green)}
   .bar-fill.orange{background:var(--orange)}
@@ -172,14 +172,14 @@
   /* Timeline */
   .timeline{position:relative;padding-left:2vw}
   .timeline::before{content:'';position:absolute;left:.6vw;top:0;bottom:0;width:2px;background:var(--border)}
-  .tl-item{position:relative;margin-bottom:1.8vh;padding-left:1.5vw}
+  .tl-item{position:relative;margin-bottom:2.2vh;padding-left:1.5vw}
   .tl-item::before{
     content:'';position:absolute;left:calc(-1.5vw + .1vw);top:.4em;
     width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);
   }
   .tl-item.done::before{background:var(--green)}
-  .tl-item h3{font-size:clamp(1.05rem,1.5vw,1.3rem);margin-bottom:.2vh}
-  .tl-item p{font-size:clamp(.95rem,1.3vw,1.1rem)}
+  .tl-item h3{font-size:clamp(1.2rem,1.6vw,1.45rem);margin-bottom:.3vh}
+  .tl-item p{font-size:clamp(1.05rem,1.4vw,1.25rem)}
 
   .spacer{flex:1}
   .mt-auto{margin-top:auto}
@@ -188,7 +188,7 @@
   .mb-1{margin-bottom:1vh}
   .mb-2{margin-bottom:2vh}
   .text-center{text-align:center}
-  .text-sm{font-size:clamp(.9rem,1.2vw,1.1rem)}
+  .text-sm{font-size:clamp(1rem,1.3vw,1.2rem)}
   .flex-center{display:flex;align-items:center;justify-content:center;flex:1}
 </style>
 </head>
@@ -282,7 +282,7 @@
 <!-- ==================== SLIDE 5: Game Flow ==================== -->
 <div class="slide" data-slide="4">
   <h2>Herny priebeh</h2>
-  <div class="diagram" style="text-align:center;font-size:clamp(.9rem,1.3vw,1.15rem)">
+  <div class="diagram" style="text-align:center;font-size:clamp(1.1rem,1.5vw,1.35rem)">
   <span class="hl">LOBBY</span>  &rarr;  <span class="hl">STARTING</span>  &rarr;  <span class="hl">QUESTION</span>  &rarr;  <span class="hl">ANSWERS</span>  &rarr;  <span class="hl">RESULT</span>  &rarr;  <span class="hl">LEADERBOARD</span>  &rarr;  <span class="hl">FINISHED</span>
     |                                    |                                          |
     |   Hraci sa                    Countdown                               Opakovanie
@@ -410,7 +410,7 @@
         <p>9 suborov, ~500 LOC</p>
       </div>
     </div>
-    <div class="diagram" style="font-size:clamp(.8rem,1.15vw,1.05rem)">
+    <div class="diagram" style="font-size:clamp(1rem,1.35vw,1.2rem)">
 <span class="hl">CLIENT (React SPA)</span>                       <span class="hl">SERVER (Node.js)</span>
  Port 5173 (dev) / 80 (prod)                Port 3001
  +--------------------------+               +---------------------------+
@@ -640,7 +640,7 @@
   <div class="cols cols-2">
     <div>
       <h3 class="mb-1">Socket.IO event flow</h3>
-      <div class="diagram" style="font-size:clamp(.8rem,1.15vw,1.05rem)">
+      <div class="diagram" style="font-size:clamp(1rem,1.35vw,1.2rem)">
 <span class="hl">HOST</span>                     <span class="o">SERVER</span>                    <span class="g">PLAYER</span>
 
 start-game        &rarr;   GameEngine.startGame()
@@ -871,7 +871,7 @@ host:show-result  &rarr;   flushToDB() <span class="c">[batch]</span>
     </div>
   </div>
   <div class="text-center mt-2">
-    <p class="desc" style="font-size:clamp(1.15rem,1.7vw,1.5rem)">QuizApp je <strong>stredne az vysoko komplexny projekt</strong>, ktoreho hlavnou vyzvou je real-time herny engine s WebSocket komunikaciou, stavovym automatom a viacerymi typmi otazok s roznym scoring algoritmom.</p>
+    <p class="desc" style="font-size:clamp(1.3rem,1.9vw,1.7rem)">QuizApp je <strong>stredne az vysoko komplexny projekt</strong>, ktoreho hlavnou vyzvou je real-time herny engine s WebSocket komunikaciou, stavovym automatom a viacerymi typmi otazok s roznym scoring algoritmom.</p>
   </div>
 </div>
 
