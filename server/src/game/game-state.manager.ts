@@ -12,12 +12,28 @@ import { Quiz } from '@shared/types';
 import { calculateScore, ScoreBreakdown } from '@shared/types';
 import { checkAnswer } from './answer-checker';
 
+// Data structure for deferred DB writes (batched at end of question)
+export interface PendingAnswerWrite {
+  playerId: string;
+  sessionId: string;
+  questionId: string;
+  answerId: string | null;
+  isCorrect: boolean;
+  timeTaken: number;
+  score: number;
+}
+
 // Internal state that extends GameState with tracking data not sent to clients
 interface InternalGameState extends GameState {
   // Full list of questions from the quiz (with correct answers)
   questions: Question[];
   // Map of playerId -> answer data for the current question
   currentAnswers: Map<string, { answerId: string | string[]; timeTaken: number; scoreBreakdown: ScoreBreakdown }>;
+  // Deferred DB writes for current question
+  pendingAnswerWrites: PendingAnswerWrite[];
+  // Leaderboard cache
+  _cachedLeaderboard: LeaderboardEntry[] | null;
+  _leaderboardDirty: boolean;
 }
 
 class GameStateManager {
@@ -35,6 +51,9 @@ class GameStateManager {
       totalQuestions: quiz.questions.length,
       questions: quiz.questions,
       currentAnswers: new Map(),
+      pendingAnswerWrites: [],
+      _cachedLeaderboard: null,
+      _leaderboardDirty: true,
     };
 
     this.states.set(session.id, state);
@@ -68,6 +87,7 @@ class GameStateManager {
     const existing = state.players.find((p) => p.id === player.id);
     if (!existing) {
       state.players.push({ ...player });
+      state._leaderboardDirty = true;
     }
   }
 
@@ -79,6 +99,7 @@ class GameStateManager {
     if (!state) return;
 
     state.players = state.players.filter((p) => p.id !== playerId);
+    state._leaderboardDirty = true;
   }
 
   /**
@@ -118,6 +139,9 @@ class GameStateManager {
     state.session.status = 'question';
     state.questionStartedAt = Date.now();
     state.currentAnswers = new Map();
+    state.pendingAnswerWrites = [];
+    state._leaderboardDirty = true;
+    state._cachedLeaderboard = null;
 
     // Set the current question (with correct answer info -- host view)
     state.currentQuestion = state.questions[targetIndex];
@@ -194,6 +218,9 @@ class GameStateManager {
       player.streak = correctRatio >= 1.0 ? player.streak + 1 : 0;
     }
 
+    // Mark leaderboard cache as dirty since score changed
+    state._leaderboardDirty = true;
+
     // Record the answer
     state.currentAnswers.set(playerId, {
       answerId,
@@ -220,7 +247,50 @@ class GameStateManager {
         resetPlayers.push({ playerId: player.id, score: player.score });
       }
     }
+    if (resetPlayers.length > 0) {
+      state._leaderboardDirty = true;
+    }
     return resetPlayers;
+  }
+
+  /**
+   * Add a pending answer write for batch DB insertion.
+   */
+  addPendingAnswerWrite(sessionId: string, write: PendingAnswerWrite): void {
+    const state = this.states.get(sessionId);
+    if (!state) return;
+    state.pendingAnswerWrites.push(write);
+  }
+
+  /**
+   * Get and clear all pending answer writes for batch DB insertion.
+   */
+  flushPendingAnswerWrites(sessionId: string): PendingAnswerWrite[] {
+    const state = this.states.get(sessionId);
+    if (!state) return [];
+    const writes = state.pendingAnswerWrites;
+    state.pendingAnswerWrites = [];
+    return writes;
+  }
+
+  /**
+   * Get answer progress for the current question (how many connected players have answered).
+   */
+  getAnswerProgress(sessionId: string): { answered: number; total: number } | undefined {
+    const state = this.states.get(sessionId);
+    if (!state) return undefined;
+    const connectedPlayers = state.players.filter((p) => p.isConnected);
+    const answered = connectedPlayers.filter((p) => state.currentAnswers.has(p.id)).length;
+    return { answered, total: connectedPlayers.length };
+  }
+
+  /**
+   * Get all player scores for batch DB update.
+   */
+  getAllPlayerScores(sessionId: string): { id: string; score: number; streak: number }[] {
+    const state = this.states.get(sessionId);
+    if (!state) return [];
+    return state.players.map((p) => ({ id: p.id, score: p.score, streak: p.streak }));
   }
 
   /**
@@ -230,13 +300,18 @@ class GameStateManager {
     const state = this.states.get(sessionId);
     if (!state) return [];
 
+    // Return cached leaderboard if available and not dirty
+    if (!state._leaderboardDirty && state._cachedLeaderboard) {
+      return state._cachedLeaderboard;
+    }
+
     const sorted = [...state.players].sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
       // Tiebreaker: earlier join time
       return new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
     });
 
-    return sorted.map((player, index) => {
+    const leaderboard = sorted.map((player, index) => {
       const answerData = state.currentAnswers.get(player.id);
       return {
         playerId: player.id,
@@ -247,6 +322,12 @@ class GameStateManager {
         lastScoreBreakdown: answerData?.scoreBreakdown,
       };
     });
+
+    // Cache the result
+    state._cachedLeaderboard = leaderboard;
+    state._leaderboardDirty = false;
+
+    return leaderboard;
   }
 
   /**
@@ -298,7 +379,7 @@ class GameStateManager {
    * Get the PlayerGameState for a specific player.
    * Strips correct answer information from question data.
    */
-  getPlayerGameState(sessionId: string, playerId: string): PlayerGameState | undefined {
+  getPlayerGameState(sessionId: string, playerId: string, precomputedLeaderboard?: LeaderboardEntry[]): PlayerGameState | undefined {
     const state = this.states.get(sessionId);
     if (!state) return undefined;
 
@@ -332,7 +413,7 @@ class GameStateManager {
     let leaderboard: LeaderboardEntry[] | undefined;
     let finalRank: number | undefined;
     if (state.session.status === 'leaderboard' || state.session.status === 'finished') {
-      leaderboard = this.getLeaderboard(sessionId);
+      leaderboard = precomputedLeaderboard || this.getLeaderboard(sessionId);
       const entry = leaderboard.find((e) => e.playerId === playerId);
       finalRank = entry?.rank;
     }

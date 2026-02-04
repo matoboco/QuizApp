@@ -81,6 +81,24 @@ export class PlayerAnswerRepository {
     };
   }
 
+  async createMany(data: CreatePlayerAnswerData[]): Promise<void> {
+    if (data.length === 0) return;
+    const db = getKysely();
+    const now = new Date().toISOString();
+    const values = data.map((d) => ({
+      id: uuidv4(),
+      player_id: d.playerId,
+      session_id: d.sessionId,
+      question_id: d.questionId,
+      answer_id: d.answerId,
+      is_correct: d.isCorrect ? 1 : 0,
+      time_taken: d.timeTaken,
+      score: d.score,
+      created_at: now,
+    }));
+    await db.insertInto('player_answers').values(values).execute();
+  }
+
   async findByPlayerAndQuestion(playerId: string, questionId: string): Promise<PlayerAnswer | undefined> {
     const db = getKysely();
     const row = await db

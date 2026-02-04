@@ -220,13 +220,12 @@ class GameEngine {
       return;
     }
 
-    // Persist to DB (store first answerId for single answers, or first from array)
+    // Queue for batch DB write (will be flushed at end of question phase)
     const dbAnswerId = Array.isArray(answerId) ? answerId[0] || null : answerId;
-    // For number-guess, any answer within tolerance counts as correct for history
     const dbIsCorrect = question.questionType === 'number-guess'
       ? scoreBreakdown.correctRatio > 0
       : scoreBreakdown.isCorrect;
-    await playerAnswerRepository.create({
+    gameStateManager.addPendingAnswerWrite(sessionId, {
       playerId,
       sessionId,
       questionId,
@@ -236,33 +235,16 @@ class GameEngine {
       score: scoreBreakdown.totalPoints,
     });
 
-    // Update player score in DB
-    const playerState = gameStateManager.getPlayerGameState(sessionId, playerId);
-    if (playerState) {
-      await playerRepository.updateScore(
-        playerId,
-        playerState.player.score,
-        playerState.player.streak
-      );
-    }
-
     // Emit result to the individual player
     this.io.to(playerIndividualRoom(playerId)).emit('player:answer-result', scoreBreakdown);
 
-    // Emit progress to host
-    const updatedState = gameStateManager.getGameState(sessionId);
-    if (updatedState) {
-      const connectedPlayers = updatedState.players.filter((p) => p.isConnected);
-      const answeredCount = connectedPlayers.filter((p) => {
-        // Check if player has answered by looking at player game state
-        const pState = gameStateManager.getPlayerGameState(sessionId, p.id);
-        return pState?.hasAnswered;
-      }).length;
-
+    // Emit progress to host (optimized: single call instead of N getPlayerGameState calls)
+    const progress = gameStateManager.getAnswerProgress(sessionId);
+    if (progress) {
       this.io.to(hostRoom(sessionId)).emit('game:player-answered', {
         playerId,
-        totalAnswered: answeredCount,
-        totalPlayers: connectedPlayers.length,
+        totalAnswered: progress.answered,
+        totalPlayers: progress.total,
       });
     }
 
@@ -287,11 +269,11 @@ class GameEngine {
    * Auto-advances to result phase after 3 seconds.
    */
   async showAnswers(sessionId: string): Promise<void> {
-    // Reset streak for players who didn't answer in time and persist to DB
-    const resetPlayers = gameStateManager.resetStreaksForUnanswered(sessionId);
-    for (const { playerId, score } of resetPlayers) {
-      await playerRepository.updateScore(playerId, score, 0);
-    }
+    // Reset streak for players who didn't answer in time
+    gameStateManager.resetStreaksForUnanswered(sessionId);
+
+    // Batch flush: write all answers and player scores to DB in one go
+    await this.flushCurrentQuestionToDB(sessionId);
 
     gameStateManager.setStatus(sessionId, 'answers');
     await gameRepository.updateStatus(sessionId, 'answers');
@@ -393,10 +375,8 @@ class GameEngine {
 
     const leaderboard = gameStateManager.getLeaderboard(sessionId);
 
-    // Persist final scores to DB
-    for (const entry of leaderboard) {
-      await playerRepository.updateScore(entry.playerId, entry.score, entry.streak);
-    }
+    // Batch flush: persist any remaining pending answers and final scores to DB
+    await this.flushCurrentQuestionToDB(sessionId);
 
     // Emit final state to host
     const state = gameStateManager.getGameState(sessionId);
@@ -481,6 +461,22 @@ class GameEngine {
     }
   }
 
+  /**
+   * Batch flush pending answer writes and player scores to DB.
+   * Called at end of question phase (showAnswers) or endGame.
+   */
+  private async flushCurrentQuestionToDB(sessionId: string): Promise<void> {
+    // Batch INSERT all pending answer records
+    const pendingWrites = gameStateManager.flushPendingAnswerWrites(sessionId);
+    if (pendingWrites.length > 0) {
+      await playerAnswerRepository.createMany(pendingWrites);
+    }
+
+    // Batch UPDATE all player scores in a single transaction
+    const allScores = gameStateManager.getAllPlayerScores(sessionId);
+    await playerRepository.updateScoreBatch(allScores);
+  }
+
   // ---------------------------------------------------------------------------
   // Private helpers
   // ---------------------------------------------------------------------------
@@ -543,8 +539,11 @@ class GameEngine {
     const state = gameStateManager.getGameState(sessionId);
     if (!state) return;
 
+    // Precompute leaderboard once for all players (avoids N redundant sorts)
+    const leaderboard = gameStateManager.getLeaderboard(sessionId);
+
     for (const player of state.players) {
-      const playerState = gameStateManager.getPlayerGameState(sessionId, player.id);
+      const playerState = gameStateManager.getPlayerGameState(sessionId, player.id, leaderboard);
       if (playerState) {
         this.io.to(playerIndividualRoom(player.id)).emit('player:state-update', playerState);
       }

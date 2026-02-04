@@ -22,6 +22,7 @@ export function getKysely(): Kysely<Database> {
       database: config.postgres.database,
       user: config.postgres.user,
       password: config.postgres.password,
+      max: config.postgres.poolMax,
     });
 
     db = new Kysely<Database>({
