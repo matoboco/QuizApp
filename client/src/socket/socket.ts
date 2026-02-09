@@ -1,6 +1,6 @@
 import { io, Socket } from 'socket.io-client';
 import type { ClientToServerEvents, ServerToClientEvents } from '@shared/types/socket-events';
-import { SOCKET_URL } from '@/lib/constants';
+import { SOCKET_URL, SOCKET_PATH } from '@/lib/constants';
 
 export type AppSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
@@ -14,6 +14,7 @@ export type AppSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
  */
 export function createSocket(token?: string): Socket<ServerToClientEvents, ClientToServerEvents> {
   const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(SOCKET_URL || undefined, {
+    path: SOCKET_PATH,
     autoConnect: false,
     reconnection: true,
     reconnectionAttempts: 5,

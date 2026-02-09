@@ -19,12 +19,15 @@ import type {
 // ---------------------------------------------------------------------------
 const httpServer = createServer(app);
 
+const socketPath = `${config.basePath}/socket.io/`;
+
 const io = new Server<
   ClientToServerEvents,
   ServerToClientEvents,
   InterServerEvents,
   SocketData
 >(httpServer, {
+  path: socketPath,
   cors: {
     origin: config.corsOrigin,
     methods: ['GET', 'POST'],
@@ -55,7 +58,7 @@ async function bootstrap(): Promise<void> {
   // Start listening
   httpServer.listen(config.port, () => {
     console.log(
-      `[server] Quiz App server running on http://localhost:${config.port} (${config.nodeEnv})`,
+      `[server] Quiz App server running on http://localhost:${config.port}${config.basePath || '/'} (${config.nodeEnv})`,
     );
   });
 }

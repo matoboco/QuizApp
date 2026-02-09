@@ -22,7 +22,7 @@ import DisplayPage from '@/pages/display/DisplayPage';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/+$/, '')}>
       <ToastProvider>
         <AuthProvider>
           <Routes>

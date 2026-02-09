@@ -1,0 +1,21 @@
+# Override for testing non-root context path deployment.
+#
+# Usage (with postgres):
+#   docker compose -f docker-compose.yml -f docker-compose.basepath.yml up --build
+#
+# Usage (with sqlite):
+#   docker compose -f docker-compose.yml -f docker-compose.sqlite.yml -f docker-compose.basepath.yml up --build
+#
+# Then open: http://localhost/quizapp/
+
+services:
+  client:
+    build:
+      args:
+        BASE_PATH: /quizapp
+    environment:
+      BASE_PATH: /quizapp
+
+  server:
+    environment:
+      BASE_PATH: /quizapp

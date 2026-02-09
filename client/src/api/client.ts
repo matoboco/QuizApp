@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { API_BASE_URL, AUTH_TOKEN_KEY } from '@/lib/constants';
 
+const basePath = import.meta.env.BASE_URL.replace(/\/+$/, '');
+
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -24,8 +26,9 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem(AUTH_TOKEN_KEY);
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+      const loginPath = `${basePath}/login`;
+      if (window.location.pathname !== loginPath) {
+        window.location.href = loginPath;
       }
     }
     return Promise.reject(error);

@@ -57,14 +57,15 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // ---------------------------------------------------------------------------
 // Routes
 // ---------------------------------------------------------------------------
-app.use('/api/auth', authRouter);
-app.use('/api/quizzes', quizRouter);
-app.use('/api/games', gameRouter);
-app.use('/api/admin', adminRouter);
-app.use('/api/history', historyRouter);
+const apiPrefix = `${config.basePath}/api`;
+app.use(`${apiPrefix}/auth`, authRouter);
+app.use(`${apiPrefix}/quizzes`, quizRouter);
+app.use(`${apiPrefix}/games`, gameRouter);
+app.use(`${apiPrefix}/admin`, adminRouter);
+app.use(`${apiPrefix}/history`, historyRouter);
 
 // Health check
-app.get('/api/health', (_req: Request, res: Response) => {
+app.get(`${apiPrefix}/health`, (_req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 

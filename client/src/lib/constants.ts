@@ -1,5 +1,7 @@
-export const API_BASE_URL = '/api';
+const basePath = import.meta.env.BASE_URL.replace(/\/+$/, '');
+export const API_BASE_URL = `${basePath}/api`;
 export const SOCKET_URL = '';
+export const SOCKET_PATH = basePath ? `${basePath}/socket.io/` : '/socket.io/';
 export const APP_NAME = 'QuizApp';
 export const AUTH_TOKEN_KEY = 'quiz_auth_token';
 

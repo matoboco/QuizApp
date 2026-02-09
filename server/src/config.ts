@@ -17,6 +17,7 @@ export const config = {
     password: process.env.POSTGRES_PASSWORD || 'quizapp',
     poolMax: parseInt(process.env.POSTGRES_POOL_MAX || '20', 10),
   },
+  basePath: (process.env.BASE_PATH || '').replace(/\/+$/, ''),
   nodeEnv: process.env.NODE_ENV || 'development',
   smtp: {
     host: process.env.SMTP_HOST || 'localhost',
