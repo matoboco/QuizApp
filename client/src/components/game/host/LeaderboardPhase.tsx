@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import type { LeaderboardEntry } from '@shared/types/game';
+import { useSound } from '@/context/SoundContext';
 import { formatScore } from '@/lib/utils';
 
 interface LeaderboardPhaseProps {
@@ -47,6 +49,12 @@ function RankBadge({ rank }: { rank: number }) {
 }
 
 export default function LeaderboardPhase({ leaderboard }: LeaderboardPhaseProps) {
+  const { play } = useSound();
+
+  useEffect(() => {
+    play('leaderboard');
+  }, [play]);
+
   const top5 = leaderboard.slice(0, 5);
 
   return (

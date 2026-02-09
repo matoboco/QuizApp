@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastProvider } from '@/context/ToastContext';
+import { SoundProvider } from '@/context/SoundContext';
 import { AuthProvider } from '@/context/AuthContext';
 import ProtectedRoute from '@/components/guards/ProtectedRoute';
 import AdminGuard from '@/components/guards/AdminGuard';
@@ -24,6 +25,7 @@ function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/+$/, '')}>
       <ToastProvider>
+        <SoundProvider>
         <AuthProvider>
           <Routes>
             {/* Public auth routes */}
@@ -67,6 +69,7 @@ function App() {
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </AuthProvider>
+        </SoundProvider>
       </ToastProvider>
     </BrowserRouter>
   );

@@ -1,5 +1,7 @@
+import { useEffect, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import type { Player } from '@shared/types/game';
+import { useSound } from '@/context/SoundContext';
 import Button from '@/components/common/Button';
 import PlayerList from './PlayerList';
 
@@ -18,6 +20,16 @@ export default function LobbyScreen({
   onKickPlayer,
   displayCount = 0,
 }: LobbyScreenProps) {
+  const { play } = useSound();
+  const prevCountRef = useRef(players.length);
+
+  useEffect(() => {
+    if (players.length > prevCountRef.current) {
+      play('join');
+    }
+    prevCountRef.current = players.length;
+  }, [players.length, play]);
+
   const joinUrl = `${window.location.origin}/play?pin=${pin}`;
   const connectedCount = players.filter((p) => p.isConnected).length;
 

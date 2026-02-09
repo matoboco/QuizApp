@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSound } from '@/context/SoundContext';
 
 interface CountdownTimerProps {
   timeLimit: number; // seconds
@@ -37,6 +38,21 @@ export default function CountdownTimer({
 
   const seconds = Math.ceil(remaining);
   const fraction = remaining / timeLimit;
+
+  // Tick sounds for last 5 seconds
+  const { play } = useSound();
+  const prevSecondsRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (prevSecondsRef.current === seconds) return;
+    const prev = prevSecondsRef.current;
+    prevSecondsRef.current = seconds;
+    if (prev === null) return;
+
+    if (seconds <= 5 && seconds > 0) {
+      play(seconds <= 3 ? 'tickUrgent' : 'tick');
+    }
+  }, [seconds, play]);
 
   // Color transitions: green -> yellow -> red
   let strokeColor = '#22c55e'; // green

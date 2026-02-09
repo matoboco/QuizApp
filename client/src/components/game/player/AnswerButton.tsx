@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { useSound } from '@/context/SoundContext';
 import type { AnswerShape } from '@shared/types/quiz';
 
 interface AnswerButtonProps {
@@ -53,9 +54,10 @@ export default function AnswerButton({
   onClick,
   index,
 }: AnswerButtonProps) {
+  const { play } = useSound();
   return (
     <button
-      onClick={onClick}
+      onClick={() => { play('click'); onClick(); }}
       disabled={isDisabled}
       className={cn(
         'relative w-full h-full min-h-[100px] rounded-xl p-4',

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useSound } from '@/context/SoundContext';
 import { ANSWER_COLORS, ANSWER_SHAPES } from '@/lib/constants';
 import type { AnswerShape } from '@shared/types/quiz';
 
@@ -57,11 +58,13 @@ export default function MultiSelectGrid({
   submitted,
   disabled,
 }: MultiSelectGridProps) {
+  const { play } = useSound();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const sorted = [...answers].sort((a, b) => a.orderIndex - b.orderIndex);
 
   const toggleAnswer = (id: string) => {
     if (submitted || disabled) return;
+    play('click');
     setSelected((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
@@ -75,6 +78,7 @@ export default function MultiSelectGrid({
 
   const handleSubmit = () => {
     if (selected.size === 0 || submitted || disabled) return;
+    play('submit');
     onSubmit(Array.from(selected));
   };
 

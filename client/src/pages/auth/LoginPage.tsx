@@ -101,14 +101,14 @@ export default function LoginPage() {
             </Link>
           </p>
 
-          <div className="mt-4 pt-4 border-t border-gray-200 text-center">
+          <div className="mt-6 pt-5 border-t border-gray-200 text-center">
+            <p className="text-sm text-gray-500 mb-3">Just want to play?</p>
             <Link
               to="/play"
-              className="inline-flex items-center justify-center gap-3 w-full px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-display font-bold text-lg rounded-xl transition-colors shadow-md hover:shadow-lg"
+              className="inline-flex items-center justify-center gap-3 w-full px-6 py-4 bg-green-500 hover:bg-green-600 text-white font-display font-bold text-xl rounded-xl transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 010 1.972l-11.54 6.347a1.125 1.125 0 01-1.667-.986V5.653z" />
               </svg>
               Join a Game
             </Link>

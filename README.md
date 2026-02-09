@@ -71,6 +71,17 @@ See [all screenshots](docs/SCREENSHOTS.md) for a complete walkthrough of every s
 - **Shareable results** — generate a public link so participants can review their game without logging in
 - "History" button on each quiz card, "View Details" button on final results screen
 
+### Sound Effects
+- Synthesized in-browser via Web Audio API — no audio files needed
+- **Player interactions**: click on answer select, submit confirmation
+- **Result feedback**: correct, incorrect, partial correct sounds
+- **Countdown**: tick sounds for last 5 seconds, urgent ticks for last 3
+- **Game flow**: game start, question reveal, time's up, game end
+- **Scoring**: score pop, streak, leaderboard entrance
+- **Finale**: podium sounds (gold/silver/bronze), confetti
+- **Lobby**: player join notification
+- Global mute/unmute toggle (persisted in localStorage)
+
 ### Reconnection
 - Players and hosts can reconnect after page refresh or network drop
 - JWT-based session recovery
@@ -148,9 +159,19 @@ All transitions are automatic with status guards - host can also advance manuall
 docker compose up -d --build
 ```
 
-Open `http://localhost` (app), `http://localhost:8025` (MailPit email UI), and `http://localhost:8080` (Adminer DB UI — server: `postgres`, user: `quizapp`, password: `quizapp-secret`).
+Open `http://localhost` (app) and `http://localhost:8025` (MailPit email UI).
 
 See [Development Guide](docs/DEVELOPMENT.md) for local setup, environment variables, and test credentials.
+
+### Non-root deployment (base path)
+
+To deploy the app under a sub-path (e.g. `/quizapp`):
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.basepath.yml up -d --build
+```
+
+Set `BASE_PATH` in `docker-compose.basepath.yml` (default: `/quizapp`). Both client and server adapt automatically via environment variables (`VITE_BASE_PATH` for client, `BASE_PATH` for server).
 
 ## Docs
 
@@ -160,7 +181,7 @@ See [Development Guide](docs/DEVELOPMENT.md) for local setup, environment variab
 ## TODO
 
 - [ ] Image upload for questions (currently URL only)
-- [ ] Sound effects and music
+- [x] Sound effects (Web Audio API synthesized)
 - [x] Number guess question type (numeric input with tolerance-based scoring)
 - [ ] Open-ended question type (free text)
 - [ ] Team mode

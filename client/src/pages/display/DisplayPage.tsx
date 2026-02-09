@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDisplaySocket } from '@/socket/useDisplaySocket';
+import { useSound } from '@/context/SoundContext';
 import DisplayAttachForm from '@/components/display/DisplayAttachForm';
 import DisplayLobbyScreen from '@/components/display/DisplayLobbyScreen';
 import FinalResultsDisplay from '@/components/display/FinalResultsDisplay';
 import GamePresentation from '@/components/game/host/GamePresentation';
+import SoundToggle from '@/components/ui/SoundToggle';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export default function DisplayPage() {
+  const { play } = useSound();
+  const prevStatusRef = useRef<string | null>(null);
+
   const {
     isConnected,
     gameState,
@@ -60,6 +65,18 @@ export default function DisplayPage() {
 
   const status = gameState.session.status;
 
+  // Phase transition sounds
+  useEffect(() => {
+    if (status === prevStatusRef.current) return;
+    const prev = prevStatusRef.current;
+    prevStatusRef.current = status;
+    if (!prev) return;
+    if (status === 'starting') play('gameStart');
+    else if (status === 'question') play('reveal');
+    else if (status === 'answers') play('timeUp');
+    else if (status === 'finished') play('gameEnd');
+  }, [status, play]);
+
   // Lobby phase
   if (status === 'lobby') {
     return (
@@ -92,6 +109,9 @@ export default function DisplayPage() {
 
   return (
     <div className="game-bg relative">
+      <div className="absolute top-4 right-4 z-50">
+        <SoundToggle />
+      </div>
       <GamePresentation
         gameState={gameState}
         handlers={noopHandlers}

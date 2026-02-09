@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { formatScore } from '@/lib/utils';
+import { useSound } from '@/context/SoundContext';
 import StreakIndicator from './StreakIndicator';
 import type { ScoreBreakdown } from '@shared/types/scoring';
 
@@ -58,9 +59,23 @@ export default function PlayerResultScreen({
   correctNumber,
   tolerance,
 }: PlayerResultScreenProps) {
+  const { play } = useSound();
+  const soundPlayedRef = useRef(false);
   const isCorrect = result.isCorrect;
   const isPartial = !isCorrect && result.correctRatio > 0 && result.correctRatio < 1;
   const hasPoints = result.totalPoints > 0;
+
+  useEffect(() => {
+    if (soundPlayedRef.current) return;
+    soundPlayedRef.current = true;
+    if (isCorrect) play('correct');
+    else if (isPartial) play('partial');
+    else play('incorrect');
+    if (hasPoints) {
+      const timer = setTimeout(() => play('score'), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [isCorrect, isPartial, hasPoints, play]);
 
   const bgColor = isCorrect ? 'bg-green-600' : isPartial ? 'bg-yellow-600' : 'bg-red-600';
   const iconBg = isCorrect ? 'bg-green-400' : isPartial ? 'bg-yellow-400' : 'bg-red-400';

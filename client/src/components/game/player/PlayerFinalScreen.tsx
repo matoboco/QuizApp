@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { formatScore } from '@/lib/utils';
+import { useSound } from '@/context/SoundContext';
 import Button from '@/components/common/Button';
 
 interface PlayerFinalScreenProps {
@@ -60,8 +62,16 @@ export default function PlayerFinalScreen({
   nickname,
 }: PlayerFinalScreenProps) {
   const navigate = useNavigate();
+  const { play } = useSound();
 
   const isTopThree = rank <= 3;
+
+  useEffect(() => {
+    if (rank === 1) play('podium1');
+    else if (rank === 2) play('podium2');
+    else if (rank === 3) play('podium3');
+    else play('gameEnd');
+  }, [rank, play]);
 
   return (
     <div

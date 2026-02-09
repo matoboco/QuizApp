@@ -1,14 +1,19 @@
+import { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useHostGame } from '@/hooks/useHostGame';
+import { useSound } from '@/context/SoundContext';
 import LobbyScreen from '@/components/game/host/LobbyScreen';
 import GamePresentation from '@/components/game/host/GamePresentation';
 import GameControls from '@/components/game/host/GameControls';
 import FinalResultsScreen from '@/components/game/host/FinalResultsScreen';
+import SoundToggle from '@/components/ui/SoundToggle';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 export default function HostGamePage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
+  const { play } = useSound();
+  const prevPhaseRef = useRef<string | null>(null);
 
   const {
     gameState,
@@ -25,6 +30,17 @@ export default function HostGamePage() {
     endGame,
     kickPlayer,
   } = useHostGame(sessionId!);
+
+  useEffect(() => {
+    if (!currentPhase || currentPhase === prevPhaseRef.current) return;
+    const prev = prevPhaseRef.current;
+    prevPhaseRef.current = currentPhase;
+    if (!prev) return;
+    if (currentPhase === 'starting') play('gameStart');
+    else if (currentPhase === 'question') play('reveal');
+    else if (currentPhase === 'answers') play('timeUp');
+    else if (currentPhase === 'finished') play('gameEnd');
+  }, [currentPhase, play]);
 
   const handleBackToDashboard = () => {
     navigate('/dashboard');
@@ -96,6 +112,9 @@ export default function HostGamePage() {
   // Active game phases (starting, question, answers, result, leaderboard)
   return (
     <div className="game-bg relative">
+      <div className="absolute top-4 right-4 z-50">
+        <SoundToggle />
+      </div>
       <GamePresentation
         gameState={gameState}
         handlers={{

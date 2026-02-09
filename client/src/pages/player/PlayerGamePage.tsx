@@ -1,10 +1,13 @@
+import { useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePlayerGame } from '@/hooks/usePlayerGame';
+import { useSound } from '@/context/SoundContext';
 import WaitingScreen from '@/components/game/player/WaitingScreen';
 import AnswerGrid from '@/components/game/player/AnswerGrid';
 import PlayerResultScreen from '@/components/game/player/PlayerResultScreen';
 import PlayerFinalScreen from '@/components/game/player/PlayerFinalScreen';
 import StreakIndicator from '@/components/game/player/StreakIndicator';
+import SoundToggle from '@/components/ui/SoundToggle';
 import { cn } from '@/lib/utils';
 
 function ReconnectingOverlay() {
@@ -216,6 +219,8 @@ function LeaderboardWaitScreen({ rank, score, streak }: { rank?: number; score: 
 export default function PlayerGamePage() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const navigate = useNavigate();
+  const { play } = useSound();
+  const prevStatusRef = useRef<string | null>(null);
 
   const {
     isConnected,
@@ -226,6 +231,25 @@ export default function PlayerGamePage() {
     isKicked,
     submitAnswer,
   } = usePlayerGame();
+
+  // Phase transition sounds
+  useEffect(() => {
+    if (!playerState) return;
+    const { status } = playerState;
+    if (status === prevStatusRef.current) return;
+    const prev = prevStatusRef.current;
+    prevStatusRef.current = status;
+    if (!prev) return;
+    if (status === 'starting') play('gameStart');
+    else if (status === 'question') play('reveal');
+    else if (status === 'answers') play('timeUp');
+    else if (status === 'finished') play('gameEnd');
+  }, [playerState?.status, play]);
+
+  // Kicked sound
+  useEffect(() => {
+    if (isKicked) play('kicked');
+  }, [isKicked, play]);
 
   // If kicked, show kicked screen
   if (isKicked) {
@@ -411,6 +435,9 @@ export default function PlayerGamePage() {
   return (
     <div className="relative">
       {showReconnecting && <ReconnectingOverlay />}
+      <div className="absolute top-4 right-4 z-50">
+        <SoundToggle />
+      </div>
       {renderContent()}
     </div>
   );

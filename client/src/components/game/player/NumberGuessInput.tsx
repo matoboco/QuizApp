@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSound } from '@/context/SoundContext';
 
 interface NumberGuessInputProps {
   onSubmit: (value: string) => void;
@@ -7,11 +8,13 @@ interface NumberGuessInputProps {
 }
 
 export default function NumberGuessInput({ onSubmit, disabled, submitted }: NumberGuessInputProps) {
+  const { play } = useSound();
   const [value, setValue] = useState('');
 
   const handleSubmit = () => {
     const trimmed = value.trim();
     if (trimmed === '' || isNaN(Number(trimmed))) return;
+    play('submit');
     onSubmit(trimmed);
   };
 

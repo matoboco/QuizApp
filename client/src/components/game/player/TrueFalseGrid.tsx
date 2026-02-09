@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { useSound } from '@/context/SoundContext';
 
 interface AnswerOption {
   id: string;
@@ -19,6 +20,7 @@ export default function TrueFalseGrid({
   selectedId,
   disabled,
 }: TrueFalseGridProps) {
+  const { play } = useSound();
   const sorted = [...answers].sort((a, b) => a.orderIndex - b.orderIndex);
 
   return (
@@ -31,7 +33,7 @@ export default function TrueFalseGrid({
         return (
           <button
             key={answer.id}
-            onClick={() => onSelect(answer.id)}
+            onClick={() => { play('click'); onSelect(answer.id); }}
             disabled={disabled || selectedId !== undefined}
             className={cn(
               'w-full min-h-[120px] rounded-xl p-6',

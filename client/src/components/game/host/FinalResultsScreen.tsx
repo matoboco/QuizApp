@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import type { LeaderboardEntry } from '@shared/types/game';
+import { useSound } from '@/context/SoundContext';
 import { formatScore } from '@/lib/utils';
 import Button from '@/components/common/Button';
 
@@ -25,10 +26,19 @@ function PodiumPlace({
 }) {
   const [show, setShow] = useState(false);
 
+  const { play } = useSound();
+
   useEffect(() => {
-    const timer = setTimeout(() => setShow(true), parseFloat(delay) * 1000);
+    const timer = setTimeout(() => {
+      setShow(true);
+      if (entry) {
+        if (rank === 1) play('podium1');
+        else if (rank === 2) play('podium2');
+        else if (rank === 3) play('podium3');
+      }
+    }, parseFloat(delay) * 1000);
     return () => clearTimeout(timer);
-  }, [delay]);
+  }, [delay, rank, entry, play]);
 
   const colors: Record<number, { gradient: string; bg: string; label: string }> = {
     1: { gradient: 'from-yellow-400 to-yellow-600', bg: 'bg-yellow-400', label: '1st' },
@@ -93,10 +103,15 @@ export default function FinalResultsScreen({
   const [showConfetti, setShowConfetti] = useState(false);
   const shareUrl = shareToken ? `${window.location.origin}/shared/${shareToken}` : null;
 
+  const { play } = useSound();
+
   useEffect(() => {
-    const timer = setTimeout(() => setShowConfetti(true), 500);
+    const timer = setTimeout(() => {
+      setShowConfetti(true);
+      play('confetti');
+    }, 500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [play]);
 
   const sorted = [...leaderboard].sort((a, b) => a.rank - b.rank);
   const first = sorted[0];

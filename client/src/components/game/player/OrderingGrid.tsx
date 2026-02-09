@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import { useSound } from '@/context/SoundContext';
 
 interface AnswerOption {
   id: string;
@@ -30,6 +31,7 @@ export default function OrderingGrid({
     return shuffled;
   });
 
+  const { play } = useSound();
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   const moveItem = useCallback((fromIndex: number, toIndex: number) => {
@@ -44,6 +46,7 @@ export default function OrderingGrid({
 
   const handleSubmit = () => {
     if (submitted || disabled) return;
+    play('submit');
     onSubmit(items.map((item) => item.id));
   };
 
