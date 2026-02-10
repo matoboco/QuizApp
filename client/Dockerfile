@@ -16,6 +16,7 @@ RUN npm ci
 # Copy source files and configs
 COPY client/tsconfig.json client/vite.config.ts client/postcss.config.js client/tailwind.config.js ./
 COPY client/index.html ./
+COPY client/public/ ./public/
 COPY client/src/ ./src/
 
 # Build the Vite app (produces dist/)
