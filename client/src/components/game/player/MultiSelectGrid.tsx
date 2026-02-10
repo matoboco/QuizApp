@@ -46,6 +46,30 @@ function ShapeIcon({ shape, className }: { shape: AnswerShape; className?: strin
           <rect x="4" y="4" width="32" height="32" rx="2" />
         </svg>
       );
+    case 'hexagon':
+      return (
+        <svg className={iconClass} viewBox="0 0 40 40" fill="currentColor">
+          <polygon points="20,2 37,11 37,29 20,38 3,29 3,11" />
+        </svg>
+      );
+    case 'star':
+      return (
+        <svg className={iconClass} viewBox="0 0 40 40" fill="currentColor">
+          <polygon points="20,2 25,15 39,15 28,23 32,37 20,29 8,37 12,23 1,15 15,15" />
+        </svg>
+      );
+    case 'pentagon':
+      return (
+        <svg className={iconClass} viewBox="0 0 40 40" fill="currentColor">
+          <polygon points="20,2 38,15 31,36 9,36 2,15" />
+        </svg>
+      );
+    case 'heart':
+      return (
+        <svg className={iconClass} viewBox="0 0 40 40" fill="currentColor">
+          <path d="M20,36 C14,30 2,22 2,13 A9,9,0,0,1,20,10 A9,9,0,0,1,38,13 C38,22 26,30 20,36Z" />
+        </svg>
+      );
     default:
       return null;
   }
