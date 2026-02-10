@@ -89,21 +89,21 @@ export default function PlayerFinalScreen({
 
       {/* Rank display */}
       <div className="animate-bounce-in">
-        <p className="text-sky-300 text-lg font-display uppercase tracking-wider mb-1">
+        <p className="text-primary-300 text-lg font-display uppercase tracking-wider mb-1">
           You finished
         </p>
         <div className="flex items-baseline justify-center gap-1">
           <span className="text-7xl md:text-8xl font-display font-bold text-white text-shadow-lg">
             #{rank}
           </span>
-          <span className="text-2xl md:text-3xl font-display font-bold text-sky-200">
+          <span className="text-2xl md:text-3xl font-display font-bold text-primary-200">
             {getOrdinalSuffix(rank)}
           </span>
         </div>
       </div>
 
       {/* Player name */}
-      <p className="text-xl text-sky-200 mt-3 font-display font-semibold">
+      <p className="text-xl text-primary-200 mt-3 font-display font-semibold">
         {nickname}
       </p>
 
@@ -114,7 +114,7 @@ export default function PlayerFinalScreen({
 
       {/* Total score */}
       <div className="bg-white/10 backdrop-blur-sm rounded-xl px-8 py-5 mt-8 animate-fade-in">
-        <p className="text-sky-300 text-sm uppercase tracking-wider mb-1">
+        <p className="text-primary-300 text-sm uppercase tracking-wider mb-1">
           Final Score
         </p>
         <p className="text-4xl md:text-5xl font-display font-bold text-white">

@@ -79,7 +79,7 @@ export default function Toast({ toast, onRemove }: ToastProps) {
   return (
     <div
       className={cn(
-        'flex items-start gap-3 w-80 max-w-sm rounded-lg border-l-4 bg-white p-4 shadow-lg',
+        'flex items-start gap-3 w-80 max-w-sm rounded-lg border-l-4 bg-cyber-card p-4 shadow-lg',
         borderColors[toast.type],
         isExiting ? 'animate-slide-out-right' : 'animate-slide-in-right'
       )}
@@ -87,11 +87,11 @@ export default function Toast({ toast, onRemove }: ToastProps) {
     >
       <ToastIcon type={toast.type} />
 
-      <p className="flex-1 text-sm text-gray-700 leading-snug">{toast.message}</p>
+      <p className="flex-1 text-sm text-gray-200 leading-snug">{toast.message}</p>
 
       <button
         onClick={() => onRemove(toast.id)}
-        className="flex-shrink-0 rounded p-0.5 text-gray-400 transition-colors hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300"
+        className="flex-shrink-0 rounded p-0.5 text-gray-400 transition-colors hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
         aria-label="Close notification"
       >
         <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

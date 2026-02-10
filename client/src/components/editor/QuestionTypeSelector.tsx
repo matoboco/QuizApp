@@ -42,7 +42,7 @@ const QUESTION_TYPE_OPTIONS: { type: QuestionType; label: string; icon: string; 
 export default function QuestionTypeSelector({ value, onChange }: QuestionTypeSelectorProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium text-gray-300 mb-2">
         Question Type
       </label>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
@@ -54,8 +54,8 @@ export default function QuestionTypeSelector({ value, onChange }: QuestionTypeSe
             className={cn(
               'flex flex-col items-center gap-1 p-3 rounded-lg border-2 transition-all text-center',
               value === option.type
-                ? 'border-primary-500 bg-primary-50 text-primary-700'
-                : 'border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                ? 'border-primary-400 bg-primary-500/10 text-primary-300'
+                : 'border-primary-500/15 bg-cyber-surface text-gray-400 hover:border-primary-500/30 hover:bg-cyber-elevated'
             )}
           >
             <svg

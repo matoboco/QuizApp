@@ -22,8 +22,8 @@ export default function QuestionList({
 }: QuestionListProps) {
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+      <div className="px-4 py-3 border-b border-primary-500/10 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
           Questions ({questions.length})
         </h3>
         <button
@@ -42,10 +42,10 @@ export default function QuestionList({
           <div
             key={question.id}
             className={cn(
-              'group relative border-b border-gray-100 cursor-pointer transition-colors',
+              'group relative border-b border-primary-500/10 cursor-pointer transition-colors',
               index === activeIndex
-                ? 'bg-primary-50 border-l-4 border-l-primary-500'
-                : 'hover:bg-gray-50 border-l-4 border-l-transparent'
+                ? 'bg-primary-500/10 border-l-4 border-l-primary-400'
+                : 'hover:bg-white/5 border-l-4 border-l-transparent'
             )}
             onClick={() => onSelect(index)}
           >
@@ -59,18 +59,18 @@ export default function QuestionList({
                         ? 'bg-red-500 text-white'
                         : index === activeIndex
                           ? 'bg-primary-500 text-white'
-                          : 'bg-gray-200 text-gray-600'
+                          : 'bg-cyber-elevated text-gray-400'
                     )}
                   >
                     {validationErrors?.[index] ? '!' : index + 1}
                   </span>
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
+                  <p className="text-sm font-medium text-gray-100 truncate">
                     {question.text || 'Untitled question'}
                   </p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 font-medium">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyber-elevated text-gray-400 font-medium">
                       {question.questionType === 'multiple-choice' ? 'MC'
                         : question.questionType === 'true-false' ? 'T/F'
                         : question.questionType === 'multi-select' ? 'Multi'
@@ -96,7 +96,7 @@ export default function QuestionList({
                     onMove(index, index - 1);
                   }}
                   disabled={index === 0}
-                  className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-1 text-gray-400 hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
                   title="Move up"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -110,7 +110,7 @@ export default function QuestionList({
                     onMove(index, index + 1);
                   }}
                   disabled={index === questions.length - 1}
-                  className="p-1 text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-1 text-gray-400 hover:text-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
                   title="Move down"
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

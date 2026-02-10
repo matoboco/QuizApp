@@ -87,22 +87,22 @@ export default function Modal({
     >
       <div
         className={cn(
-          'relative w-full max-w-lg rounded-xl bg-white shadow-2xl',
+          'relative w-full max-w-lg rounded-xl bg-cyber-card border border-primary-500/20 shadow-2xl',
           isAnimatingOut ? 'animate-modal-scale-out' : 'animate-modal-scale-in'
         )}
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between border-b border-primary-500/10 px-6 py-4">
             {title && (
-              <h2 id="modal-title" className="text-lg font-semibold text-gray-900 font-display">
+              <h2 id="modal-title" className="text-lg font-semibold text-gray-100 font-display">
                 {title}
               </h2>
             )}
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="ml-auto rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-300"
+                className="ml-auto rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-300"
                 aria-label="Close modal"
               >
                 <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -119,7 +119,7 @@ export default function Modal({
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-end gap-3 border-t border-primary-500/10 px-6 py-4">
             {footer}
           </div>
         )}

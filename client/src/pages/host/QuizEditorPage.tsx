@@ -69,7 +69,7 @@ export default function QuizEditorPage({ readOnly: propReadOnly }: { readOnly?: 
       <div className="flex items-center justify-center py-24">
         <div className="text-center">
           <LoadingSpinner size="lg" />
-          <p className="mt-4 text-gray-500">Loading quiz...</p>
+          <p className="mt-4 text-gray-400">Loading quiz...</p>
         </div>
       </div>
     );
@@ -80,13 +80,13 @@ export default function QuizEditorPage({ readOnly: propReadOnly }: { readOnly?: 
     return (
       <div className="flex items-center justify-center py-24">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-red-500/20 rounded-full flex items-center justify-center">
             <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <h2 className="text-xl font-display font-bold text-gray-800">Failed to load quiz</h2>
-          <p className="mt-2 text-gray-500">{editor.error}</p>
+          <h2 className="text-xl font-display font-bold text-gray-100">Failed to load quiz</h2>
+          <p className="mt-2 text-gray-400">{editor.error}</p>
           <Button
             variant="primary"
             className="mt-4"
@@ -116,25 +116,25 @@ export default function QuizEditorPage({ readOnly: propReadOnly }: { readOnly?: 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
       {/* Header bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
+      <div className="flex items-center justify-between px-4 py-3 bg-cyber-surface border-b border-primary-500/10">
         <div className="flex items-center gap-3">
           <button
             onClick={handleBack}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-400 hover:text-gray-200 hover:bg-white/10 rounded-lg transition-colors"
             title="Back to dashboard"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
           </button>
-          <div className="h-6 w-px bg-gray-300" />
+          <div className="h-6 w-px bg-primary-500/20" />
           {isReadOnly ? (
             <div className="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              <span className="text-sm text-amber-600 font-medium">Read-only view</span>
+              <span className="text-sm text-neon-yellow font-medium">Read-only view</span>
             </div>
           ) : (
             <AutoSaveIndicator
@@ -161,15 +161,15 @@ export default function QuizEditorPage({ readOnly: propReadOnly }: { readOnly?: 
 
       {/* Read-only info banner */}
       {isReadOnly && (
-        <div className="px-4 py-2 bg-amber-50 border-b border-amber-200">
-          <p className="text-sm text-amber-700">
+        <div className="px-4 py-2 bg-neon-yellow/10 border-b border-neon-yellow/20">
+          <p className="text-sm text-neon-yellow">
             This quiz is in read-only mode. Duplicate it to make your own editable copy.
           </p>
         </div>
       )}
 
       {/* Quiz settings */}
-      <div className="px-4 py-4 bg-white border-b border-gray-200">
+      <div className="px-4 py-4 bg-cyber-surface border-b border-primary-500/10">
         <QuizSettingsForm
           title={quiz.title}
           description={quiz.description}
@@ -184,7 +184,7 @@ export default function QuizEditorPage({ readOnly: propReadOnly }: { readOnly?: 
       {/* Main content: sidebar + editor */}
       <div className="flex flex-1 overflow-hidden">
         {/* Question list sidebar */}
-        <div className="w-72 flex-shrink-0 bg-white border-r border-gray-200 overflow-hidden">
+        <div className="w-72 flex-shrink-0 bg-cyber-surface border-r border-primary-500/10 overflow-hidden">
           <QuestionList
             questions={quiz.questions}
             activeIndex={activeQuestionIndex}
@@ -210,15 +210,15 @@ export default function QuizEditorPage({ readOnly: propReadOnly }: { readOnly?: 
         </div>
 
         {/* Question editor area */}
-        <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+        <div className="flex-1 overflow-y-auto bg-cyber-dark p-6">
           {activeQuestion ? (
             <div className="max-w-3xl mx-auto">
               <div className="mb-4">
-                <span className="text-sm font-medium text-gray-500">
+                <span className="text-sm font-medium text-gray-400">
                   Question {activeQuestionIndex + 1} of {quiz.questions.length}
                 </span>
               </div>
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <div className="bg-cyber-card rounded-xl shadow-sm border border-primary-500/15 p-6">
                 <QuestionEditor
                   question={activeQuestion}
                   errors={editor.validationErrors[activeQuestionIndex]}
@@ -237,12 +237,12 @@ export default function QuizEditorPage({ readOnly: propReadOnly }: { readOnly?: 
           ) : (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <div className="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                <div className="w-20 h-20 mx-auto mb-4 bg-cyber-surface rounded-full flex items-center justify-center">
                   <svg className="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-display font-bold text-gray-800">
+                <h3 className="text-lg font-display font-bold text-gray-100">
                   {isReadOnly ? 'No questions in this quiz' : 'Add your first question'}
                 </h3>
                 {!isReadOnly && (
@@ -289,7 +289,7 @@ export default function QuizEditorPage({ readOnly: propReadOnly }: { readOnly?: 
             </>
           }
         >
-          <p className="text-gray-600">
+          <p className="text-gray-400">
             You have unsaved changes. Are you sure you want to leave? Your changes will be lost.
           </p>
         </Modal>

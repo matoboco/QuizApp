@@ -89,7 +89,7 @@ export default function GameHistoryPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-cyber-dark flex items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -97,12 +97,12 @@ export default function GameHistoryPage() {
 
   if (error || !game) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
+      <div className="min-h-screen bg-cyber-dark p-8">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+          <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">
             {error || 'Game not found'}
           </div>
-          <Link to="/dashboard" className="mt-4 inline-block text-indigo-600 hover:text-indigo-700">
+          <Link to="/dashboard" className="mt-4 inline-block text-primary-400 hover:text-primary-300">
             Back to Dashboard
           </Link>
         </div>
@@ -115,19 +115,19 @@ export default function GameHistoryPage() {
   const duration = Math.round((endDate.getTime() - startDate.getTime()) / 1000 / 60);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cyber-dark">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div>
             <Link
               to={`/quiz/${game.quiz.id}/history`}
-              className="text-sm text-gray-500 hover:text-gray-700 mb-2 inline-block"
+              className="text-sm text-gray-400 hover:text-gray-200 mb-2 inline-block"
             >
               &larr; Back to Quiz History
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900">{game.quiz.title}</h1>
-            <p className="text-gray-500">
+            <h1 className="text-2xl font-bold text-gray-100">{game.quiz.title}</h1>
+            <p className="text-gray-400">
               {startDate.toLocaleDateString()} at{' '}
               {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} &middot;{' '}
               {game.players.length} players &middot; {duration} min &middot; PIN: {game.pin}
@@ -141,7 +141,7 @@ export default function GameHistoryPage() {
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200 mb-6">
+        <div className="border-b border-primary-500/10 mb-6">
           <nav className="flex gap-8">
             {[
               { id: 'players', label: 'Players' },
@@ -153,8 +153,8 @@ export default function GameHistoryPage() {
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
                 className={`pb-4 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === tab.id
-                    ? 'border-indigo-600 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-primary-400 text-primary-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-300'
                 }`}
               >
                 {tab.label}
@@ -171,8 +171,8 @@ export default function GameHistoryPage() {
         {activeTab === 'questions' && (
           <div className="grid md:grid-cols-3 gap-6">
             {/* Question list */}
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="font-medium text-gray-900 mb-4">Questions</h3>
+            <div className="bg-cyber-card border border-primary-500/15 rounded-lg shadow p-4">
+              <h3 className="font-medium text-gray-100 mb-4">Questions</h3>
               <div className="space-y-2">
                 {game.questions.map((q, idx) => (
                   <button
@@ -180,8 +180,8 @@ export default function GameHistoryPage() {
                     onClick={() => setSelectedQuestionIndex(idx)}
                     className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
                       selectedQuestionIndex === idx
-                        ? 'bg-indigo-100 text-indigo-700'
-                        : 'hover:bg-gray-100 text-gray-700'
+                        ? 'bg-primary-500/10 text-primary-300'
+                        : 'hover:bg-white/10 text-gray-300'
                     }`}
                   >
                     <span className="font-medium">Q{idx + 1}:</span>{' '}
@@ -196,7 +196,7 @@ export default function GameHistoryPage() {
               {selectedQuestionIndex !== null && questionStats ? (
                 <QuestionStatsPanel stats={questionStats} />
               ) : (
-                <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+                <div className="bg-cyber-card border border-primary-500/15 rounded-lg shadow p-8 text-center text-gray-400">
                   Select a question to see statistics
                 </div>
               )}
@@ -212,7 +212,7 @@ export default function GameHistoryPage() {
       {/* Share Modal */}
       {showShareModal && (
         <Modal isOpen={true} onClose={() => setShowShareModal(false)} title="Share Game Results">
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-400 mb-4">
             Anyone with this link can view the results of this game:
           </p>
           <div className="flex gap-2 mb-6">
@@ -220,7 +220,7 @@ export default function GameHistoryPage() {
               type="text"
               readOnly
               value={shareUrl || ''}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm"
+              className="flex-1 px-3 py-2 border border-primary-500/20 rounded-lg bg-cyber-surface text-gray-100 text-sm"
             />
             <Button onClick={copyShareUrl}>Copy</Button>
           </div>

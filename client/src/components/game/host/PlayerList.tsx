@@ -36,7 +36,7 @@ export default function PlayerList({ players, onKick, showKick }: PlayerListProp
           <span
             className={cn(
               'flex-shrink-0 w-2.5 h-2.5 rounded-full',
-              player.isConnected ? 'bg-green-400 shadow-[0_0_6px_rgba(74,222,128,0.6)]' : 'bg-gray-400'
+              player.isConnected ? 'bg-neon-green shadow-[0_0_8px_rgba(57,255,20,0.6)]' : 'bg-gray-500'
             )}
           />
 

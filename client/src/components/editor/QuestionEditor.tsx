@@ -45,7 +45,7 @@ export default function QuestionEditor({
 
       {/* Question text */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-300 mb-1">
           Question
         </label>
         <textarea
@@ -53,13 +53,13 @@ export default function QuestionEditor({
           onChange={(e) => onChange({ text: e.target.value })}
           placeholder={isOrdering ? 'e.g. "Put these events in chronological order"' : 'Type your question here...'}
           rows={3}
-          className="w-full text-lg border rounded-lg border-gray-300 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 bg-white px-4 py-3 outline-none resize-none placeholder-gray-400"
+          className="w-full text-lg border rounded-lg border-primary-500/20 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 bg-cyber-surface text-gray-100 px-4 py-3 outline-none resize-none placeholder-gray-500"
         />
       </div>
 
       {/* Description/hint (optional) */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-300 mb-1">
           Description / Hint (optional)
         </label>
         <input
@@ -69,14 +69,14 @@ export default function QuestionEditor({
           placeholder="e.g. Select all correct answers, Double points!"
           className="input"
         />
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-gray-400">
           Shown to players below the question text
         </p>
       </div>
 
       {/* Image URL (optional) */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium text-gray-300 mb-1">
           Image URL (optional)
         </label>
         <input
@@ -87,7 +87,7 @@ export default function QuestionEditor({
           className="input"
         />
         {question.imageUrl && (
-          <div className="mt-2 relative rounded-lg overflow-hidden bg-gray-100 max-h-48 flex items-center justify-center">
+          <div className="mt-2 relative rounded-lg overflow-hidden bg-cyber-surface max-h-48 flex items-center justify-center">
             <img
               src={question.imageUrl}
               alt="Question image"
@@ -108,7 +108,7 @@ export default function QuestionEditor({
         />
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-300 mb-1">
             Points
           </label>
           <input
@@ -127,7 +127,7 @@ export default function QuestionEditor({
       {isNumberGuess && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               Correct Number
             </label>
             <input
@@ -139,7 +139,7 @@ export default function QuestionEditor({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               Tolerance (±)
             </label>
             <input
@@ -150,7 +150,7 @@ export default function QuestionEditor({
               placeholder={`e.g. ${DEFAULT_TOLERANCE}`}
               className="input"
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-gray-400">
               Answers within ±{question.tolerance ?? DEFAULT_TOLERANCE} of the correct number get partial points
             </p>
           </div>
@@ -159,19 +159,19 @@ export default function QuestionEditor({
 
       {/* Multi-select: requireAll toggle */}
       {isMultiSelect && (
-        <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+        <div className="flex items-center gap-3 p-3 bg-primary-500/10 rounded-lg border border-primary-500/20">
           <label className="flex items-center gap-2 cursor-pointer">
             <input
               type="checkbox"
               checked={question.requireAll}
               onChange={(e) => onChange({ requireAll: e.target.checked })}
-              className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+              className="w-4 h-4 text-primary-600 border-gray-600 rounded focus:ring-primary-500 bg-cyber-surface"
             />
-            <span className="text-sm font-medium text-blue-800">
+            <span className="text-sm font-medium text-primary-300">
               Require all correct answers
             </span>
           </label>
-          <span className="text-xs text-blue-600">
+          <span className="text-xs text-primary-400">
             {question.requireAll
               ? 'All-or-nothing: player must select every correct answer'
               : 'Partial credit: points based on how many correct answers selected'}
@@ -181,11 +181,11 @@ export default function QuestionEditor({
 
       {/* Validation errors */}
       {errors && errors.length > 0 && (
-        <div className="flex gap-3 p-3 bg-red-50 rounded-lg border border-red-200">
+        <div className="flex gap-3 p-3 bg-red-500/10 rounded-lg border border-red-500/30">
           <svg className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
           </svg>
-          <ul className="text-sm text-red-700 space-y-0.5">
+          <ul className="text-sm text-red-400 space-y-0.5">
             {errors.map((err, i) => (
               <li key={i}>{err}</li>
             ))}
@@ -196,7 +196,7 @@ export default function QuestionEditor({
       {/* Answers (hidden for number-guess) */}
       {!isNumberGuess && <div>
         <div className="flex items-center justify-between mb-3">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-300">
             {isOrdering ? 'Items (correct order, top to bottom)' : 'Answers'}
           </label>
           {canAddAnswer && (

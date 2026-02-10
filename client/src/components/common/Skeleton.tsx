@@ -23,7 +23,7 @@ export default function Skeleton({
   return (
     <div
       className={cn(
-        'animate-skeleton-pulse bg-gray-200',
+        'animate-skeleton-pulse bg-cyber-surface',
         variantClasses[variant],
         className
       )}

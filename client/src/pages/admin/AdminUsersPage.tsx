@@ -49,7 +49,7 @@ function UserActionsDropdown({
       <button
         ref={btnRef}
         onClick={handleToggle}
-        className="p-1 text-gray-500 hover:text-gray-700 rounded"
+        className="p-1 text-gray-400 hover:text-gray-200 rounded"
       >
         <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
           <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -60,7 +60,7 @@ function UserActionsDropdown({
         <>
           <div className="fixed inset-0 z-30" onClick={() => setIsOpen(false)} />
           <div
-            className="fixed z-40 bg-white rounded-md shadow-lg border border-gray-200 py-1"
+            className="fixed z-40 bg-cyber-elevated rounded-md shadow-lg border border-primary-500/20 py-1"
             style={{ top: menuPos.top, right: `calc(100vw - ${menuPos.left}px)` }}
           >
             {canToggleActive && (
@@ -69,7 +69,7 @@ function UserActionsDropdown({
                   setIsOpen(false);
                   onAction(user.isActive ? 'deactivate' : 'activate', user);
                 }}
-                className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 whitespace-nowrap"
+                className="block w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-white/10 whitespace-nowrap"
               >
                 {user.isActive ? 'Deactivate' : 'Activate'}
               </button>
@@ -98,20 +98,20 @@ function UserActionsDropdown({
                   setIsOpen(false);
                   onAction('change-role', user);
                 }}
-                className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 whitespace-nowrap"
+                className="block w-full px-4 py-2 text-left text-sm text-gray-300 hover:bg-white/10 whitespace-nowrap"
               >
                 Change Role
               </button>
             )}
             {canDelete && (
               <>
-                <div className="border-t border-gray-100 my-1" />
+                <div className="border-t border-primary-500/10 my-1" />
                 <button
                   onClick={() => {
                     setIsOpen(false);
                     onAction('delete', user);
                   }}
-                  className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 whitespace-nowrap"
+                  className="block w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-500/10 whitespace-nowrap"
                 >
                   Delete User
                 </button>
@@ -126,9 +126,9 @@ function UserActionsDropdown({
 
 function RoleBadge({ role }: { role: string }) {
   const styles = {
-    superadmin: 'bg-cyan-100 text-cyan-700',
-    admin: 'bg-blue-100 text-blue-700',
-    user: 'bg-gray-100 text-gray-700',
+    superadmin: 'bg-primary-500/20 text-primary-300',
+    admin: 'bg-neon-purple/20 text-neon-purple-light',
+    user: 'bg-gray-500/20 text-gray-400',
   };
 
   return (
@@ -148,7 +148,7 @@ function StatusBadge({ isActive }: { isActive: boolean }) {
     <span
       className={cn(
         'px-2 py-0.5 text-xs font-medium rounded',
-        isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+        isActive ? 'bg-neon-green/20 text-neon-green' : 'bg-red-500/20 text-red-400'
       )}
     >
       {isActive ? 'Active' : 'Inactive'}
@@ -303,7 +303,7 @@ export default function AdminUsersPage() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+        <h1 className="text-2xl font-bold text-gray-100">Users</h1>
         <form onSubmit={handleSearch} className="flex gap-2">
           <Input
             type="text"
@@ -324,40 +324,40 @@ export default function AdminUsersPage() {
         </div>
       ) : (
         <>
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+          <div className="bg-cyber-card border border-primary-500/15 rounded-lg shadow overflow-hidden">
+            <table className="min-w-full divide-y divide-primary-500/10">
+              <thead className="bg-cyber-surface">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Role
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Quizzes
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Games
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Created
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-cyber-card divide-y divide-primary-500/10">
                 {data?.users.map((user) => (
-                  <tr key={user.id} className={!user.isActive ? 'bg-gray-50' : ''}>
+                  <tr key={user.id} className={!user.isActive ? 'opacity-60' : ''}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{user.username}</div>
-                        <div className="text-sm text-gray-500">{user.email}</div>
+                        <div className="text-sm font-medium text-gray-100">{user.username}</div>
+                        <div className="text-sm text-gray-400">{user.email}</div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -366,13 +366,13 @@ export default function AdminUsersPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <StatusBadge isActive={user.isActive} />
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                       {user.quizCount}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                       {user.gameCount}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                       {new Date(user.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
@@ -399,7 +399,7 @@ export default function AdminUsersPage() {
               >
                 Previous
               </Button>
-              <span className="flex items-center px-4 text-sm text-gray-600">
+              <span className="flex items-center px-4 text-sm text-gray-400">
                 Page {page} of {totalPages}
               </span>
               <Button
@@ -421,7 +421,7 @@ export default function AdminUsersPage() {
           onClose={() => setConfirmModal(null)}
           title={confirmModal.title}
         >
-          <p className="text-gray-600 mb-6">{confirmModal.message}</p>
+          <p className="text-gray-400 mb-6">{confirmModal.message}</p>
           <div className="flex justify-end gap-3">
             <Button variant="secondary" onClick={() => setConfirmModal(null)}>
               Cancel
@@ -447,7 +447,7 @@ export default function AdminUsersPage() {
           title="Change Email"
         >
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-1">
               New Email for {emailModal.user.username}
             </label>
             <Input
@@ -473,7 +473,7 @@ export default function AdminUsersPage() {
           title="Change Role"
         >
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               New Role for {roleModal.user.username}
             </label>
             <div className="flex gap-4">
@@ -482,7 +482,7 @@ export default function AdminUsersPage() {
                   type="radio"
                   checked={newRole === 'user'}
                   onChange={() => setNewRole('user')}
-                  className="text-indigo-600"
+                  className="text-primary-500"
                 />
                 <span>User</span>
               </label>
@@ -491,7 +491,7 @@ export default function AdminUsersPage() {
                   type="radio"
                   checked={newRole === 'admin'}
                   onChange={() => setNewRole('admin')}
-                  className="text-indigo-600"
+                  className="text-primary-500"
                 />
                 <span>Admin</span>
               </label>

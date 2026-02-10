@@ -26,10 +26,10 @@ export default function WaitingScreen({
   return (
     <div className="min-h-screen bg-game-bg flex flex-col items-center justify-center px-6 text-center">
       {/* Checkmark / joined indicator */}
-      <div className="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center mb-6 animate-bounce-in">
+      <div className="w-20 h-20 rounded-full bg-neon-green flex items-center justify-center mb-6 animate-bounce-in shadow-neon-green">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-10 w-10 text-white"
+          className="h-10 w-10 text-cyber-dark"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -48,7 +48,7 @@ export default function WaitingScreen({
       </h1>
 
       <div className="bg-white/10 backdrop-blur-sm rounded-xl px-8 py-4 mt-4 mb-6">
-        <p className="text-sky-200 text-sm uppercase tracking-wider mb-1">
+        <p className="text-primary-300 text-sm uppercase tracking-wider mb-1">
           Playing as
         </p>
         <p className="text-2xl md:text-3xl font-display font-bold text-white">
@@ -58,27 +58,27 @@ export default function WaitingScreen({
 
       {/* Pulsing dots waiting indicator */}
       <div className="flex items-center space-x-2 mb-6">
-        <p className="text-lg text-sky-200">
+        <p className="text-lg text-primary-300">
           Waiting for the host to start
         </p>
         <span className="flex space-x-1">
           <span
             className={cn(
-              'inline-block w-2 h-2 bg-sky-300 rounded-full',
+              'inline-block w-2 h-2 bg-primary-400 rounded-full',
               'animate-bounce'
             )}
             style={{ animationDelay: '0ms' }}
           />
           <span
             className={cn(
-              'inline-block w-2 h-2 bg-sky-300 rounded-full',
+              'inline-block w-2 h-2 bg-primary-400 rounded-full',
               'animate-bounce'
             )}
             style={{ animationDelay: '150ms' }}
           />
           <span
             className={cn(
-              'inline-block w-2 h-2 bg-sky-300 rounded-full',
+              'inline-block w-2 h-2 bg-primary-400 rounded-full',
               'animate-bounce'
             )}
             style={{ animationDelay: '300ms' }}
@@ -86,11 +86,11 @@ export default function WaitingScreen({
         </span>
       </div>
 
-      <p className="text-sky-300 text-sm italic">{encouragingMessage}</p>
+      <p className="text-primary-300 text-sm italic">{encouragingMessage}</p>
 
       {playerCount !== undefined && playerCount > 0 && (
         <div className="mt-8 bg-white/5 rounded-lg px-6 py-3">
-          <p className="text-sky-200 text-sm">
+          <p className="text-primary-300 text-sm">
             <span className="font-bold text-white text-lg">{playerCount}</span>{' '}
             {playerCount === 1 ? 'player' : 'players'} in the lobby
           </p>

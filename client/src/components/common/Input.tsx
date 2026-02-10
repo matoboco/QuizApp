@@ -14,7 +14,7 @@ export default function Input({ label, error, className, id, ...rest }: InputPro
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-gray-300 mb-1"
         >
           {label}
         </label>
@@ -29,7 +29,7 @@ export default function Input({ label, error, className, id, ...rest }: InputPro
         {...rest}
       />
       {error && (
-        <p className="mt-1 text-sm text-red-600">{error}</p>
+        <p className="mt-1 text-sm text-red-400">{error}</p>
       )}
     </div>
   );

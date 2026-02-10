@@ -9,8 +9,8 @@ export default function TimeLimitSlider({ value, onChange }: TimeLimitSliderProp
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-gray-700">Time Limit</label>
-        <span className="text-sm font-semibold text-primary-600">
+        <label className="text-sm font-medium text-gray-300">Time Limit</label>
+        <span className="text-sm font-semibold text-primary-400">
           {value} seconds
         </span>
       </div>
@@ -23,7 +23,7 @@ export default function TimeLimitSlider({ value, onChange }: TimeLimitSliderProp
           step={5}
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
-          className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-600"
+          className="flex-1 h-2 bg-cyber-elevated rounded-lg appearance-none cursor-pointer accent-primary-400"
         />
         <span className="text-xs text-gray-400">{MAX_TIME_LIMIT}s</span>
       </div>

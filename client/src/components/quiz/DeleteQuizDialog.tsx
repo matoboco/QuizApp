@@ -35,14 +35,14 @@ export default function DeleteQuizDialog({
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
-        <h3 className="text-lg font-display font-bold text-gray-900">
+      <div className="relative bg-cyber-card border border-primary-500/20 rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+        <h3 className="text-lg font-display font-bold text-gray-100">
           Delete Quiz
         </h3>
 
-        <p className="mt-3 text-gray-600">
+        <p className="mt-3 text-gray-400">
           Are you sure you want to delete{' '}
-          <span className="font-semibold text-gray-900">"{quizTitle}"</span>?
+          <span className="font-semibold text-gray-100">"{quizTitle}"</span>?
           This action cannot be undone.
         </p>
 

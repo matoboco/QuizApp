@@ -13,33 +13,33 @@ export default function QuestionStatsPanel({ stats }: QuestionStatsPanelProps) {
   const maxCount = Math.max(...stats.answerDistribution.map((a) => a.count), 1);
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="font-medium text-gray-900 mb-2">
+    <div className="bg-cyber-card border border-primary-500/15 rounded-lg shadow p-6">
+      <h3 className="font-medium text-gray-100 mb-2">
         Q{stats.questionIndex + 1}: {stats.questionText}
       </h3>
 
       {/* Stats summary */}
       <div className="grid grid-cols-3 gap-4 mb-6 mt-4">
-        <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <p className="text-2xl font-bold text-gray-900">{accuracy}%</p>
-          <p className="text-sm text-gray-500">Accuracy</p>
+        <div className="text-center p-3 bg-cyber-surface rounded-lg">
+          <p className="text-2xl font-bold text-gray-100">{accuracy}%</p>
+          <p className="text-sm text-gray-400">Accuracy</p>
         </div>
-        <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <p className="text-2xl font-bold text-gray-900">
+        <div className="text-center p-3 bg-cyber-surface rounded-lg">
+          <p className="text-2xl font-bold text-gray-100">
             {stats.correctCount}/{stats.totalAnswers}
           </p>
-          <p className="text-sm text-gray-500">Correct</p>
+          <p className="text-sm text-gray-400">Correct</p>
         </div>
-        <div className="text-center p-3 bg-gray-50 rounded-lg">
-          <p className="text-2xl font-bold text-gray-900">
+        <div className="text-center p-3 bg-cyber-surface rounded-lg">
+          <p className="text-2xl font-bold text-gray-100">
             {(stats.averageTime / 1000).toFixed(1)}s
           </p>
-          <p className="text-sm text-gray-500">Avg. Time</p>
+          <p className="text-sm text-gray-400">Avg. Time</p>
         </div>
       </div>
 
       {/* Answer distribution */}
-      <h4 className="font-medium text-gray-700 mb-3">Answer Distribution</h4>
+      <h4 className="font-medium text-gray-300 mb-3">Answer Distribution</h4>
       <div className="space-y-3">
         {stats.answerDistribution.map((answer, index) => {
           const percentage = stats.totalAnswers > 0
@@ -50,17 +50,17 @@ export default function QuestionStatsPanel({ stats }: QuestionStatsPanelProps) {
           return (
             <div key={answer.answerId}>
               <div className="flex items-center justify-between mb-1">
-                <span className={`text-sm ${answer.isCorrect ? 'font-medium text-green-700' : 'text-gray-700'}`}>
+                <span className={`text-sm ${answer.isCorrect ? 'font-medium text-neon-green' : 'text-gray-300'}`}>
                   {answer.text}
                   {answer.isCorrect && (
-                    <span className="ml-2 text-green-600">✓</span>
+                    <span className="ml-2 text-neon-green">✓</span>
                   )}
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-400">
                   {answer.count} ({percentage}%)
                 </span>
               </div>
-              <div className="h-6 bg-gray-100 rounded overflow-hidden">
+              <div className="h-6 bg-cyber-surface rounded overflow-hidden">
                 <div
                   className={`h-full rounded transition-all ${
                     answer.isCorrect ? 'bg-green-500' : ''

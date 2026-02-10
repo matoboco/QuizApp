@@ -61,7 +61,7 @@ export default function LobbyScreen({
                   value={joinUrl}
                   size={160}
                   bgColor="#ffffff"
-                  fgColor="#0f172a"
+                  fgColor="#0a0a1a"
                   level="M"
                   includeMargin={false}
                 />
@@ -126,7 +126,7 @@ export default function LobbyScreen({
             size="lg"
             disabled={connectedCount < 1}
             onClick={onStart}
-            className="px-12 py-4 text-xl font-display font-bold bg-green-500 hover:bg-green-600 focus:ring-green-400 shadow-lg shadow-green-500/30 disabled:bg-gray-500 disabled:shadow-none transition-all duration-200"
+            className="px-12 py-4 text-xl font-display font-bold bg-neon-green hover:bg-neon-green-light text-cyber-dark focus:ring-neon-green shadow-neon-green disabled:bg-gray-600 disabled:text-gray-400 disabled:shadow-none transition-all duration-200"
           >
             {connectedCount < 1 ? 'Waiting for players...' : `Start Game (${connectedCount} player${connectedCount !== 1 ? 's' : ''})`}
           </Button>

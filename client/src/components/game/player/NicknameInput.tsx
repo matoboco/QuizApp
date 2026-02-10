@@ -66,12 +66,12 @@ export default function NicknameInput({
         maxLength={MAX_NICKNAME_LENGTH}
         className={cn(
           'w-full text-center text-2xl md:text-3xl font-display font-bold',
-          'py-4 px-6 rounded-xl border-2 bg-white',
+          'py-4 px-6 rounded-xl border-2 bg-cyber-surface text-gray-100',
           'focus:outline-none focus:ring-4 focus:ring-primary-400 focus:border-primary-500',
-          'transition-all duration-200 placeholder:text-gray-300',
+          'transition-all duration-200 placeholder:text-gray-500',
           error
-            ? 'border-red-500 ring-2 ring-red-300'
-            : 'border-gray-200',
+            ? 'border-red-500 ring-2 ring-red-500/30'
+            : 'border-primary-500/30',
           isLoading && 'opacity-60 cursor-not-allowed'
         )}
       />
@@ -93,7 +93,7 @@ export default function NicknameInput({
         Join!
       </Button>
 
-      <p className="mt-3 text-center text-sky-200 text-xs">
+      <p className="mt-3 text-center text-primary-300 text-xs">
         {nickname.length}/{MAX_NICKNAME_LENGTH} characters
       </p>
     </form>

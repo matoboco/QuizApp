@@ -29,7 +29,7 @@ export default function GameControls({
           variant="primary"
           size="lg"
           onClick={onShowAnswers}
-          className="bg-amber-500 hover:bg-amber-600 focus:ring-amber-400 font-display font-bold shadow-lg"
+          className="bg-neon-yellow hover:bg-neon-yellow/80 text-cyber-dark focus:ring-neon-yellow font-display font-bold shadow-neon-yellow"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
@@ -45,7 +45,7 @@ export default function GameControls({
           variant="primary"
           size="lg"
           onClick={onShowResult}
-          className="bg-blue-500 hover:bg-blue-600 focus:ring-blue-400 font-display font-bold shadow-lg"
+          className="bg-primary-400 hover:bg-primary-300 text-cyber-dark focus:ring-primary-400 font-display font-bold shadow-neon-cyan"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
@@ -61,7 +61,7 @@ export default function GameControls({
           variant="primary"
           size="lg"
           onClick={onShowLeaderboard}
-          className="bg-primary-600 hover:bg-primary-700 focus:ring-primary-400 font-display font-bold shadow-lg"
+          className="bg-neon-purple hover:bg-neon-purple-light text-white focus:ring-neon-purple font-display font-bold shadow-neon-purple"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z" />
@@ -77,7 +77,7 @@ export default function GameControls({
           variant="primary"
           size="lg"
           onClick={onEndGame}
-          className="bg-red-500 hover:bg-red-600 focus:ring-red-400 font-display font-bold shadow-lg"
+          className="bg-neon-pink hover:bg-neon-pink-light text-white focus:ring-neon-pink font-display font-bold shadow-neon-pink"
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clipRule="evenodd" />
@@ -89,7 +89,7 @@ export default function GameControls({
           variant="primary"
           size="lg"
           onClick={onNextQuestion}
-          className="bg-green-500 hover:bg-green-600 focus:ring-green-400 font-display font-bold shadow-lg"
+          className="bg-neon-green hover:bg-neon-green-light text-cyber-dark focus:ring-neon-green font-display font-bold shadow-neon-green"
         >
           Next Question
           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 ml-2" viewBox="0 0 20 20" fill="currentColor">

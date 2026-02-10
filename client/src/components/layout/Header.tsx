@@ -11,16 +11,16 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm">
+    <header className="bg-cyber-surface border-b border-primary-500/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/dashboard" className="flex items-center gap-2">
             <img src={`${import.meta.env.BASE_URL}logo.svg`} alt={APP_NAME} className="h-8 w-8" />
             <div className="flex flex-col">
-              <span className="text-xl font-display font-bold text-primary-600 leading-tight">
+              <span className="text-xl font-display font-bold text-primary-400 leading-tight">
                 {APP_NAME}
               </span>
-              <span className="text-[10px] text-gray-400 leading-tight hidden sm:block">
+              <span className="text-[10px] text-gray-500 leading-tight hidden sm:block">
                 {APP_TAGLINE}
               </span>
             </div>
@@ -29,12 +29,12 @@ export default function Header() {
             {user && ['admin', 'superadmin'].includes(user.role) && (
               <Link
                 to="/admin"
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                className="text-sm font-medium text-neon-purple hover:text-neon-purple-light"
               >
                 Admin
               </Link>
             )}
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-400">
               {user?.username}
             </span>
             <Button variant="ghost" size="sm" onClick={logout}>

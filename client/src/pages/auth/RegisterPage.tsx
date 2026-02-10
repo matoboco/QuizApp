@@ -80,21 +80,21 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-cyber-dark px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <img src={`${import.meta.env.BASE_URL}logo.svg`} alt={APP_NAME} className="h-16 w-16 mx-auto mb-3" />
-          <h1 className="text-3xl font-display font-bold text-primary-600">
+          <h1 className="text-3xl font-display font-bold text-primary-400 text-shadow-neon-cyan">
             {APP_NAME}
           </h1>
-          <p className="text-xs text-gray-400 mt-1">{APP_TAGLINE}</p>
-          <p className="mt-2 text-gray-600">Create your account</p>
+          <p className="text-xs text-gray-500 mt-1">{APP_TAGLINE}</p>
+          <p className="mt-2 text-gray-400">Create your account</p>
         </div>
 
         <div className="card">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
@@ -172,11 +172,11 @@ export default function RegisterPage() {
             </Button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-gray-400">
             Already have an account?{' '}
             <Link
               to="/login"
-              className="font-semibold text-primary-600 hover:text-primary-500"
+              className="font-semibold text-primary-400 hover:text-primary-300"
             >
               Sign in
             </Link>

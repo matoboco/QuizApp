@@ -4,7 +4,7 @@
 
 @layer base {
   body {
-    @apply font-body bg-gray-50 text-gray-900 antialiased;
+    @apply font-body bg-cyber-dark text-gray-100 antialiased;
     margin: 0;
     min-height: 100vh;
   }
@@ -17,17 +17,17 @@
 @layer components {
   .btn {
     @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold
-           transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2
+           transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-cyber-dark
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500
-           active:bg-primary-800;
+    @apply btn bg-primary-500 text-cyber-dark hover:bg-primary-400 focus:ring-primary-500
+           active:bg-primary-600 shadow-neon-cyan;
   }
 
   .btn-secondary {
-    @apply btn bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400;
+    @apply btn bg-cyber-elevated text-gray-200 hover:bg-white/10 focus:ring-primary-500;
   }
 
   .btn-danger {
@@ -43,17 +43,17 @@
   }
 
   .input {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg
+    @apply w-full px-4 py-2 bg-cyber-surface border border-primary-500/20 rounded-lg text-gray-100
            focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-           transition-all duration-200 placeholder:text-gray-400;
+           transition-all duration-200 placeholder:text-gray-500;
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-md p-6;
+    @apply bg-cyber-card rounded-xl shadow-md p-6 border border-primary-500/15;
   }
 
   .game-bg {
-    @apply bg-game-bg min-h-screen;
+    @apply bg-cyber-dark min-h-screen;
   }
 }
 
@@ -64,5 +64,17 @@
 
   .text-shadow-lg {
     text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.4);
+  }
+
+  .text-shadow-neon-cyan {
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.6), 0 0 20px rgba(0, 240, 255, 0.3);
+  }
+
+  .text-shadow-neon-pink {
+    text-shadow: 0 0 10px rgba(255, 45, 138, 0.6), 0 0 20px rgba(255, 45, 138, 0.3);
+  }
+
+  .text-shadow-neon-green {
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.6), 0 0 20px rgba(57, 255, 20, 0.3);
   }
 }

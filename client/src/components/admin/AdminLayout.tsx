@@ -12,16 +12,16 @@ export default function AdminLayout() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-cyber-dark">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-cyber-surface border-b border-neon-purple/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-8">
-              <NavLink to="/dashboard" className="text-xl font-bold text-indigo-600">
+              <NavLink to="/dashboard" className="text-xl font-bold text-neon-purple">
                 {APP_NAME}
               </NavLink>
-              <span className="px-2 py-1 text-xs font-medium bg-indigo-100 text-indigo-700 rounded">
+              <span className="px-2 py-1 text-xs font-medium bg-neon-purple/20 text-neon-purple-light rounded">
                 Admin Panel
               </span>
             </div>
@@ -35,7 +35,7 @@ export default function AdminLayout() {
                   className={({ isActive }) =>
                     cn(
                       'text-sm font-medium transition-colors',
-                      isActive ? 'text-indigo-600' : 'text-gray-600 hover:text-gray-900'
+                      isActive ? 'text-neon-purple' : 'text-gray-400 hover:text-gray-100'
                     )
                   }
                 >
@@ -47,15 +47,15 @@ export default function AdminLayout() {
             <div className="flex items-center gap-4">
               <NavLink
                 to="/dashboard"
-                className="text-sm text-gray-600 hover:text-gray-900"
+                className="text-sm text-gray-400 hover:text-gray-100"
               >
                 Back to App
               </NavLink>
-              <div className="h-4 w-px bg-gray-300" />
-              <span className="text-sm text-gray-600">{user?.username}</span>
+              <div className="h-4 w-px bg-primary-500/20" />
+              <span className="text-sm text-gray-400">{user?.username}</span>
               <button
                 onClick={logout}
-                className="text-sm text-red-600 hover:text-red-700"
+                className="text-sm text-red-400 hover:text-red-300"
               >
                 Logout
               </button>

@@ -28,7 +28,7 @@ function QuizCardMenu({
     <div className="relative ml-auto">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+        className="p-1.5 text-gray-400 hover:text-gray-200 hover:bg-white/10 rounded-md transition-colors"
       >
         <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
           <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -38,11 +38,11 @@ function QuizCardMenu({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 bottom-full z-20 mb-1 w-40 bg-white rounded-md shadow-lg border border-gray-200 py-1">
+          <div className="absolute right-0 bottom-full z-20 mb-1 w-40 bg-cyber-elevated rounded-md shadow-lg border border-primary-500/20 py-1">
             {onExport && (
               <button
                 onClick={() => { setIsOpen(false); onExport(); }}
-                className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-white/10 flex items-center gap-2"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -53,7 +53,7 @@ function QuizCardMenu({
             {onDuplicate && (
               <button
                 onClick={() => { setIsOpen(false); onDuplicate(); }}
-                className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                className="w-full px-3 py-2 text-left text-sm text-gray-300 hover:bg-white/10 flex items-center gap-2"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -63,10 +63,10 @@ function QuizCardMenu({
             )}
             {onDelete && (
               <>
-                <div className="border-t border-gray-100 my-1" />
+                <div className="border-t border-primary-500/10 my-1" />
                 <button
                   onClick={() => { setIsOpen(false); onDelete(); }}
-                  className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                  className="w-full px-3 py-2 text-left text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -93,17 +93,17 @@ export default function QuizCard({ quiz, mode = 'own', onDelete, onPlay, onExpor
       : quiz.description;
 
   return (
-    <div className="group relative flex flex-col rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md hover:border-primary-200">
+    <div className="group relative flex flex-col rounded-xl border border-primary-500/15 bg-cyber-card shadow-sm transition-all duration-200 hover:shadow-neon-cyan hover:border-primary-400/30">
       {/* Card body */}
       <div className="flex flex-1 flex-col p-5">
         {/* Header row: title + badge */}
         <div className="flex items-start justify-between gap-2">
-          <h3 className="text-lg font-display font-bold text-gray-900 leading-tight line-clamp-2">
+          <h3 className="text-lg font-display font-bold text-gray-100 leading-tight line-clamp-2">
             {quiz.title}
           </h3>
           <div className="flex items-center gap-1.5 shrink-0">
             {isLocked && (
-              <span className="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700" title="Quiz has been played — duplicate to edit">
+              <span className="inline-flex items-center rounded-full bg-neon-yellow/20 px-2 py-0.5 text-xs font-medium text-neon-yellow" title="Quiz has been played — duplicate to edit">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
@@ -111,11 +111,11 @@ export default function QuizCard({ quiz, mode = 'own', onDelete, onPlay, onExpor
               </span>
             )}
             {quiz.isPublished ? (
-              <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+              <span className="inline-flex items-center rounded-full bg-neon-green/20 px-2.5 py-0.5 text-xs font-medium text-neon-green">
                 Public
               </span>
             ) : (
-              <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
+              <span className="inline-flex items-center rounded-full bg-gray-500/20 px-2.5 py-0.5 text-xs font-medium text-gray-400">
                 Private
               </span>
             )}
@@ -124,7 +124,7 @@ export default function QuizCard({ quiz, mode = 'own', onDelete, onPlay, onExpor
 
         {/* Author for public quizzes */}
         {!isOwn && quiz.hostUsername && (
-          <p className="mt-1 text-xs text-primary-600 font-medium">
+          <p className="mt-1 text-xs text-primary-400 font-medium">
             by {quiz.hostUsername}
           </p>
         )}
@@ -198,7 +198,7 @@ export default function QuizCard({ quiz, mode = 'own', onDelete, onPlay, onExpor
       </div>
 
       {/* Actions footer */}
-      <div className="flex items-center gap-2 border-t border-gray-100 px-5 py-3">
+      <div className="flex items-center gap-2 border-t border-primary-500/10 px-5 py-3">
         {isOwn ? (
           <>
             {isLocked ? (

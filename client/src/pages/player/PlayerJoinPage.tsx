@@ -92,7 +92,7 @@ export default function PlayerJoinPage() {
         <h1 className="text-5xl md:text-6xl font-display font-bold text-white text-shadow-lg">
           {APP_NAME}
         </h1>
-        <p className="text-sky-300 mt-2 text-lg">
+        <p className="text-primary-300 mt-2 text-lg">
           {APP_TAGLINE}
         </p>
       </div>
@@ -129,7 +129,7 @@ export default function PlayerJoinPage() {
       {/* Join card */}
       <div
         className={cn(
-          'w-full max-w-md bg-white/10 backdrop-blur-sm rounded-2xl p-8',
+          'w-full max-w-md bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-primary-500/15',
           'animate-slide-up'
         )}
       >
@@ -192,7 +192,7 @@ export default function PlayerJoinPage() {
             />
             <button
               onClick={handleBackToPin}
-              className="mt-4 w-full text-center text-sky-300 hover:text-white text-sm transition-colors"
+              className="mt-4 w-full text-center text-primary-300 hover:text-white text-sm transition-colors"
             >
               &larr; Change PIN ({pin})
             </button>

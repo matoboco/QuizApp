@@ -7,14 +7,14 @@ interface RankingChartProps {
 
 // Colors for top players
 const PLAYER_COLORS = [
-  '#6366f1', // indigo
-  '#f59e0b', // amber
-  '#10b981', // emerald
-  '#ef4444', // red
-  '#8b5cf6', // violet
-  '#06b6d4', // cyan
-  '#f97316', // orange
-  '#84cc16', // lime
+  '#00f0ff', // neon cyan
+  '#ff2d8a', // neon pink
+  '#39ff14', // neon green
+  '#ffe600', // neon yellow
+  '#bf00ff', // neon purple
+  '#ff6d00', // neon orange
+  '#2979ff', // neon blue
+  '#ff4081', // neon rose
 ];
 
 export default function RankingChart({ data }: RankingChartProps) {
@@ -41,7 +41,7 @@ export default function RankingChart({ data }: RankingChartProps) {
 
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+      <div className="bg-cyber-card border border-primary-500/15 rounded-lg shadow p-8 text-center text-gray-400">
         No ranking data available
       </div>
     );
@@ -62,9 +62,9 @@ export default function RankingChart({ data }: RankingChartProps) {
   const yScale = (rank: number) => padding.top + ((rank - 1) / (maxRank - 1)) * chartHeight;
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="font-medium text-gray-900 mb-4">Ranking Progression</h3>
-      <p className="text-sm text-gray-500 mb-4">
+    <div className="bg-cyber-card border border-primary-500/15 rounded-lg shadow p-6">
+      <h3 className="font-medium text-gray-100 mb-4">Ranking Progression</h3>
+      <p className="text-sm text-gray-400 mb-4">
         How player positions changed throughout the game (lower is better)
       </p>
 
@@ -78,7 +78,7 @@ export default function RankingChart({ data }: RankingChartProps) {
               y1={yScale(i + 1)}
               x2={width - padding.right}
               y2={yScale(i + 1)}
-              stroke="#e5e7eb"
+              stroke="rgba(0,240,255,0.1)"
               strokeWidth="1"
             />
           ))}
@@ -91,7 +91,7 @@ export default function RankingChart({ data }: RankingChartProps) {
               y={yScale(i + 1)}
               textAnchor="end"
               alignmentBaseline="middle"
-              className="text-xs fill-gray-500"
+              className="text-xs fill-gray-400"
             >
               #{i + 1}
             </text>
@@ -104,7 +104,7 @@ export default function RankingChart({ data }: RankingChartProps) {
               x={xScale(i)}
               y={height - padding.bottom + 20}
               textAnchor="middle"
-              className="text-xs fill-gray-500"
+              className="text-xs fill-gray-400"
             >
               Q{d.questionIndex + 1}
             </text>
@@ -158,7 +158,7 @@ export default function RankingChart({ data }: RankingChartProps) {
               <text
                 x="18"
                 y="10"
-                className="text-xs fill-gray-700"
+                className="text-xs fill-gray-300"
               >
                 {player.nickname.length > 12 ? player.nickname.slice(0, 12) + '...' : player.nickname}
               </text>
@@ -170,7 +170,7 @@ export default function RankingChart({ data }: RankingChartProps) {
             x={width / 2}
             y={height - 10}
             textAnchor="middle"
-            className="text-sm fill-gray-600"
+            className="text-sm fill-gray-400"
           >
             Question
           </text>
@@ -179,7 +179,7 @@ export default function RankingChart({ data }: RankingChartProps) {
             y={height / 2}
             textAnchor="middle"
             transform={`rotate(-90, 15, ${height / 2})`}
-            className="text-sm fill-gray-600"
+            className="text-sm fill-gray-400"
           >
             Rank
           </text>

@@ -12,7 +12,7 @@ const variantClasses = {
   primary: 'btn-primary',
   secondary: 'btn-secondary',
   danger: 'btn-danger',
-  ghost: 'btn bg-transparent text-gray-600 hover:bg-gray-100 focus:ring-gray-300',
+  ghost: 'btn bg-transparent text-gray-300 hover:bg-white/10 focus:ring-primary-500',
 };
 
 const sizeClasses = {

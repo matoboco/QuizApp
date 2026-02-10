@@ -7,14 +7,14 @@ export const APP_TAGLINE = 'Think fast. Get bonked.';
 export const AUTH_TOKEN_KEY = 'quiz_auth_token';
 
 export const ANSWER_COLORS = [
-  '#e21b3c', // red
-  '#1368ce', // blue
-  '#d89e00', // gold
-  '#26890c', // green
-  '#9b2fae', // purple
-  '#d35400', // orange
-  '#0097a7', // teal
-  '#c2185b', // pink
+  '#ff1744', // red
+  '#2979ff', // blue
+  '#ffea00', // yellow
+  '#00e676', // green
+  '#d500f9', // purple
+  '#ff6d00', // orange
+  '#00e5ff', // teal
+  '#ff4081', // pink
 ] as const;
 export const ANSWER_SHAPES = ['triangle', 'diamond', 'circle', 'square', 'hexagon', 'star', 'pentagon', 'heart'] as const;
 export type AnswerShape = (typeof ANSWER_SHAPES)[number];

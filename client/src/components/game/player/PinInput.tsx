@@ -64,12 +64,12 @@ export default function PinInput({ onSubmit, error, isLoading }: PinInputProps) 
           maxLength={6}
           className={cn(
             'w-full text-center text-4xl md:text-5xl font-display font-bold tracking-[0.5em]',
-            'py-4 px-6 rounded-xl border-2 bg-white',
+            'py-4 px-6 rounded-xl border-2 bg-cyber-surface text-gray-100',
             'focus:outline-none focus:ring-4 focus:ring-primary-400 focus:border-primary-500',
-            'transition-all duration-200 placeholder:text-gray-300 placeholder:tracking-[0.5em]',
+            'transition-all duration-200 placeholder:text-gray-500 placeholder:tracking-[0.5em]',
             error
-              ? 'border-red-500 ring-2 ring-red-300'
-              : 'border-gray-200',
+              ? 'border-red-500 ring-2 ring-red-500/30'
+              : 'border-primary-500/30',
             isLoading && 'opacity-60 cursor-not-allowed'
           )}
         />
@@ -106,7 +106,7 @@ export default function PinInput({ onSubmit, error, isLoading }: PinInputProps) 
         </p>
       )}
 
-      <p className="mt-4 text-center text-sky-200 text-sm">
+      <p className="mt-4 text-center text-primary-300 text-sm">
         Enter the 6-digit PIN shown on the host screen
       </p>
     </form>

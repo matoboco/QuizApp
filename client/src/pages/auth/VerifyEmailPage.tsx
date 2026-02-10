@@ -115,31 +115,31 @@ export default function VerifyEmailPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-cyber-dark px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <img src={`${import.meta.env.BASE_URL}logo.svg`} alt={APP_NAME} className="h-16 w-16 mx-auto mb-3" />
-          <h1 className="text-3xl font-display font-bold text-primary-600">
+          <h1 className="text-3xl font-display font-bold text-primary-400 text-shadow-neon-cyan">
             {APP_NAME}
           </h1>
-          <p className="text-xs text-gray-400 mt-1">{APP_TAGLINE}</p>
-          <p className="mt-2 text-gray-600">Verify your email address</p>
+          <p className="text-xs text-gray-500 mt-1">{APP_TAGLINE}</p>
+          <p className="mt-2 text-gray-400">Verify your email address</p>
         </div>
 
         <div className="card">
-          <p className="text-sm text-gray-600 mb-6 text-center">
-            We sent a 6-digit code to <span className="font-semibold">{email}</span>
+          <p className="text-sm text-gray-400 mb-6 text-center">
+            We sent a 6-digit code to <span className="font-semibold text-gray-200">{email}</span>
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
 
             {resendMessage && (
-              <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-neon-green/10 border border-neon-green/30 text-neon-green px-4 py-3 rounded-lg text-sm">
                 {resendMessage}
               </div>
             )}
@@ -156,7 +156,7 @@ export default function VerifyEmailPage() {
                   value={digit}
                   onChange={(e) => handleDigitChange(i, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(i, e)}
-                  className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-colors"
+                  className="w-12 h-14 text-center text-2xl font-bold bg-cyber-surface border-2 border-primary-500/30 rounded-lg text-gray-100 focus:border-primary-400 focus:ring-2 focus:ring-primary-500/30 outline-none transition-colors"
                 />
               ))}
             </div>
@@ -172,23 +172,23 @@ export default function VerifyEmailPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-400">
               Didn't receive the code?{' '}
               <button
                 type="button"
                 onClick={handleResend}
                 disabled={resendCooldown > 0}
-                className="font-semibold text-primary-600 hover:text-primary-500 disabled:text-gray-400 disabled:cursor-not-allowed"
+                className="font-semibold text-primary-400 hover:text-primary-300 disabled:text-gray-500 disabled:cursor-not-allowed"
               >
                 {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
               </button>
             </p>
           </div>
 
-          <p className="mt-4 text-center text-sm text-gray-600">
+          <p className="mt-4 text-center text-sm text-gray-400">
             <Link
               to="/login"
-              className="font-semibold text-primary-600 hover:text-primary-500"
+              className="font-semibold text-primary-400 hover:text-primary-300"
             >
               Back to login
             </Link>

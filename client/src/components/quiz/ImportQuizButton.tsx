@@ -85,14 +85,14 @@ export default function ImportQuizButton({ onImport }: ImportQuizButtonProps) {
           </Button>
         }
       >
-        <p className="mb-3 text-sm text-gray-600">
+        <p className="mb-3 text-sm text-gray-400">
           The file could not be imported due to the following errors:
         </p>
         <ul className="max-h-60 overflow-y-auto space-y-1">
           {errors.map((err, i) => (
             <li key={i} className="text-sm">
-              <span className="font-mono text-red-600">Line {err.line}:</span>{' '}
-              <span className="text-gray-700">{err.message}</span>
+              <span className="font-mono text-red-400">Line {err.line}:</span>{' '}
+              <span className="text-gray-300">{err.message}</span>
             </li>
           ))}
         </ul>

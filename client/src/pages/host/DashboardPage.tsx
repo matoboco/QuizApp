@@ -142,7 +142,7 @@ export default function DashboardPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="rounded-lg bg-red-50 p-6 max-w-md">
+        <div className="rounded-lg bg-red-500/10 border border-red-500/30 p-6 max-w-md">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="mx-auto h-10 w-10 text-red-400"
@@ -157,10 +157,10 @@ export default function DashboardPage() {
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
             />
           </svg>
-          <h3 className="mt-3 text-sm font-semibold text-red-800">
+          <h3 className="mt-3 text-sm font-semibold text-red-400">
             Failed to load quizzes
           </h3>
-          <p className="mt-1 text-sm text-red-600">{error}</p>
+          <p className="mt-1 text-sm text-red-400/80">{error}</p>
         </div>
       </div>
     );
@@ -171,10 +171,10 @@ export default function DashboardPage() {
       {/* Page header */}
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-display font-bold text-gray-900">
+          <h1 className="text-3xl font-display font-bold text-gray-100">
             Quizzes
           </h1>
-          <p className="mt-1 text-gray-500">
+          <p className="mt-1 text-gray-400">
             Create, manage, and host your quizzes.
           </p>
         </div>
@@ -195,19 +195,19 @@ export default function DashboardPage() {
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 border-b border-gray-200">
+      <div className="mb-6 border-b border-primary-500/10">
         <nav className="-mb-px flex gap-6">
           <button
             onClick={() => setActiveTab('my')}
             className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'my'
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-400 text-primary-400'
+                : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-600'
             }`}
           >
             My Quizzes
             {quizzes.length > 0 && (
-              <span className="ml-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+              <span className="ml-2 inline-flex items-center rounded-full bg-primary-500/10 px-2 py-0.5 text-xs font-medium text-primary-400">
                 {quizzes.length}
               </span>
             )}
@@ -216,13 +216,13 @@ export default function DashboardPage() {
             onClick={() => setActiveTab('public')}
             className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'public'
-                ? 'border-primary-500 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-400 text-primary-400'
+                : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-600'
             }`}
           >
             Public Quizzes
             {publicQuizzes.length > 0 && (
-              <span className="ml-2 inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
+              <span className="ml-2 inline-flex items-center rounded-full bg-primary-500/10 px-2 py-0.5 text-xs font-medium text-primary-400">
                 {publicQuizzes.length}
               </span>
             )}
@@ -232,7 +232,7 @@ export default function DashboardPage() {
 
       {/* Action error banner */}
       {actionError && (
-        <div className="mb-6 rounded-lg bg-red-50 border border-red-200 p-4 flex items-start gap-3">
+        <div className="mb-6 rounded-lg bg-red-500/10 border border-red-500/30 p-4 flex items-start gap-3">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5 text-red-400 shrink-0 mt-0.5"
@@ -248,11 +248,11 @@ export default function DashboardPage() {
             />
           </svg>
           <div className="flex-1">
-            <p className="text-sm text-red-700">{actionError}</p>
+            <p className="text-sm text-red-400">{actionError}</p>
           </div>
           <button
             onClick={() => setActionError(null)}
-            className="shrink-0 text-red-400 hover:text-red-600"
+            className="shrink-0 text-red-400 hover:text-red-300"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

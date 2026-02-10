@@ -13,10 +13,10 @@ function StatsCard({
   subtitle?: string;
 }) {
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-sm font-medium text-gray-500">{title}</h3>
-      <p className="mt-2 text-3xl font-bold text-gray-900">{value.toLocaleString()}</p>
-      {subtitle && <p className="mt-1 text-sm text-gray-500">{subtitle}</p>}
+    <div className="bg-cyber-card border border-primary-500/15 rounded-lg shadow p-6">
+      <h3 className="text-sm font-medium text-gray-400">{title}</h3>
+      <p className="mt-2 text-3xl font-bold text-gray-100">{value.toLocaleString()}</p>
+      {subtitle && <p className="mt-1 text-sm text-gray-400">{subtitle}</p>}
     </div>
   );
 }
@@ -50,7 +50,7 @@ export default function AdminDashboardPage() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700">
+      <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 text-red-400">
         {error}
       </div>
     );
@@ -60,7 +60,7 @@ export default function AdminDashboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
+      <h1 className="text-2xl font-bold text-gray-100 mb-6">Admin Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
