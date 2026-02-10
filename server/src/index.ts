@@ -58,7 +58,7 @@ async function bootstrap(): Promise<void> {
   // Start listening
   httpServer.listen(config.port, () => {
     console.log(
-      `[server] Quiz App server running on http://localhost:${config.port}${config.basePath || '/'} (${config.nodeEnv})`,
+      `[server] QuizBonk server running on http://localhost:${config.port}${config.basePath || '/'} (${config.nodeEnv})`,
     );
   });
 }

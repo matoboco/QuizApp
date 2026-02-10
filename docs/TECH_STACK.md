@@ -30,7 +30,7 @@
 ## Project Structure
 
 ```
-QuizApp/
+QuizBonk/
 ├── shared/types/        # Shared TypeScript interfaces
 ├── server/src/
 │   ├── auth/            # JWT auth, login, register

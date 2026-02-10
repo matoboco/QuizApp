@@ -1,7 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { APP_NAME } from '@/lib/constants';
+import { APP_NAME, APP_TAGLINE } from '@/lib/constants';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
 import { AxiosError } from 'axios';
@@ -45,9 +45,11 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt={APP_NAME} className="h-16 w-16 mx-auto mb-3" />
           <h1 className="text-3xl font-display font-bold text-primary-600">
             {APP_NAME}
           </h1>
+          <p className="text-xs text-gray-400 mt-1">{APP_TAGLINE}</p>
           <p className="mt-2 text-gray-600">Sign in to your account</p>
         </div>
 

@@ -2,7 +2,7 @@ import { useState, useEffect, FormEvent, useRef } from 'react';
 import { Navigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { resendCodeApi } from '@/api/auth.api';
-import { APP_NAME } from '@/lib/constants';
+import { APP_NAME, APP_TAGLINE } from '@/lib/constants';
 import Button from '@/components/common/Button';
 import { AxiosError } from 'axios';
 import type { ApiResponse } from '@shared/types/api';
@@ -118,9 +118,11 @@ export default function VerifyEmailPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
+          <img src={`${import.meta.env.BASE_URL}logo.svg`} alt={APP_NAME} className="h-16 w-16 mx-auto mb-3" />
           <h1 className="text-3xl font-display font-bold text-primary-600">
             {APP_NAME}
           </h1>
+          <p className="text-xs text-gray-400 mt-1">{APP_TAGLINE}</p>
           <p className="mt-2 text-gray-600">Verify your email address</p>
         </div>
 

@@ -6,16 +6,16 @@
 # Usage (with sqlite):
 #   docker compose -f docker-compose.yml -f docker-compose.sqlite.yml -f docker-compose.basepath.yml up --build
 #
-# Then open: http://localhost/quizapp/
+# Then open: http://localhost/quizbonk/
 
 services:
   client:
     build:
       args:
-        BASE_PATH: /quizapp
+        BASE_PATH: /quizbonk
     environment:
-      BASE_PATH: /quizapp
+      BASE_PATH: /quizbonk
 
   server:
     environment:
-      BASE_PATH: /quizapp
+      BASE_PATH: /quizbonk

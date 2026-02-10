@@ -12,9 +12,9 @@ export const config = {
   postgres: {
     host: process.env.POSTGRES_HOST || 'localhost',
     port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
-    database: process.env.POSTGRES_DB || 'quizapp',
-    user: process.env.POSTGRES_USER || 'quizapp',
-    password: process.env.POSTGRES_PASSWORD || 'quizapp',
+    database: process.env.POSTGRES_DB || 'quizbonk',
+    user: process.env.POSTGRES_USER || 'quizbonk',
+    password: process.env.POSTGRES_PASSWORD || 'quizbonk',
     poolMax: parseInt(process.env.POSTGRES_POOL_MAX || '20', 10),
   },
   basePath: (process.env.BASE_PATH || '').replace(/\/+$/, ''),
@@ -25,7 +25,7 @@ export const config = {
     secure: process.env.SMTP_SECURE === 'true',
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
-    from: process.env.SMTP_FROM || 'QuizApp <noreply@quizapp.local>',
+    from: process.env.SMTP_FROM || 'QuizBonk <noreply@quizbonk.com>',
   },
   verificationCodeExpiryMinutes: parseInt(process.env.VERIFICATION_CODE_EXPIRY_MINUTES || '10', 10),
   allowedEmailDomains: (process.env.ALLOWED_EMAIL_DOMAINS || '')

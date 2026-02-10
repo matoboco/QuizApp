@@ -2,13 +2,13 @@ services:
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: quizapp
-      POSTGRES_USER: quizapp
-      POSTGRES_PASSWORD: quizapp-secret
+      POSTGRES_DB: quizbonk
+      POSTGRES_USER: quizbonk
+      POSTGRES_PASSWORD: quizbonk-secret
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U quizapp"]
+      test: ["CMD-SHELL", "pg_isready -U quizbonk"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -28,12 +28,12 @@ services:
       DB_TYPE: postgres
       POSTGRES_HOST: postgres
       POSTGRES_PORT: "5432"
-      POSTGRES_DB: quizapp
-      POSTGRES_USER: quizapp
-      POSTGRES_PASSWORD: quizapp-secret
+      POSTGRES_DB: quizbonk
+      POSTGRES_USER: quizbonk
+      POSTGRES_PASSWORD: quizbonk-secret
       SMTP_HOST: mailpit
       SMTP_PORT: "1025"
-      SMTP_FROM: "QuizApp <noreply@quizapp.local>"
+      SMTP_FROM: "QuizBonk <noreply@quizbonk.com>"
       ALLOWED_EMAIL_DOMAINS: ""
     depends_on:
       postgres:

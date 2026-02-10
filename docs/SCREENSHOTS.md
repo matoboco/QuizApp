@@ -1,6 +1,6 @@
 # Screenshots
 
-Complete visual walkthrough of QuizApp — from login to gameplay.
+Complete visual walkthrough of QuizBonk — from login to gameplay.
 
 ## Authentication
 

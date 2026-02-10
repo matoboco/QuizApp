@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Quiz bubble -->
+  <rect x="30" y="50" width="120" height="90" rx="18" ry="18" fill="#0f3460" stroke="#0d9488" stroke-width="4"/>
+  <!-- Bubble tail -->
+  <polygon points="60,140 80,140 55,165" fill="#0f3460" stroke="#0d9488" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="55" y="136" width="28" height="8" fill="#0f3460"/>
+  <!-- Question mark in bubble -->
+  <text x="90" y="115" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-weight="800" font-size="64" fill="#ffffff">?</text>
+  <!-- Mallet -->
+  <g transform="rotate(-35, 155, 55)">
+    <!-- Mallet handle -->
+    <rect x="148" y="70" width="8" height="65" rx="3" fill="#d4a574"/>
+    <!-- Mallet head -->
+    <rect x="132" y="50" width="40" height="26" rx="6" fill="#0d9488" stroke="#0a7c72" stroke-width="2"/>
+  </g>
+  <!-- Impact lines -->
+  <line x1="135" y1="35" x2="145" y2="25" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <line x1="150" y1="30" x2="165" y2="22" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <line x1="160" y1="42" x2="175" y2="38" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+  <!-- Stars for bonk effect -->
+  <circle cx="140" cy="18" r="3" fill="#f59e0b"/>
+  <circle cx="172" cy="30" r="2.5" fill="#f59e0b"/>
+</svg>

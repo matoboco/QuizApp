@@ -1,5 +1,5 @@
 import { useAuth } from '@/context/AuthContext';
-import { APP_NAME } from '@/lib/constants';
+import { APP_NAME, APP_TAGLINE } from '@/lib/constants';
 import Button from '@/components/common/Button';
 import { Link } from 'react-router-dom';
 
@@ -15,9 +15,15 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link to="/dashboard" className="flex items-center gap-2">
-            <span className="text-xl font-display font-bold text-primary-600">
-              {APP_NAME}
-            </span>
+            <img src={`${import.meta.env.BASE_URL}logo.svg`} alt={APP_NAME} className="h-8 w-8" />
+            <div className="flex flex-col">
+              <span className="text-xl font-display font-bold text-primary-600 leading-tight">
+                {APP_NAME}
+              </span>
+              <span className="text-[10px] text-gray-400 leading-tight hidden sm:block">
+                {APP_TAGLINE}
+              </span>
+            </div>
           </Link>
           <div className="flex items-center gap-4">
             {user && ['admin', 'superadmin'].includes(user.role) && (

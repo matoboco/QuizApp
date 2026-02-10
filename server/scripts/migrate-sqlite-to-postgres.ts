@@ -2,7 +2,7 @@
  * Standalone migration script: SQLite → PostgreSQL
  *
  * Usage:
- *   POSTGRES_HOST=localhost POSTGRES_DB=quizapp POSTGRES_USER=quizapp POSTGRES_PASSWORD=quizapp \
+ *   POSTGRES_HOST=localhost POSTGRES_DB=quizbonk POSTGRES_USER=quizbonk POSTGRES_PASSWORD=quizbonk \
  *   npx tsx scripts/migrate-sqlite-to-postgres.ts [path-to-sqlite.db]
  *
  * The script:
@@ -43,9 +43,9 @@ async function main(): Promise<void> {
   const pool = new Pool({
     host: process.env.POSTGRES_HOST || 'localhost',
     port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
-    database: process.env.POSTGRES_DB || 'quizapp',
-    user: process.env.POSTGRES_USER || 'quizapp',
-    password: process.env.POSTGRES_PASSWORD || 'quizapp',
+    database: process.env.POSTGRES_DB || 'quizbonk',
+    user: process.env.POSTGRES_USER || 'quizbonk',
+    password: process.env.POSTGRES_PASSWORD || 'quizbonk',
   });
 
   const pg = new Kysely<DbSchema>({

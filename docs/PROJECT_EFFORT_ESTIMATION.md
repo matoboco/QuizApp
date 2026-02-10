@@ -1,8 +1,8 @@
-# QuizApp - Odhad pracnosti projektu
+# QuizBonk - Odhad pracnosti projektu
 
 ## 1. Zhrnutie projektu
 
-**QuizApp** je real-time multiplayerova kvizova aplikacia, ktora umoznuje hostitelom vytvarat kvizy a hracom sa pripajat cez PIN kod a suazit o najvyssi pocet bodov v realnom case.
+**QuizBonk** je real-time multiplayerova kvizova aplikacia, ktora umoznuje hostitelom vytvarat kvizy a hracom sa pripajat cez PIN kod a suazit o najvyssi pocet bodov v realnom case.
 
 | Parameter | Hodnota |
 |-----------|---------|
@@ -483,7 +483,7 @@ Tyzden 22-23  ████████████████████  Faza
 
 ## 9. Zaver
 
-QuizApp je **stredne az vysoko komplexny projekt**, ktoreho hlavnou vyzvou je **real-time herny engine** s WebSocket komunikaciou, stavovym automatom a viacerymi typmi otazok s roznym scoring algoritmom.
+QuizBonk je **stredne az vysoko komplexny projekt**, ktoreho hlavnou vyzvou je **real-time herny engine** s WebSocket komunikaciou, stavovym automatom a viacerymi typmi otazok s roznym scoring algoritmom.
 
 Pre trojclenny tim (BE developer, FE developer, analytik/tester) je realisticky odhad **~6 mesiacov** na kompletnu implementaciu vsetkych existujucich funkcionalit, vratane infrastruktury a deploymentu.
 
@@ -491,5 +491,5 @@ Najnarocnejsia cast projektu (Faza 5 - herny engine) tvori **34% celkoveho usili
 
 ---
 
-*Dokument vygenerovany na zaklade analyzy zdrojoveho kodu projektu QuizApp.*
+*Dokument vygenerovany na zaklade analyzy zdrojoveho kodu projektu QuizBonk.*
 *Datum: 2026-02-03*

@@ -1,4 +1,4 @@
-# QuizApp
+# QuizBonk
 
 Real-time multiplayer quiz game. Host creates quizzes, players join via PIN and compete for the highest score.
 
@@ -165,13 +165,13 @@ See [Development Guide](docs/DEVELOPMENT.md) for local setup, environment variab
 
 ### Non-root deployment (base path)
 
-To deploy the app under a sub-path (e.g. `/quizapp`):
+To deploy the app under a sub-path (e.g. `/quizbonk`):
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.basepath.yml up -d --build
 ```
 
-Set `BASE_PATH` in `docker-compose.basepath.yml` (default: `/quizapp`). Both client and server adapt automatically via environment variables (`VITE_BASE_PATH` for client, `BASE_PATH` for server).
+Set `BASE_PATH` in `docker-compose.basepath.yml` (default: `/quizbonk`). Both client and server adapt automatically via environment variables (`VITE_BASE_PATH` for client, `BASE_PATH` for server).
 
 ## Docs
 

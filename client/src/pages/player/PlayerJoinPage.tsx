@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { usePlayerGame } from '@/hooks/usePlayerGame';
 import PinInput from '@/components/game/player/PinInput';
 import NicknameInput from '@/components/game/player/NicknameInput';
-import { APP_NAME } from '@/lib/constants';
+import { APP_NAME, APP_TAGLINE } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 
 type JoinStep = 'pin' | 'nickname';
@@ -88,11 +88,12 @@ export default function PlayerJoinPage() {
     <div className="min-h-screen bg-game-bg flex flex-col items-center justify-center px-6 py-8">
       {/* App logo / title */}
       <div className="mb-10 text-center animate-fade-in">
+        <img src={`${import.meta.env.BASE_URL}logo.svg`} alt={APP_NAME} className="h-20 w-20 mx-auto mb-3" />
         <h1 className="text-5xl md:text-6xl font-display font-bold text-white text-shadow-lg">
           {APP_NAME}
         </h1>
         <p className="text-sky-300 mt-2 text-lg">
-          Join the game and test your knowledge!
+          {APP_TAGLINE}
         </p>
       </div>
 

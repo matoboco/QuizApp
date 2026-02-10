@@ -67,15 +67,15 @@ Server `.env` (defaults work for development):
 | `DB_PATH` | `./data/quiz.db` | SQLite file path (only when `DB_TYPE=sqlite`) |
 | `POSTGRES_HOST` | `localhost` | PostgreSQL host |
 | `POSTGRES_PORT` | `5432` | PostgreSQL port |
-| `POSTGRES_DB` | `quizapp` | PostgreSQL database name |
-| `POSTGRES_USER` | `quizapp` | PostgreSQL user |
-| `POSTGRES_PASSWORD` | `quizapp` | PostgreSQL password |
+| `POSTGRES_DB` | `quizbonk` | PostgreSQL database name |
+| `POSTGRES_USER` | `quizbonk` | PostgreSQL user |
+| `POSTGRES_PASSWORD` | `quizbonk` | PostgreSQL password |
 | `POSTGRES_POOL_MAX` | `20` | Connection pool size (increase for 50+ players) |
 | `SMTP_HOST` | `localhost` | SMTP server host |
 | `SMTP_PORT` | `1025` | SMTP server port |
 | `SMTP_SECURE` | `false` | Use TLS for SMTP |
 | `SMTP_USER` | | SMTP auth username |
 | `SMTP_PASS` | | SMTP auth password |
-| `SMTP_FROM` | `QuizApp <noreply@quizapp.local>` | Sender address |
+| `SMTP_FROM` | `QuizBonk <noreply@quizbonk.com>` | Sender address |
 | `VERIFICATION_CODE_EXPIRY_MINUTES` | `10` | Code expiry time |
 | `ALLOWED_EMAIL_DOMAINS` | | Comma-separated allowed domains (empty = all) |

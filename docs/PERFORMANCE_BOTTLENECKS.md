@@ -1,8 +1,8 @@
-# QuizApp - Analyza vykonovych uzkych hrdiel (100 hracov)
+# QuizBonk - Analyza vykonovych uzkych hrdiel (100 hracov)
 
 ## 1. Uvod
 
-Tento dokument analyzuje vykonove uzke hrdla aplikacie QuizApp pri scenari, kedy sa kvizu zucastni **100 hracov sucasne** (napr. firemny event, konferencia, skolske podujatie).
+Tento dokument analyzuje vykonove uzke hrdla aplikacie QuizBonk pri scenari, kedy sa kvizu zucastni **100 hracov sucasne** (napr. firemny event, konferencia, skolske podujatie).
 
 Analyza vychadza z podrobneho studia zdrojoveho kodu - najma herneho engine (`game.engine.ts`), stavoveho manazera (`game-state.manager.ts`), Socket.IO handlerov (`socket.handler.ts`) a databazovej vrstvy (repositories).
 
@@ -449,7 +449,7 @@ Toto je vsak relevantne az pri skalovani na viacero stoviek sucasnych hier. Pre 
 
 ## 8. Zaver
 
-Pre event so 100 hracmi je QuizApp **funkcne pouzitelny**, ale s viditelnym oneskorenim v kritickych momentoch (submitovanie odpovedov v spicke, zobrazovanie leaderboardu). Najzavaznejsie uzke hrdla su:
+Pre event so 100 hracmi je QuizBonk **funkcne pouzitelny**, ale s viditelnym oneskorenim v kritickych momentoch (submitovanie odpovedov v spicke, zobrazovanie leaderboardu). Najzavaznejsie uzke hrdla su:
 
 1. **Sekvencne DB zapisy pri spicke** - 200 individualnych dotazov ked vsetci odpovedia naraz
 2. **Opakovany sort leaderboardu** - 10 000 sort operacii pri jednom zobrazeni
@@ -459,5 +459,5 @@ Implementaciou troch najvyssie prioritizovanych rieseni (batch DB zapisy, cache 
 
 ---
 
-*Dokument vygenerovany na zaklade analyzy zdrojoveho kodu projektu QuizApp.*
+*Dokument vygenerovany na zaklade analyzy zdrojoveho kodu projektu QuizBonk.*
 *Datum: 2026-02-03*

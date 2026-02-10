@@ -5,7 +5,7 @@ import { SOCKET_URL, SOCKET_PATH } from '@/lib/constants';
 export type AppSocket = Socket<ServerToClientEvents, ClientToServerEvents>;
 
 /**
- * Creates a new Socket.IO client instance configured for the Quiz App.
+ * Creates a new Socket.IO client instance configured for QuizBonk.
  * The socket is created with autoConnect: false so the caller controls
  * when the connection is established.
  *

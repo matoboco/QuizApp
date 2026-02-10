@@ -14,11 +14,11 @@ export async function sendVerificationCode(email: string, code: string): Promise
   await transporter.sendMail({
     from: config.smtp.from,
     to: email,
-    subject: 'QuizApp - Email Verification Code',
+    subject: 'QuizBonk - Email Verification Code',
     text: `Your verification code is: ${code}\n\nThis code expires in ${config.verificationCodeExpiryMinutes} minutes.`,
     html: `
       <div style="font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 24px;">
-        <h2 style="color: #4f46e5; margin-bottom: 16px;">QuizApp</h2>
+        <h2 style="color: #4f46e5; margin-bottom: 16px;">QuizBonk</h2>
         <p>Your verification code is:</p>
         <div style="font-size: 32px; font-weight: bold; letter-spacing: 8px; text-align: center; padding: 16px; background: #f3f4f6; border-radius: 8px; margin: 16px 0;">
           ${code}
@@ -33,11 +33,11 @@ export async function sendPasswordResetEmail(email: string, tempPassword: string
   await transporter.sendMail({
     from: config.smtp.from,
     to: email,
-    subject: 'QuizApp - Password Reset',
+    subject: 'QuizBonk - Password Reset',
     text: `Your password has been reset by an administrator.\n\nYour new temporary password is: ${tempPassword}\n\nPlease log in and change your password as soon as possible.`,
     html: `
       <div style="font-family: sans-serif; max-width: 400px; margin: 0 auto; padding: 24px;">
-        <h2 style="color: #4f46e5; margin-bottom: 16px;">QuizApp</h2>
+        <h2 style="color: #4f46e5; margin-bottom: 16px;">QuizBonk</h2>
         <p>Your password has been reset by an administrator.</p>
         <p>Your new temporary password is:</p>
         <div style="font-size: 18px; font-weight: bold; text-align: center; padding: 16px; background: #f3f4f6; border-radius: 8px; margin: 16px 0; font-family: monospace;">
