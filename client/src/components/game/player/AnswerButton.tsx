@@ -1,4 +1,4 @@
-import { cn } from '@/lib/utils';
+import { cn, isLightColor } from '@/lib/utils';
 import { useSound } from '@/context/SoundContext';
 import type { AnswerShape } from '@shared/types/quiz';
 
@@ -79,6 +79,7 @@ export default function AnswerButton({
   index,
 }: AnswerButtonProps) {
   const { play } = useSound();
+  const light = isLightColor(color);
   return (
     <button
       onClick={() => { play('click'); onClick(); }}
@@ -86,7 +87,8 @@ export default function AnswerButton({
       className={cn(
         'relative w-full h-full min-h-[100px] rounded-xl p-4',
         'flex items-center gap-3 md:gap-4',
-        'text-white font-display font-bold text-lg md:text-xl',
+        'font-display font-bold text-lg md:text-xl',
+        light ? 'text-gray-900' : 'text-white',
         'transition-all duration-200 active:scale-[0.97]',
         'focus:outline-none focus:ring-4 focus:ring-white/50',
         isSelected && 'ring-4 ring-white shadow-lg scale-[0.98]',
@@ -100,18 +102,18 @@ export default function AnswerButton({
       }}
       aria-label={`Answer ${index + 1}: ${text}`}
     >
-      <ShapeIcon shape={shape} className="text-white/80" />
+      <ShapeIcon shape={shape} className={light ? 'text-gray-900/70' : 'text-white/80'} />
       <span className="flex-1 text-left leading-snug line-clamp-3">
         {text}
       </span>
       {isSelected && (
-        <div className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center animate-bounce-in">
+        <div className={cn('absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center animate-bounce-in', light ? 'bg-gray-900' : 'bg-white')}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-5 w-5"
             fill="none"
             viewBox="0 0 24 24"
-            stroke={color}
+            stroke={light ? '#ffffff' : color}
             strokeWidth={3}
           >
             <path
