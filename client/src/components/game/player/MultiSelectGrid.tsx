@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { cn, isLightColor } from '@/lib/utils';
 import { useSound } from '@/context/SoundContext';
 import { ANSWER_COLORS, ANSWER_SHAPES } from '@/lib/constants';
 import type { AnswerShape } from '@shared/types/quiz';
@@ -114,6 +114,7 @@ export default function MultiSelectGrid({
           const shape = ANSWER_SHAPES[index % ANSWER_SHAPES.length] as AnswerShape;
           const isChecked = selected.has(answer.id);
 
+          const light = isLightColor(color);
           return (
             <button
               key={answer.id}
@@ -122,7 +123,8 @@ export default function MultiSelectGrid({
               className={cn(
                 'relative w-full min-h-[80px] rounded-xl p-4',
                 'flex items-center gap-3 md:gap-4',
-                'text-white font-display font-bold text-lg md:text-xl',
+                'font-display font-bold text-lg md:text-xl',
+                light ? 'text-gray-900' : 'text-white',
                 'transition-all duration-200 active:scale-[0.97]',
                 'focus:outline-none focus:ring-4 focus:ring-white/50',
                 isChecked && 'ring-4 ring-white shadow-lg',
@@ -131,7 +133,7 @@ export default function MultiSelectGrid({
               )}
               style={{ backgroundColor: color }}
             >
-              <ShapeIcon shape={shape} className="text-white/80" />
+              <ShapeIcon shape={shape} className={light ? 'text-gray-900/70' : 'text-white/80'} />
               <span className="flex-1 text-left leading-snug line-clamp-3">
                 {answer.text}
               </span>
@@ -140,16 +142,16 @@ export default function MultiSelectGrid({
                 className={cn(
                   'w-7 h-7 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors',
                   isChecked
-                    ? 'bg-white border-white'
-                    : 'bg-white/10 border-white/50'
+                    ? light ? 'bg-gray-900 border-gray-900' : 'bg-white border-white'
+                    : light ? 'bg-gray-900/10 border-gray-900/50' : 'bg-white/10 border-white/50'
                 )}
               >
                 {isChecked && (
                   <svg
-                    className="w-5 h-5"
+                    className={cn('w-5 h-5', light ? 'stroke-white' : 'stroke-current')}
                     fill="none"
                     viewBox="0 0 24 24"
-                    stroke={color}
+                    stroke={light ? undefined : color}
                     strokeWidth={3}
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />

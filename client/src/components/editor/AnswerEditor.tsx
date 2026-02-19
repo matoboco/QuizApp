@@ -1,6 +1,6 @@
 import type { Answer, QuestionType } from '@shared/types/quiz';
 import { ANSWER_COLORS, ANSWER_SHAPES } from '@shared/types/quiz';
-import { cn } from '@/lib/utils';
+import { cn, isLightColor } from '@/lib/utils';
 
 interface AnswerEditorProps {
   answer: Answer;
@@ -82,6 +82,8 @@ export default function AnswerEditor({
   const isOrdering = questionType === 'ordering';
   const isTrueFalse = questionType === 'true-false';
 
+  const light = isLightColor(color);
+
   return (
     <div
       className="relative rounded-lg p-4 min-h-[120px] flex flex-col"
@@ -92,7 +94,12 @@ export default function AnswerEditor({
         <button
           type="button"
           onClick={onRemove}
-          className="absolute top-2 right-2 p-1 rounded-full bg-black/20 text-white/80 hover:bg-black/40 hover:text-white transition-colors"
+          className={cn(
+            'absolute top-2 right-2 p-1 rounded-full transition-colors',
+            light
+              ? 'bg-black/10 text-gray-900/70 hover:bg-black/20 hover:text-gray-900'
+              : 'bg-black/20 text-white/80 hover:bg-black/40 hover:text-white'
+          )}
           title="Remove answer"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -103,7 +110,7 @@ export default function AnswerEditor({
 
       {/* Order number for ordering type */}
       {isOrdering && (
-        <div className="absolute top-2 left-2 w-6 h-6 rounded-full bg-white/30 flex items-center justify-center text-white text-xs font-bold">
+        <div className={cn('absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold', light ? 'bg-gray-900/15 text-gray-900' : 'bg-white/30 text-white')}>
           {index + 1}
         </div>
       )}
@@ -111,14 +118,19 @@ export default function AnswerEditor({
       {/* Shape icon and text input */}
       <div className="flex items-start gap-3 flex-1">
         {!isOrdering && (
-          <ShapeIcon shape={shape} className="text-white/60 flex-shrink-0 mt-1" />
+          <ShapeIcon shape={shape} className={cn('flex-shrink-0 mt-1', light ? 'text-gray-900/50' : 'text-white/60')} />
         )}
         <input
           type="text"
           value={answer.text}
           onChange={(e) => onChange({ text: e.target.value })}
           placeholder={isOrdering ? `Item ${index + 1}` : `Answer ${index + 1}`}
-          className="flex-1 bg-transparent border-0 border-b border-white/30 text-white font-medium placeholder-white/50 focus:border-white focus:ring-0 outline-none text-sm pb-1"
+          className={cn(
+            'flex-1 bg-transparent border-0 border-b font-medium focus:ring-0 outline-none text-sm pb-1',
+            light
+              ? 'border-gray-900/30 text-gray-900 placeholder-gray-900/50 focus:border-gray-900'
+              : 'border-white/30 text-white placeholder-white/50 focus:border-white'
+          )}
           disabled={isTrueFalse}
         />
       </div>
@@ -133,7 +145,9 @@ export default function AnswerEditor({
               'flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-semibold transition-colors',
               answer.isCorrect
                 ? 'bg-white text-green-700'
-                : 'bg-black/20 text-white/80 hover:bg-black/30'
+                : light
+                  ? 'bg-black/10 text-gray-900/70 hover:bg-black/20'
+                  : 'bg-black/20 text-white/80 hover:bg-black/30'
             )}
           >
             {answer.isCorrect ? (

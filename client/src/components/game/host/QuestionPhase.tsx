@@ -1,5 +1,6 @@
 import type { Question } from '@shared/types/quiz';
 import { ANSWER_COLORS, ANSWER_SHAPES } from '@/lib/constants';
+import { cn, isLightColor } from '@/lib/utils';
 import CountdownTimer from './CountdownTimer';
 
 interface QuestionPhaseProps {
@@ -136,6 +137,7 @@ export default function QuestionPhase({
           <div className="max-w-3xl mx-auto flex flex-col gap-3">
             {sortedAnswers.map((answer, idx) => {
               const color = ANSWER_COLORS[idx % ANSWER_COLORS.length];
+              const light = isLightColor(color);
               return (
                 <div
                   key={answer.id}
@@ -146,10 +148,10 @@ export default function QuestionPhase({
                     animationFillMode: 'both',
                   }}
                 >
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                  <div className={cn('w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0', light ? 'bg-gray-900/15 text-gray-900' : 'bg-white/20 text-white')}>
                     {idx + 1}
                   </div>
-                  <span className="text-white font-bold text-lg md:text-xl lg:text-2xl leading-snug">
+                  <span className={cn('font-bold text-lg md:text-xl lg:text-2xl leading-snug', light ? 'text-gray-900' : 'text-white')}>
                     {answer.text}
                   </span>
                 </div>
@@ -162,6 +164,7 @@ export default function QuestionPhase({
             {sortedAnswers.map((answer, idx) => {
               const color = ANSWER_COLORS[idx % ANSWER_COLORS.length];
               const shape = ANSWER_SHAPES[idx % ANSWER_SHAPES.length];
+              const light = isLightColor(color);
 
               return (
                 <div
@@ -173,8 +176,8 @@ export default function QuestionPhase({
                     animationFillMode: 'both',
                   }}
                 >
-                  <ShapeIcon shape={shape} className="w-8 h-8 text-white/80 flex-shrink-0" />
-                  <span className="text-white font-bold text-lg md:text-xl lg:text-2xl leading-snug">
+                  <ShapeIcon shape={shape} className={cn('w-8 h-8 flex-shrink-0', light ? 'text-gray-900/70' : 'text-white/80')} />
+                  <span className={cn('font-bold text-lg md:text-xl lg:text-2xl leading-snug', light ? 'text-gray-900' : 'text-white')}>
                     {answer.text}
                   </span>
                 </div>
